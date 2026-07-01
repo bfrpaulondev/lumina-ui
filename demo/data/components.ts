@@ -2261,11 +2261,13 @@ export class Select extends LuminaElement {
   static tagName = 'lumina-select';
 
   // Accepts variants: 'glass' | 'neural' | 'morph'
-  // CSS parts:       trigger, menu, option
+  // CSS parts:       trigger, dropdown, option, search
   // Events:          lumina-change, lumina-open, lumina-close
   // Props:
    * value: string
    * placeholder: string
+   * searchable: boolean
+   * options: string
   // Slots:           (none)
 
   protected render(): string {
@@ -2448,12 +2450,14 @@ export class Slider extends LuminaElement {
   static tagName = 'lumina-slider';
 
   // Accepts variants: 'glass' | 'neural' | 'aura'
-  // CSS parts:       track, thumb, fill, glow
-  // Events:          lumina-change, lumina-input
+  // CSS parts:       track, fill, thumb, tooltip
+  // Events:          lumina-input, lumina-change
   // Props:
    * value: number
    * min: number
    * max: number
+   * step: number
+   * marks: string
   // Slots:           (none)
 
   protected render(): string {
@@ -2485,7 +2489,7 @@ customElements.define(Slider.tagName, Slider);
 </lumina-slider>
 <script type="module">
   const el = document.querySelector('lumina-slider');
-  el.addEventListener('lumina-change', (e) => console.log(e));
+  el.addEventListener('lumina-input', (e) => console.log(e));
 </script>
 `,
     react: `import 'lumina-ui';
@@ -2497,7 +2501,7 @@ export function SliderExample() {
       intensity="intense"
       accent-color="#7c5cff"
       speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
+      onLuminaInput={(e) => console.log(e)}
     >
       Conteúdo
     </lumina-slider>
@@ -3318,10 +3322,12 @@ export class Tabs extends LuminaElement {
   static tagName = 'lumina-tabs';
 
   // Accepts variants: 'glass' | 'neural' | 'segmented' | 'underline'
-  // CSS parts:       list, tab, indicator, panel
+  // CSS parts:       tabs, tab, indicator, panel
   // Events:          lumina-tab-change
   // Props:
-   * (only shared LuminaElement props)
+   * active-tab: string
+   * orientation: "horizontal" | "vertical"
+   * lazy: boolean
   // Slots:           default
 
   protected render(): string {
@@ -3567,12 +3573,13 @@ export class Drawer extends LuminaElement {
   static tagName = 'lumina-drawer';
 
   // Accepts variants: 'glass' | 'void' | 'dimensional'
-  // CSS parts:       backdrop, panel, portal
+  // CSS parts:       backdrop, drawer, header, content
   // Events:          lumina-open, lumina-close
   // Props:
    * open: boolean
-   * side: "left"|"right"
-  // Slots:           default
+   * placement: "left" | "right"
+   * size: "sm" | "md" | "lg" | "full"
+  // Slots:           default, header
 
   protected render(): string {
     /* Full source: src/components/lumina-drawer.ts */
@@ -4002,11 +4009,12 @@ export function OrbitalNavExample() {
 export class Alert extends LuminaElement {
   static tagName = 'lumina-alert';
 
-  // Accepts variants: 'glass' | 'neural' | 'success' | 'warning' | 'error'
-  // CSS parts:       alert, icon, title, message, close
-  // Events:          lumina-dismiss
+  // Accepts variants: 'glass' | 'neural' | 'success' | 'warning' | 'error' | 'info'
+  // CSS parts:       alert, icon, content, close-button
+  // Events:          lumina-close
   // Props:
-   * (only shared LuminaElement props)
+   * dismissible: boolean
+   * auto-dismiss: number
   // Slots:           default, title
 
   protected render(): string {
@@ -4038,7 +4046,7 @@ customElements.define(Alert.tagName, Alert);
 </lumina-alert>
 <script type="module">
   const el = document.querySelector('lumina-alert');
-  el.addEventListener('lumina-dismiss', (e) => console.log(e));
+  el.addEventListener('lumina-close', (e) => console.log(e));
 </script>
 `,
     react: `import 'lumina-ui';
@@ -4050,7 +4058,7 @@ export function AlertExample() {
       intensity="intense"
       accent-color="#22c55e"
       speed={0.5}
-      onLuminaDismiss={(e) => console.log(e)}
+      onLuminaClose={(e) => console.log(e)}
     >
       Conteúdo
     </lumina-alert>
@@ -4064,12 +4072,13 @@ export function AlertExample() {
 export class Toast extends LuminaElement {
   static tagName = 'lumina-toast';
 
-  // Accepts variants: 'glass' | 'neural' | 'aura'
-  // CSS parts:       toast, icon, message, action
-  // Events:          lumina-show, lumina-dismiss
+  // Accepts variants: 'glass' | 'neural' | 'success' | 'error' | 'warning'
+  // CSS parts:       toast, icon, content, actions
+  // Events:          lumina-dismiss
   // Props:
    * duration: number
-  // Slots:           (none)
+   * position: "top-right" | "top-left" | "bottom-right" | "bottom-left" | "top-center" | "bottom-center"
+  // Slots:           default, actions
 
   protected render(): string {
     /* Full source: src/components/lumina-toast.ts */
@@ -4100,7 +4109,7 @@ customElements.define(Toast.tagName, Toast);
 </lumina-toast>
 <script type="module">
   const el = document.querySelector('lumina-toast');
-  el.addEventListener('lumina-show', (e) => console.log(e));
+  el.addEventListener('lumina-dismiss', (e) => console.log(e));
 </script>
 `,
     react: `import 'lumina-ui';
@@ -4112,7 +4121,7 @@ export function ToastExample() {
       intensity="intense"
       accent-color="#7c5cff"
       speed={0.5}
-      onLuminaShow={(e) => console.log(e)}
+      onLuminaDismiss={(e) => console.log(e)}
     >
       Conteúdo
     </lumina-toast>
@@ -4312,12 +4321,14 @@ export function BadgeExample() {
 export class Chip extends LuminaElement {
   static tagName = 'lumina-chip';
 
-  // Accepts variants: 'glass' | 'neural' | 'minimal'
-  // CSS parts:       chip, label, remove
-  // Events:          lumina-remove, lumina-click
+  // Accepts variants: 'glass' | 'neural' | 'minimal' | 'aura'
+  // CSS parts:       chip, label, remove-button
+  // Events:          lumina-remove, lumina-select
   // Props:
    * removable: boolean
-  // Slots:           default
+   * selected: boolean
+   * selectable: boolean
+  // Slots:           default, icon
 
   protected render(): string {
     /* Full source: src/components/lumina-chip.ts */
@@ -4374,11 +4385,13 @@ export function ChipExample() {
 export class Loading extends LuminaElement {
   static tagName = 'lumina-loading';
 
-  // Accepts variants: 'neural' | 'aura' | 'void' | 'dimensional'
-  // CSS parts:       loader, ring, core
+  // Accepts variants: 'neural' | 'aura' | 'void' | 'dimensional' | 'spinner'
+  // CSS parts:       container, spinner, particles
   // Events:          (inherits standard lumina-* events)
   // Props:
    * size: number
+   * overlay: boolean
+   * text: string
   // Slots:           (none)
 
   protected render(): string {
@@ -5585,13 +5598,15 @@ export function GridExample() {
 export class Avatar extends LuminaElement {
   static tagName = 'lumina-avatar';
 
-  // Accepts variants: 'glass' | 'neural' | 'holo'
-  // CSS parts:       avatar, image, fallback, status
-  // Events:          (inherits standard lumina-* events)
+  // Accepts variants: 'glass' | 'neural' | 'holo' | 'minimal'
+  // CSS parts:       avatar, image, initials, status
+  // Events:          lumina-click
   // Props:
    * src: string
    * name: string
-   * size: number
+   * status: "online" | "busy" | "offline" | "away"
+   * size: "sm" | "md" | "lg" | "xl"
+   * interactive: boolean
   // Slots:           (none)
 
   protected render(): string {
@@ -5620,7 +5635,12 @@ customElements.define(Avatar.tagName, Avatar);
   depth="medium"
 >
   Conteúdo de exemplo
-</lumina-avatar>`,
+</lumina-avatar>
+<script type="module">
+  const el = document.querySelector('lumina-avatar');
+  el.addEventListener('lumina-click', (e) => console.log(e));
+</script>
+`,
     react: `import 'lumina-ui';
 
 export function AvatarExample() {
@@ -5630,6 +5650,7 @@ export function AvatarExample() {
       intensity="intense"
       accent-color="#7c5cff"
       speed={0.5}
+      onLuminaClick={(e) => console.log(e)}
     >
       Conteúdo
     </lumina-avatar>

@@ -1,43 +1,72 @@
 /**
- * LuminaLoading — Loading com 4 estilos visuais.
+ * LuminaLoading — Loading com 5 estilos visuais (neural/aura/void/dimensional/spinner),
+ * modo overlay e texto opcional.
  *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: feedback
+ * Variants: neural | aura | void | dimensional | spinner
  *
- * Description: Componente de loading com múltiplos estilos.
+ * Uso:
+ *   <lumina-loading variant="neural" size="64"></lumina-loading>
+ *   <lumina-loading variant="spinner" overlay text="Carregando dados..."></lumina-loading>
  *
- * Variants: `neural` | `aura` | `void` | `dimensional`
- * Events:    (none — inherits standard)
- * CSS parts: loader, ring, core
- * Props:     `size`
- * Slots:     (none)
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * Eventos: nenhum (componente puramente visual)
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { ParticleField } from '../core/ParticleField';
+import { prefersReducedMotion } from '../core/utils';
 
-export class Loading extends LuminaElement {
+export class LuminaLoading extends LuminaElement {
   static tagName = 'lumina-loading';
 
   static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes, "size"];
+    return [
+      ...LuminaElement.observedAttributes,
+      'size',
+      'overlay',
+      'text',
+    ];
   }
 
-  get size(): number {
-    return parseFloat(this.getAttribute('size') ?? '64') || 0;
-  }
+  private _size = 64;
+  private _overlay = false;
+  private _text = '';
+  private field: ParticleField | null = null;
+  private fieldHost: HTMLElement | null = null;
+
+  get size(): number { return this._size; }
   set size(v: number) {
+    this._size = v;
     this.setAttribute('size', String(v));
+    this.applySize();
+  }
+
+  get overlay(): boolean { return this._overlay; }
+  set overlay(v: boolean) {
+    this._overlay = v;
+    if (v) this.setAttribute('overlay', '');
+    else this.removeAttribute('overlay');
+  }
+
+  get text(): string { return this._text; }
+  set text(v: string) {
+    this._text = v;
+    this.setAttribute('text', v);
+    this.applyText();
   }
 
   protected render(): string {
     return `
-      <div class="lmc" part="loader">
-        <span class="lmc__ring" part="ring" aria-hidden="true"></span>
-        <span class="lmc__core" part="core" aria-hidden="true"></span>
+      <div class="lml" part="container">
+        <div class="lml__backdrop" aria-hidden="true"></div>
+        <div class="lml__spinner" part="spinner">
+          <span class="lml__ring lml__ring--1" aria-hidden="true"></span>
+          <span class="lml__ring lml__ring--2" aria-hidden="true"></span>
+          <span class="lml__ring lml__ring--3" aria-hidden="true"></span>
+          <span class="lml__core" aria-hidden="true"></span>
+          <div class="lml__particles" part="particles" aria-hidden="true"></div>
+        </div>
+        <div class="lml__text" part="text"></div>
       </div>
     `;
   }
@@ -48,85 +77,281 @@ export class Loading extends LuminaElement {
         display: inline-flex;
         font-family: var(--lumina-font-sans);
         color: var(--lumina-text);
+        --lml-size: 64px;
       }
-      .lmc {
+
+      .lml {
         position: relative;
         display: inline-flex;
+        flex-direction: column;
         align-items: center;
-        gap: 8px;
-        padding: 8px 14px;
-        border-radius: var(--lumina-radius-pill);
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid var(--lumina-border);
-        font-size: 13px; font-weight: 600;
-        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), var(--lumina-shadow);
+        gap: 14px;
       }
-      .lmc__dot {
-        width: 8px; height: 8px;
-        border-radius: 50%;
-        background: var(--lumina-accent);
-        box-shadow: 0 0 8px var(--lumina-accent);
+
+      .lml__backdrop {
+        display: none;
       }
-      .lmc__pulse {
+      :host([overlay]) {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      :host([overlay]) .lml__backdrop {
+        display: block;
         position: absolute;
         inset: 0;
-        border-radius: inherit;
+        background: rgb(var(--lumina-surface) / 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+      :host([overlay]) .lml {
+        position: relative;
+        z-index: 1;
+        padding: 32px 48px;
+        border-radius: var(--lumina-radius-lg);
+        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
+        backdrop-filter: blur(20px) saturate(1.5);
+        -webkit-backdrop-filter: blur(20px) saturate(1.5);
+        border: 1px solid var(--lumina-border);
+        box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.5);
+      }
+
+      .lml__spinner {
+        position: relative;
+        width: var(--lml-size);
+        height: var(--lml-size);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .lml__ring {
+        position: absolute;
+        inset: 0;
+        border-radius: 50%;
+        border: 2px solid transparent;
+        border-top-color: var(--lumina-accent);
+        animation: lml-spin 1.4s linear infinite;
+      }
+      .lml__ring--2 {
+        inset: 12%;
+        border-top-color: rgb(var(--lumina-accent-rgb) / 0.6);
+        animation-duration: 1.8s;
+        animation-direction: reverse;
+      }
+      .lml__ring--3 {
+        inset: 24%;
+        border-top-color: rgb(var(--lumina-accent-rgb) / 0.3);
+        animation-duration: 2.2s;
+      }
+
+      .lml__core {
+        width: 20%;
+        height: 20%;
+        border-radius: 50%;
+        background: var(--lumina-accent);
+        box-shadow:
+          0 0 16px var(--lumina-accent),
+          0 0 32px rgb(var(--lumina-accent-rgb) / 0.6);
+        animation: lml-pulse 1.2s ease-in-out infinite;
+      }
+      @keyframes lml-pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50%      { transform: scale(1.4); opacity: 0.7; }
+      }
+      @keyframes lml-spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .lml__particles {
+        position: absolute;
+        inset: -20%;
         pointer-events: none;
         opacity: 0;
+        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
       }
-      :host([variant="pulse"]) .lmc__dot,
-      :host([variant="aura"]) .lmc__dot,
-      :host([variant="online"]) .lmc__dot {
-        animation: lmc-pulse 1.6s ease-in-out infinite;
+
+      .lml__text {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--lumina-text-muted);
+        letter-spacing: 0.04em;
+        text-align: center;
+        display: none;
       }
-      @keyframes lmc-pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.5); opacity: 0.6; }
+      .lml__text:not(:empty) { display: block; }
+
+      /* ----- Variant: spinner (clean, default-ish) ----- */
+      :host([variant="spinner"]) .lml__ring--2,
+      :host([variant="spinner"]) .lml__ring--3 { display: none; }
+      :host([variant="spinner"]) .lml__core { display: none; }
+
+      /* ----- Variant: neural — show particles ----- */
+      :host([variant="neural"]) .lml__particles { opacity: 1; }
+      :host([variant="neural"]) .lml__ring {
+        border-top-color: transparent;
+        border-color: rgb(var(--lumina-accent-rgb) / 0.2);
+        border-top-color: var(--lumina-accent);
       }
+
+      /* ----- Variant: aura — soft glow + slow rings ----- */
+      :host([variant="aura"]) .lml__ring {
+        border-color: rgb(var(--lumina-accent-rgb) / 0.15);
+        border-top-color: rgb(var(--lumina-accent-rgb) / 0.9);
+        animation-duration: 3s;
+        box-shadow: 0 0 16px rgb(var(--lumina-accent-rgb) / 0.4);
+      }
+      :host([variant="aura"]) .lml__ring--2 {
+        animation-duration: 4s;
+        animation-direction: normal;
+      }
+      :host([variant="aura"]) .lml__ring--3 { display: none; }
+      :host([variant="aura"]) .lml__core {
+        animation: lml-aura-breathe 2s ease-in-out infinite;
+      }
+      @keyframes lml-aura-breathe {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 16px var(--lumina-accent); }
+        50%      { transform: scale(1.6); box-shadow: 0 0 32px var(--lumina-accent), 0 0 64px rgb(var(--lumina-accent-rgb) / 0.5); }
+      }
+
+      /* ----- Variant: void — pure black with cyan starfield ----- */
+      :host([variant="void"]) .lml__particles { opacity: 1; }
+      :host([variant="void"]) .lml__ring {
+        border-top-color: transparent;
+        border-color: rgb(120 240 255 / 0.15);
+        border-top-color: #78f0ff;
+        box-shadow: 0 0 8px rgb(120 240 255 / 0.4);
+      }
+      :host([variant="void"]) .lml__core {
+        background: #78f0ff;
+        box-shadow:
+          0 0 16px #78f0ff,
+          -2px 0 4px rgb(255 0 80 / 0.6),
+          2px 0 4px rgb(0 200 255 / 0.6);
+      }
+
+      /* ----- Variant: dimensional — 3D cube-ish rings ----- */
+      :host([variant="dimensional"]) .lml__spinner {
+        perspective: 400px;
+        transform-style: preserve-3d;
+      }
+      :host([variant="dimensional"]) .lml__ring {
+        transform-style: preserve-3d;
+      }
+      :host([variant="dimensional"]) .lml__ring--1 {
+        animation: lml-dim-x 2s linear infinite;
+        border-top-color: transparent;
+        border-color: rgb(var(--lumina-accent-rgb) / 0.3);
+      }
+      :host([variant="dimensional"]) .lml__ring--2 {
+        animation: lml-dim-y 2.4s linear infinite;
+        inset: 8%;
+      }
+      :host([variant="dimensional"]) .lml__ring--3 {
+        animation: lml-dim-z 2.8s linear infinite;
+        inset: 16%;
+      }
+      @keyframes lml-dim-x {
+        from { transform: rotateX(0deg) rotateY(0deg); }
+        to   { transform: rotateX(360deg) rotateY(0deg); }
+      }
+      @keyframes lml-dim-y {
+        from { transform: rotateX(0deg) rotateY(0deg); }
+        to   { transform: rotateX(0deg) rotateY(360deg); }
+      }
+      @keyframes lml-dim-z {
+        from { transform: rotateZ(0deg); }
+        to   { transform: rotateZ(360deg); }
+      }
+
       @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__dot, .lmc__pulse { animation: none !important; transition: none !important; }
+        .lml__ring, .lml__core, .lml__particles {
+          animation: none !important;
+        }
       }
-`;
+    `;
   }
 
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this.fieldHost = this.$$('.lml__particles');
+    this._size = parseFloat(this.getAttribute('size') ?? '64') || 64;
+    this._overlay = this.hasAttribute('overlay');
+    this._text = this.getAttribute('text') ?? '';
+
+    this.applySize();
+    this.applyText();
+
+    if (!prefersReducedMotion()) this.maybeInitField();
   }
 
   protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+    this.field?.destroy();
+    this.field = null;
   }
 
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  protected onConfigChange(changed: Partial<LuminaElementAttributes>): void {
+    if (changed.variant) {
+      this.field?.destroy();
+      this.field = null;
+      this.maybeInitField();
+    }
   }
 
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  attributeChangedCallback(
+    name: string,
+    _old: string | null,
+    value: string | null,
+  ): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'size') {
+      this._size = parseFloat(value ?? '64') || 64;
+      this.applySize();
+    } else if (name === 'overlay') {
+      this._overlay = value !== null;
+    } else if (name === 'text') {
+      this._text = value ?? '';
+      this.applyText();
+    }
   }
 
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
+  private applySize(): void {
+    this.style.setProperty('--lml-size', `${this._size}px`);
   }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
+
+  private applyText(): void {
+    const textEl = this.$$('.lml__text');
+    if (textEl) textEl.textContent = this._text;
+  }
+
+  private maybeInitField(): void {
+    if (!this.fieldHost) return;
+    const v = this.variant;
+    if (v !== 'neural' && v !== 'void') return;
+    const accentRgb = (this.shadow.host as HTMLElement).style
+      .getPropertyValue('--lumina-accent-rgb')
+      .trim() || (v === 'void' ? '120 240 255' : '124 92 255');
+    this.field = new ParticleField(this.shadow.host as HTMLElement, {
+      count: 24,
+      rgb: accentRgb,
+      sizeRange: [0.6, 1.8],
+      speedRange: [0.2, 0.6],
+      lifeRange: [100, 200],
+      connect: v === 'neural',
+      starfield: v === 'void',
+    });
+    this.field.mount(this.fieldHost);
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'lumina-loading': Loading;
+    'lumina-loading': LuminaLoading;
   }
 }
 
-if (!customElements.get(Loading.tagName)) {
-  customElements.define(Loading.tagName, Loading);
+if (!customElements.get(LuminaLoading.tagName)) {
+  customElements.define(LuminaLoading.tagName, LuminaLoading);
 }
