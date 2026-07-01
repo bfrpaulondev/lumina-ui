@@ -368,8 +368,9 @@ export class LuminaSelect extends LuminaElement {
   }
 
   private applySearchable(): void {
-    if (this._searchable) this.setAttribute('searchable', '');
-    else this.removeAttribute('searchable');
+    // Guard against infinite recursion: attributeChangedCallback → applySearchable → setAttribute → callback
+    if (this._searchable && !this.hasAttribute('searchable')) this.setAttribute('searchable', '');
+    else if (!this._searchable && this.hasAttribute('searchable')) this.removeAttribute('searchable');
   }
 
   private updateTrigger(): void {

@@ -195,6 +195,14 @@ async function render(): Promise<void> {
     a.classList.toggle('is-active', a.getAttribute('data-section') === route.section);
   });
 
+  // Close any open modals/drawers before navigating (BUG 7 fix)
+  document.querySelectorAll('lumina-modal[data-open], lumina-drawer[data-open], lumina-drawer-modal[data-open], lumina-dialog[data-open], lumina-confirmation-dialog[data-open], lumina-fullscreen-overlay[data-open]').forEach((el) => {
+    (el as any).close?.() || (el as any).hide?.();
+    el.removeAttribute('data-open');
+    el.removeAttribute('open');
+  });
+  document.body.style.overflow = '';
+
   outlet.innerHTML = `<div class="route-loading">Carregando…</div>`;
 
   const sectionDef = SECTIONS.find((s) => s.id === route.section) ?? SECTIONS[0];

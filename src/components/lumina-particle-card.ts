@@ -113,7 +113,7 @@ export class ParticleCard extends LuminaElement {
       const a = 1 - p.life / p.maxLife;
       this.burstCtx.fillStyle = `rgba(${rgb} / ${a})`;
       this.burstCtx.beginPath();
-      this.burstCtx.arc(p.x, p.y, p.size * a, 0, Math.PI * 2);
+      this.burstCtx.arc(p.x, p.y, Math.max(0, p.size * a), 0, Math.PI * 2);
       this.burstCtx.fill();
     }
     if (this.burstParticles.length > 0) this.burstRaf = requestAnimationFrame(() => this.tickBurst(rgb));

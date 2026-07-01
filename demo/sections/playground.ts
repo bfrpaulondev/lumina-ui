@@ -149,7 +149,7 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
 /** Build live preview HTML per component category. */
 function buildPreviewHTML(meta: ComponentMeta, state: { variant: string; intensity: string; accent: string }): string {
   const tag = meta.tag;
-  const attrs = `variant="${state.variant}" intensity="${state.intensity}" accent-color="${state.accent}"`;
+  const attrs = `variant="${state.variant}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark"`;
   const cat = meta.category;
 
   // Special previews for each button type

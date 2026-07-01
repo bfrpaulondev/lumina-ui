@@ -133,7 +133,7 @@ export class PortalButton extends LuminaElement {
       const a = 1 - p.life / p.maxLife;
       this.ctx.fillStyle = `rgba(${rgb} / ${a})`;
       this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.size * a, 0, Math.PI * 2);
+      this.ctx.arc(p.x, p.y, Math.max(0, p.size * a), 0, Math.PI * 2);
       this.ctx.fill();
     }
     if (this.particles.length > 0) this.raf = requestAnimationFrame(() => this.tick(rgb, cx, cy));

@@ -17,7 +17,8 @@ const styles = `
   display: block;
   position: relative;
   height: 100%;
-  min-height: 360px;
+  min-height: 0;
+  max-height: 100%;
   background: #0b0b14;
   border-radius: 12px;
   overflow: hidden;
@@ -70,7 +71,9 @@ const styles = `
 }
 .code-viewer__container {
   height: calc(100% - 40px);
-  min-height: 320px;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
 }
 .code-viewer__loading {
   display: flex;

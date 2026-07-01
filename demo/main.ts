@@ -15,7 +15,11 @@ if (document.readyState === 'loading') {
   initApp();
 }
 
-console.log(
-  '%cLuminaUI Playground v0.1.0 ✨',
-  'color: #7c5cff; font-size: 14px; font-weight: bold;',
-);
+// Guard against duplicate initialization (BUG 8 fix)
+if (!(window as any).__luminaInitialized) {
+  (window as any).__luminaInitialized = true;
+  console.log(
+    '%cLuminaUI Playground v0.3.0 ✨',
+    'color: #7c5cff; font-size: 14px; font-weight: bold;',
+  );
+}

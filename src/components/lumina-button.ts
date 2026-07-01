@@ -512,7 +512,7 @@ export class LuminaButton extends LuminaElement {
       const a = 1 - p.life / p.maxLife;
       ctx.fillStyle = `rgba(${rgb} / ${a})`;
       ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size * a, 0, Math.PI * 2);
+      ctx.arc(p.x, p.y, Math.max(0, p.size * a), 0, Math.PI * 2);
       ctx.fill();
     }
 

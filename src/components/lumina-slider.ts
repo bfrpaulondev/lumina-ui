@@ -306,7 +306,15 @@ export class LuminaSlider extends LuminaElement {
     }
 
     this.renderMarks();
-    this.updateUI();
+
+    // Defer updateUI to next frame so the component has layout dimensions
+    requestAnimationFrame(() => this.updateUI());
+
+    // Also observe resize to recalculate when container changes size
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(() => this.updateUI());
+      ro.observe(this);
+    }
 
     // Pointer events
     this.track?.addEventListener('pointerdown', this.onPointerDown);

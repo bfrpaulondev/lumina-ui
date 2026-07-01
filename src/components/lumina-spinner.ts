@@ -99,7 +99,7 @@ export class Spinner extends LuminaElement {
         const a = (1 - t / trailLen) * glowIntensity;
         this.ctx.fillStyle = `rgba(${rgb} / ${a})`;
         this.ctx.beginPath();
-        this.ctx.arc(tx, ty, p.size * (1 - t / trailLen), 0, Math.PI * 2);
+        this.ctx.arc(tx, ty, Math.max(0, p.size * (1 - t / trailLen)), 0, Math.PI * 2);
         this.ctx.fill();
       }
     }
