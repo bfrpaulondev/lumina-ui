@@ -165,6 +165,7 @@ export class LuminaAvatar extends LuminaElement {
         letter-spacing: -0.02em;
         text-transform: uppercase;
         border: 1px solid var(--lumina-border);
+        -webkit-backdrop-filter: blur(8px);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
         box-shadow:
@@ -252,6 +253,7 @@ export class LuminaAvatar extends LuminaElement {
       /* Variant: minimal — no ring, no blur, flat */
       :host([variant="minimal"]) .lmav__initials {
         background: rgb(var(--lumina-surface) / 0.6);
+        -webkit-backdrop-filter: none;
         backdrop-filter: none;
         -webkit-backdrop-filter: none;
         box-shadow: none;

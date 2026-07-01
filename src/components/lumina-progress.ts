@@ -213,6 +213,9 @@ export class LuminaProgress extends LuminaElement {
     const pct = (this._value / this.max) * 100;
     this.fill.style.width = `${pct}%`;
     this.setAttribute('aria-valuenow', String(this._value));
+    // Also update the inner progressbar element's aria-valuenow
+    const pb = this.shadow.querySelector('[role="progressbar"]');
+    if (pb) pb.setAttribute('aria-valuenow', String(this._value));
   }
 
   private tick = (): void => {

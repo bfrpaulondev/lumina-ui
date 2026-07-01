@@ -15,6 +15,7 @@ export class SignaturePad extends LuminaElement {
   private lastX = 0; private lastY = 0;
   private points: Array<{x:number;y:number;p:number}> = [];
   private inkDrops: Array<{x:number;y:number;radius:number;life:number}> = [];
+  private rafId = 0;
 
   protected render(): string {
     return `
@@ -50,9 +51,9 @@ export class SignaturePad extends LuminaElement {
     this.$$('.lmsp__clear')?.addEventListener('click', this.clear);
     this.$$('.lmsp__export')?.addEventListener('click', this.exportPNG);
     window.addEventListener('resize', () => this.resizeCanvas());
-    if (!prefersReducedMotion()) this.rafLoop();
+    if (!prefersReducedMotion()) this.rafId = requestAnimationFrame(this.rafLoop);
   }
-  protected unmounted(): void {}
+  protected unmounted(): void { cancelAnimationFrame(this.rafId); }
   protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
   private resizeCanvas(): void {
     if (!this.canvas || !this.ctx) return;
@@ -123,7 +124,7 @@ export class SignaturePad extends LuminaElement {
         this.ctx.globalAlpha = 1;
       }
     }
-    requestAnimationFrame(this.rafLoop);
+    this.rafId = requestAnimationFrame(this.rafLoop);
   };
   private clear = (): void => {
     if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);

@@ -83,6 +83,7 @@ export class LuminaModal extends LuminaElement {
         position: absolute;
         inset: 0;
         background: rgb(0 0 0 / 0.6);
+        -webkit-backdrop-filter: blur(8px) saturate(0.8);
         backdrop-filter: blur(8px) saturate(0.8);
         -webkit-backdrop-filter: blur(8px) saturate(0.8);
         opacity: 0;
@@ -124,6 +125,7 @@ export class LuminaModal extends LuminaElement {
       .lumina-modal__glass {
         position: relative;
         background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) + 0.1));
+        -webkit-backdrop-filter: blur(24px) saturate(1.6);
         backdrop-filter: blur(24px) saturate(1.6);
         -webkit-backdrop-filter: blur(24px) saturate(1.6);
         border: 1px solid var(--lumina-border);
@@ -213,6 +215,7 @@ export class LuminaModal extends LuminaElement {
       /* Void variant */
       :host([variant="void"]) .lumina-modal__glass {
         background: rgb(0 0 0 / 0.7);
+        -webkit-backdrop-filter: blur(8px);
         backdrop-filter: blur(8px);
       }
       :host([variant="void"]) .lumina-modal__title {

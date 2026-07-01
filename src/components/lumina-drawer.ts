@@ -102,6 +102,7 @@ export class LuminaDrawer extends LuminaElement {
         position: fixed;
         inset: 0;
         background: rgb(0 0 0 / 0.6);
+        -webkit-backdrop-filter: blur(8px);
         backdrop-filter: blur(8px);
         -webkit-backdrop-filter: blur(8px);
         opacity: 0;
@@ -121,6 +122,7 @@ export class LuminaDrawer extends LuminaElement {
         width: var(--lmd-width);
         max-width: 100vw;
         background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) + 0.1));
+        -webkit-backdrop-filter: blur(24px) saturate(1.6);
         backdrop-filter: blur(24px) saturate(1.6);
         -webkit-backdrop-filter: blur(24px) saturate(1.6);
         border: 1px solid var(--lumina-border);
@@ -203,6 +205,7 @@ export class LuminaDrawer extends LuminaElement {
       /* Variant: void — pure black + neon edge */
       :host([variant="void"]) .lmd__drawer {
         background: rgb(0 0 0 / 0.85);
+        -webkit-backdrop-filter: blur(8px);
         backdrop-filter: blur(8px);
         border-color: rgb(var(--lumina-accent-rgb) / 0.25);
       }

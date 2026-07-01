@@ -1582,3 +1582,17 @@ kbd {
   .particle-physics__layout, .depth-explorer__layout { grid-template-columns: 1fr !important; }
   .a11y__layout { grid-template-columns: 1fr !important; }
 }
+
+/* ===== Print Styles ===== */
+@media print {
+  .bg-aurora, .app-sidebar, .playground__sidebar, .playground__code,
+  .playground__controls, .playground__info, .site-header, .github-link,
+  lumina-code-viewer, lumina-code-block { display: none !important; }
+  
+  body { background: #fff !important; color: #000 !important; }
+  .app-main { padding: 0 !important; max-width: 100% !important; }
+  .playground__preview { background: #fff !important; border: 1px solid #ccc !important; }
+  .section-head__title, h1, h2, h3 { color: #000 !important; }
+  .section-head__sub, p { color: #333 !important; }
+  .gradient-text { -webkit-text-fill-color: #000 !important; color: #000 !important; }
+}

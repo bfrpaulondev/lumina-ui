@@ -79,6 +79,7 @@ export class StepIndicator extends LuminaElement {
         padding: 6px;
         border-radius: inherit;
         background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
+        -webkit-backdrop-filter: blur(20px) saturate(1.5);
         backdrop-filter: blur(20px) saturate(1.5);
         -webkit-backdrop-filter: blur(20px) saturate(1.5);
         border: 1px solid var(--lumina-border);

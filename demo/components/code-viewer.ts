@@ -180,6 +180,25 @@ export class CodeViewer extends HTMLElement {
     const tab = this.tabs.find((t) => t.id === this.activeTabId) ?? this.tabs[0];
     if (!tab) return;
 
+    // Fallback to textarea if Monaco CDN failed
+    if (!monaco) {
+      const textarea = document.createElement("textarea");
+      textarea.value = tab.code;
+      textarea.style.width = "100%";
+      textarea.style.height = "100%";
+      textarea.style.border = "0";
+      textarea.style.background = "#0b0b14";
+      textarea.style.color = "#e8e8f5";
+      textarea.style.fontFamily = "'JetBrains Mono', monospace";
+      textarea.style.fontSize = "12.5px";
+      textarea.style.padding = "12px";
+      textarea.style.outline = "none";
+      textarea.style.resize = "none";
+      container.appendChild(textarea);
+      this.editor = { getValue: () => textarea.value, setValue: (v: string) => { textarea.value = v; }, onDidChangeModelContent: () => {} } as any;
+      return;
+    }
+
     this.editor = monaco.editor.create(container, {
       value: tab.code,
       language: tab.language,

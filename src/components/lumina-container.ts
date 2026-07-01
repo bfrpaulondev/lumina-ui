@@ -83,6 +83,7 @@ export class LuminaContainer extends LuminaElement {
       /* Variants */
       :host([variant="glass"]) .lumina-container {
         background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) - 0.1));
+        -webkit-backdrop-filter: blur(16px) saturate(1.3);
         backdrop-filter: blur(16px) saturate(1.3);
         -webkit-backdrop-filter: blur(16px) saturate(1.3);
         border: 1px solid var(--lumina-border);
@@ -94,6 +95,7 @@ export class LuminaContainer extends LuminaElement {
       :host([variant="neural"]) .lumina-container__field { opacity: 0.5; }
       :host([variant="neural"]) .lumina-container {
         background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) - 0.15));
+        -webkit-backdrop-filter: blur(8px);
         backdrop-filter: blur(8px);
         border: 1px solid rgb(var(--lumina-accent-rgb) / 0.15);
       }
@@ -101,6 +103,7 @@ export class LuminaContainer extends LuminaElement {
       :host([variant="void"]) .lumina-container__field { opacity: 0.8; }
       :host([variant="void"]) .lumina-container {
         background: rgb(0 0 0 / 0.4);
+        -webkit-backdrop-filter: blur(6px);
         backdrop-filter: blur(6px);
         border: 1px solid rgb(var(--lumina-accent-rgb) / 0.2);
       }
@@ -112,6 +115,7 @@ export class LuminaContainer extends LuminaElement {
             rgb(var(--lumina-accent-rgb) / 0.15),
             rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) - 0.05)) 60%
           );
+        -webkit-backdrop-filter: blur(14px);
         backdrop-filter: blur(14px);
         border: 1px solid var(--lumina-border);
       }
@@ -122,6 +126,7 @@ export class LuminaContainer extends LuminaElement {
           100% calc(100% - 16px), calc(100% - 16px) 100%, 16px 100%, 0 calc(100% - 16px)
         );
         background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
+        -webkit-backdrop-filter: blur(14px);
         backdrop-filter: blur(14px);
         border: 1px solid var(--lumina-border);
       }
@@ -134,6 +139,7 @@ export class LuminaContainer extends LuminaElement {
             rgb(var(--lumina-accent-rgb) / 0.05),
             rgb(var(--lumina-surface) / var(--lumina-surface-alpha))
           );
+        -webkit-backdrop-filter: blur(14px);
         backdrop-filter: blur(14px);
         border: 1px solid var(--lumina-border);
         box-shadow:
