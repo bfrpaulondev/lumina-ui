@@ -23,7 +23,7 @@ export class Fab extends LuminaElement {
   get extended(): boolean { return this._extended; }
   set extended(v: boolean) { this._extended = v; if (v) this.setAttribute('extended',''); else this.removeAttribute('extended'); }
   get position(): Position { return this._position; }
-  set position(v: Position) { this._position = v; this.setAttribute('position', v); this.applyPosition(); }
+  set position(v: Position) { this._position = v; this.setAttribute('position', v);  }
 
   protected render(): string {
     return `
@@ -91,7 +91,7 @@ export class Fab extends LuminaElement {
     this._extended = this.hasAttribute('extended');
     this._position = coerceAttr(this.getAttribute('position'), POSITIONS, 'bottom-right');
     this.applyPosition();
-    this.setAttribute('role', 'button');
+    if (this.getAttribute('role') !== 'button') this.setAttribute('role', 'button');
     this.setAttribute('tabindex', '0');
     this.$$('.lmfb')?.addEventListener('click', () => this.dispatchEvent(new CustomEvent('lumina-click', { bubbles: true, composed: true })));
   }
@@ -102,7 +102,7 @@ export class Fab extends LuminaElement {
     if (name === 'extended') this._extended = value !== null;
     else if (name === 'position') { this._position = coerceAttr(value, POSITIONS, 'bottom-right'); this.applyPosition(); }
   }
-  private applyPosition(): void { this.setAttribute('position', this._position); }
+  private applyPosition(): void { if (this.getAttribute('position') !== this._position) this.setAttribute('position', this._position); }
 }
 declare global { interface HTMLElementTagNameMap { 'lumina-fab': Fab } }
 if (!customElements.get(Fab.tagName)) customElements.define(Fab.tagName, Fab);

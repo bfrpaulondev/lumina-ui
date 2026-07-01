@@ -279,7 +279,7 @@ export class LuminaChip extends LuminaElement {
 
   private applyRole(): void {
     if (this._selectable) {
-      this.setAttribute('role', 'button');
+      if (this.getAttribute('role') !== 'button') this.setAttribute('role', 'button');
       this.setAttribute('tabindex', '0');
       this.setAttribute('aria-pressed', String(this._selected));
     } else {

@@ -332,8 +332,7 @@ export class LuminaToast extends LuminaElement {
   }
 
   private applyPosition(): void {
-    POSITIONS.forEach((p) => this.removeAttribute(`position`));
-    this.setAttribute('position', this._position);
+    if (this.getAttribute('position') !== this._position) this.setAttribute('position', this._position);
   }
 
   private applyVariantIcon(): void {

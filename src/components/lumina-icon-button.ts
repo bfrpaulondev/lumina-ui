@@ -41,9 +41,9 @@ export class IconButton extends LuminaElement {
   private burstRaf = 0;
 
   get size(): Size { return this._size; }
-  set size(v: Size) { this._size = v; this.setAttribute('size', v); this.applySize(); }
+  set size(v: Size) { this._size = v; this.setAttribute('size', v);  }
   get shape(): Shape { return this._shape; }
-  set shape(v: Shape) { this._shape = v; this.setAttribute('shape', v); this.applyShape(); }
+  set shape(v: Shape) { this._shape = v; this.setAttribute('shape', v);  }
   get disabled(): boolean { return this._disabled; }
   set disabled(v: boolean) { this._disabled = v; if (v) this.setAttribute('disabled', ''); else this.removeAttribute('disabled'); }
 
@@ -172,7 +172,7 @@ export class IconButton extends LuminaElement {
     this._disabled = this.hasAttribute('disabled');
     this.applySize();
     this.applyShape();
-    this.setAttribute('role', 'button');
+    if (this.getAttribute('role') !== 'button') this.setAttribute('role', 'button');
     this.setAttribute('tabindex', this._disabled ? '-1' : '0');
     this.burstCanvas = this.$$('.lmib__particles') as HTMLCanvasElement | null;
     this.burstCtx = this.burstCanvas?.getContext('2d') ?? null;
@@ -192,7 +192,7 @@ export class IconButton extends LuminaElement {
   }
 
   private applySize(): void { this.style.setProperty('--lmib-size', `${SIZE_PX[this._size]}px`); }
-  private applyShape(): void { this.setAttribute('shape', this._shape); }
+  private applyShape(): void { if (this.getAttribute('shape') !== this._shape) this.setAttribute('shape', this._shape); }
 
   private onClick = (e: MouseEvent): void => {
     if (this._disabled) { e.preventDefault(); e.stopPropagation(); return; }

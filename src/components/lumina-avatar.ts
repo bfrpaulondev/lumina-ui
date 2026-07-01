@@ -324,7 +324,7 @@ export class LuminaAvatar extends LuminaElement {
     }
 
     if (this.interactive) {
-      this.setAttribute('role', 'button');
+      if (this.getAttribute('role') !== 'button') this.setAttribute('role', 'button');
       this.setAttribute('tabindex', '0');
       this.addEventListener('click', this.onClick);
       this.addEventListener('keydown', this.onKeydown);
@@ -400,7 +400,7 @@ export class LuminaAvatar extends LuminaElement {
 
   private applyInteractive(): void {
     if (this.interactive && this._mounted) {
-      this.setAttribute('role', 'button');
+      if (this.getAttribute('role') !== 'button') this.setAttribute('role', 'button');
       this.setAttribute('tabindex', '0');
       this.addEventListener('click', this.onClick);
       this.addEventListener('keydown', this.onKeydown);

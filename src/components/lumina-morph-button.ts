@@ -64,7 +64,7 @@ export class MorphButton extends LuminaElement {
     this._to = this.getAttribute('to') ?? 'squircle';
     this.iconEl = this.$$('.lmob__icon');
     this.applyShape();
-    this.setAttribute('role', 'button');
+    if (this.getAttribute('role') !== 'button') this.setAttribute('role', 'button');
     this.setAttribute('tabindex', '0');
     this.$$('.lmob')?.addEventListener('click', this.onClick);
     this.$$('.lmob')?.addEventListener('keydown', this.onKeydown);

@@ -64,14 +64,14 @@ export class LuminaDrawer extends LuminaElement {
   set placement(v: Placement) {
     this._placement = v;
     this.setAttribute('placement', v);
-    this.applyPlacement();
+    
   }
 
   get size(): Size { return this._size; }
   set size(v: Size) {
     this._size = v;
     this.setAttribute('size', v);
-    this.applySize();
+    
   }
 
   protected render(): string {
@@ -294,12 +294,12 @@ export class LuminaDrawer extends LuminaElement {
   }
 
   private applyPlacement(): void {
-    this.setAttribute('placement', this._placement);
+    if (this.getAttribute('placement') !== this._placement) this.setAttribute('placement', this._placement);
   }
 
   private applySize(): void {
     this.style.setProperty('--lmd-width', SIZE_WIDTH[this._size]);
-    this.setAttribute('size', this._size);
+    if (this.getAttribute('size') !== this._size) this.setAttribute('size', this._size);
   }
 
   /** Public API: open the drawer. */
