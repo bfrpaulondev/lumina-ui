@@ -1,0 +1,37 @@
+{
+  "name": "lumina-ui",
+  "version": "0.1.0",
+  "description": "LuminaUI - Revolutionary futuristic Web Components library. Vanilla TS, no frameworks.",
+  "type": "module",
+  "main": "./dist/lumina-ui.js",
+  "module": "./dist/lumina-ui.js",
+  "types": "./dist/lumina-ui.d.ts",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "build:lib": "vite build --config vite.lib.config.ts",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "deploy": "vite build && gh-pages -d dist"
+  },
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "shadow-dom",
+    "glassmorphism",
+    "futuristic",
+    "ui-library",
+    "typescript",
+    "vanilla"
+  ],
+  "author": "Bruno Paulon",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "vite": "^5.2.0"
+  }
+}
