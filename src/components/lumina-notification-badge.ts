@@ -1,134 +1,101 @@
 /**
- * LuminaNotificationBadge — Contador animado sobre ícone.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: feedback
- *
- * Description: Badge de notificação com contador animado.
- *
- * Variants: `glass` | `neural` | `aura`
- * Events:    lumina-click
- * CSS parts: badge, count
- * Props:     `count`
- * Slots:     `default`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaNotificationBadge — Contador pop animado, 99+ especial, glow pulsante, clear.
+ * Variants: glass | neural | aura
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
 
 export class NotificationBadge extends LuminaElement {
   static tagName = 'lumina-notification-badge';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'count']; }
+  private _count = 0;
+  private _prevCount = 0;
+  private badge: HTMLElement | null = null;
+  private countEl: HTMLElement | null = null;
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes, "count"];
-  }
-
-  get count(): number {
-    return parseFloat(this.getAttribute('count') ?? '0') || 0;
-  }
+  get count(): number { return this._count; }
   set count(v: number) {
-    this.setAttribute('count', String(v));
+    this._prevCount = this._count;
+    this._count = Math.max(0, v);
+    this.setAttribute('count', String(this._count));
+    this.updateDisplay();
+    if (this._count > this._prevCount) this.popAnimation();
   }
 
   protected render(): string {
     return `
-      <span class="lmc" part="root">
+      <span class="lmnb" part="badge">
         <slot></slot>
-        <span class="lmc__badge" part="badge">
-          <span class="lmc__count" part="count">0</span>
+        <span class="lmnb__badge" aria-hidden="true">
+          <span class="lmnb__count" part="count">0</span>
         </span>
       </span>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: inline-flex;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
+      :host { display: inline-flex; position: relative; font-family: var(--lumina-font-sans); color: var(--lumina-text); cursor: pointer; }
+      .lmnb { display: inline-flex; position: relative; }
+      .lmnb__badge {
+        position: absolute; top: -6px; right: -6px; min-width: 18px; height: 18px;
+        padding: 0 5px; border-radius: 999px;
+        background: #ff5577; color: #fff;
+        font: 700 10px 'JetBrains Mono', monospace;
+        display: inline-flex; align-items: center; justify-content: center;
+        box-shadow: 0 0 0 2px var(--lumina-bg, #06060c), 0 0 8px rgb(255 85 119 / 0.6);
+        transition: transform var(--lumina-speed) var(--lumina-ease-spring);
+        z-index: 1;
       }
-      .lmc {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 14px;
-        border-radius: var(--lumina-radius-pill);
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid var(--lumina-border);
-        font-size: 13px; font-weight: 600;
-        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), var(--lumina-shadow);
-      }
-      .lmc__dot {
-        width: 8px; height: 8px;
-        border-radius: 50%;
-        background: var(--lumina-accent);
-        box-shadow: 0 0 8px var(--lumina-accent);
-      }
-      .lmc__pulse {
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        pointer-events: none;
-        opacity: 0;
-      }
-      :host([variant="pulse"]) .lmc__dot,
-      :host([variant="aura"]) .lmc__dot,
-      :host([variant="online"]) .lmc__dot {
-        animation: lmc-pulse 1.6s ease-in-out infinite;
-      }
-      @keyframes lmc-pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.5); opacity: 0.6; }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__dot, .lmc__pulse { animation: none !important; transition: none !important; }
-      }
-`;
+      .lmnb__badge[data-hidden] { transform: scale(0); opacity: 0; }
+      .lmnb__badge[data-pulse] { animation: lmnb-pulse 1s ease-in-out infinite; }
+      @keyframes lmnb-pulse { 0%, 100% { box-shadow: 0 0 0 2px var(--lumina-bg, #06060c), 0 0 8px rgb(255 85 119 / 0.6); } 50% { box-shadow: 0 0 0 2px var(--lumina-bg, #06060c), 0 0 16px rgb(255 85 119 / 1); } }
+      .lmnb__badge[data-pop] { animation: lmnb-pop 0.4s var(--lumina-ease-spring); }
+      @keyframes lmnb-pop { 0% { transform: scale(1); } 50% { transform: scale(1.5); } 100% { transform: scale(1); } }
+      .lmnb__count { line-height: 1; }
+      :host([variant="neural"]) .lmnb__badge { background: var(--lumina-accent); box-shadow: 0 0 0 2px var(--lumina-bg, #06060c), 0 0 12px rgb(var(--lumina-accent-rgb) / 0.7); }
+      :host([variant="aura"]) .lmnb__badge { background: #ffd166; color: #1a1a2e; box-shadow: 0 0 0 2px var(--lumina-bg, #06060c), 0 0 12px rgb(255 209 102 / 0.7); }
+      @media (prefers-reduced-motion: reduce) { .lmnb__badge { animation: none !important; transition: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._count = parseInt(this.getAttribute('count') ?? '0', 10) || 0;
+    this.badge = this.$$('.lmnb__badge');
+    this.countEl = this.$$('.lmnb__count');
+    this.updateDisplay();
+    this.addEventListener('click', this.onClick);
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { this.removeEventListener('click', this.onClick); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'count') { this._prevCount = this._count; this._count = parseInt(value ?? '0', 10) || 0; this.updateDisplay(); if (this._count > this._prevCount) this.popAnimation(); }
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  private updateDisplay(): void {
+    if (!this.countEl || !this.badge) return;
+    const display = this._count > 99 ? '99+' : String(this._count);
+    this.countEl.textContent = display;
+    if (this._count === 0) this.badge.setAttribute('data-hidden', '');
+    else this.badge.removeAttribute('data-hidden');
+    if (this._count > 0) this.badge.setAttribute('data-pulse', '');
+    else this.badge.removeAttribute('data-pulse');
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  private popAnimation(): void {
+    if (!this.badge) return;
+    this.badge.setAttribute('data-pop', '');
+    setTimeout(() => this.badge?.removeAttribute('data-pop'), 400);
   }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private onClick = (): void => {
+    this.dispatchEvent(new CustomEvent('lumina-click', { bubbles: true, composed: true, detail: { count: this._count } }));
+    // Clear on click
+    if (this._count > 0) {
+      this._prevCount = this._count;
+      this._count = 0;
+      this.setAttribute('count', '0');
+      this.updateDisplay();
+      this.dispatchEvent(new CustomEvent('lumina-clear', { bubbles: true, composed: true }));
+    }
+  };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-notification-badge': NotificationBadge;
-  }
-}
-
-if (!customElements.get(NotificationBadge.tagName)) {
-  customElements.define(NotificationBadge.tagName, NotificationBadge);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-notification-badge': NotificationBadge } }
+if (!customElements.get(NotificationBadge.tagName)) customElements.define(NotificationBadge.tagName, NotificationBadge);

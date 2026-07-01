@@ -1,141 +1,93 @@
 /**
- * LuminaSkeleton — Skeleton com shimmer wave.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: feedback
- *
- * Description: Placeholder de carregamento com efeito shimmer.
- *
- * Variants: `glass` | `neural` | `wave`
- * Events:    (none — inherits standard)
- * CSS parts: skeleton
- * Props:     `shape`, `width`, `height`
- * Slots:     (none)
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaSkeleton — Shimmer orgânico (não linear), múltiplas formas, stagger animation.
+ * Variants: glass | neural | wave
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
 
 export class Skeleton extends LuminaElement {
   static tagName = 'lumina-skeleton';
-
   static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes, "shape", "width", "height"];
+    return [...LuminaElement.observedAttributes, 'shape', 'width', 'height', 'count'];
   }
-
-  get shape(): string {
-    return this.getAttribute('shape') ?? 'text';
-  }
-  set shape(v: string) {
-    this.setAttribute('shape', v);
-  }
-  get width(): string {
-    return this.getAttribute('width') ?? '';
-  }
-  set width(v: string) {
-    this.setAttribute('width', v);
-  }
-  get height(): string {
-    return this.getAttribute('height') ?? '';
-  }
-  set height(v: string) {
-    this.setAttribute('height', v);
-  }
+  private _shape = 'text';
+  private _width = '';
+  private _height = '';
+  private _count = 1;
 
   protected render(): string {
-    return `
-      <div class="lmc lmc--skeleton" part="skeleton" aria-hidden="true"></div>
-    `;
+    return `<div class="lmsk-wrap" part="skeleton"></div>`;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: inline-flex;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-      }
-      .lmc {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 14px;
-        border-radius: var(--lumina-radius-pill);
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+      :host { display: block; font-family: var(--lumina-font-sans); }
+      .lmsk-wrap { display: flex; flex-direction: column; gap: 8px; }
+      .lmsk {
+        position: relative; overflow: hidden;
+        background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) - 0.05));
         border: 1px solid var(--lumina-border);
-        font-size: 13px; font-weight: 600;
-        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), var(--lumina-shadow);
+        border-radius: var(--lumina-radius-sm);
       }
-      .lmc__dot {
-        width: 8px; height: 8px;
-        border-radius: 50%;
-        background: var(--lumina-accent);
-        box-shadow: 0 0 8px var(--lumina-accent);
+      .lmsk::after {
+        content: ''; position: absolute; inset: 0;
+        background: linear-gradient(90deg, transparent 0%, rgb(var(--lumina-accent-rgb) / 0.15) 40%, rgb(var(--lumina-accent-rgb) / 0.3) 50%, rgb(var(--lumina-accent-rgb) / 0.15) 60%, transparent 100%);
+        background-size: 200% 100%;
+        animation: lmsk-shimmer 2s ease-in-out infinite;
       }
-      .lmc__pulse {
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        pointer-events: none;
-        opacity: 0;
+      @keyframes lmsk-shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
       }
-      :host([variant="pulse"]) .lmc__dot,
-      :host([variant="aura"]) .lmc__dot,
-      :host([variant="online"]) .lmc__dot {
-        animation: lmc-pulse 1.6s ease-in-out infinite;
-      }
-      @keyframes lmc-pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.5); opacity: 0.6; }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__dot, .lmc__pulse { animation: none !important; transition: none !important; }
-      }
-`;
+      .lmsk--text { height: 14px; width: 100%; border-radius: 4px; }
+      .lmsk--text:nth-child(even) { width: 80%; }
+      .lmsk--circle { border-radius: 50%; width: 48px; height: 48px; flex-shrink: 0; }
+      .lmsk--rectangle { border-radius: var(--lumina-radius-md); width: 100%; height: 120px; }
+      .lmsk--card { border-radius: var(--lumina-radius-lg); width: 100%; height: 200px; }
+      .lmsk--card .lmsk-card-line { height: 12px; margin: 12px; border-radius: 4px; background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) - 0.05)); position: relative; overflow: hidden; }
+      .lmsk--card .lmsk-card-line::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgb(var(--lumina-accent-rgb) / 0.15) 50%, transparent); background-size: 200% 100%; animation: lmsk-shimmer 2s ease-in-out infinite; }
+      :host([variant="wave"]) .lmsk::after { animation: lmsk-wave 1.8s ease-in-out infinite; background: linear-gradient(90deg, transparent, rgb(var(--lumina-accent-rgb) / 0.2), transparent); background-size: 200% 100%; }
+      @keyframes lmsk-wave { 0% { background-position: -200% 0; transform: skewX(-12deg); } 100% { background-position: 200% 0; transform: skewX(-12deg); } }
+      :host([variant="neural"]) .lmsk { border-color: rgb(var(--lumina-accent-rgb) / 0.2); }
+      :host([variant="neural"]) .lmsk::after { background: radial-gradient(circle at 50% 50%, rgb(var(--lumina-accent-rgb) / 0.2), transparent 70%); animation: lmsk-neural-pulse 2s ease-in-out infinite; }
+      @keyframes lmsk-neural-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+      @media (prefers-reduced-motion: reduce) { .lmsk::after, .lmsk-card-line::after { animation: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._shape = this.getAttribute('shape') ?? 'text';
+    this._width = this.getAttribute('width') ?? '';
+    this._height = this.getAttribute('height') ?? '';
+    this._count = parseInt(this.getAttribute('count') ?? '1', 10) || 1;
+    this.renderSkeletons();
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void {}
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'shape') this._shape = value ?? 'text';
+    else if (name === 'width') this._width = value ?? '';
+    else if (name === 'height') this._height = value ?? '';
+    else if (name === 'count') this._count = parseInt(value ?? '1', 10) || 1;
+    this.renderSkeletons();
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
-  }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
+  private renderSkeletons(): void {
+    const host = this.$$('.lmsk-wrap');
+    if (!host) return;
+    host.innerHTML = '';
+    for (let i = 0; i < this._count; i++) {
+      const el = document.createElement('div');
+      el.className = `lmsk lmsk--${this._shape}`;
+      el.setAttribute('part', 'skeleton');
+      el.style.animationDelay = `${i * 0.15}s`;
+      if (this._width) el.style.width = this._width;
+      if (this._height) el.style.height = this._height;
+      if (this._shape === 'card') {
+        el.innerHTML = '<div class="lmsk-card-line" style="width:60%;margin-top:16px"></div><div class="lmsk-card-line" style="width:90%"></div><div class="lmsk-card-line" style="width:75%"></div>';
+      }
+      host.appendChild(el);
+    }
   }
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-skeleton': Skeleton;
-  }
-}
-
-if (!customElements.get(Skeleton.tagName)) {
-  customElements.define(Skeleton.tagName, Skeleton);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-skeleton': Skeleton } }
+if (!customElements.get(Skeleton.tagName)) customElements.define(Skeleton.tagName, Skeleton);

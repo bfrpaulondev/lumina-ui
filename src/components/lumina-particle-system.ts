@@ -1,126 +1,62 @@
 /**
- * LuminaParticleSystem — Camada de partículas universal.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: unique
- *
- * Description: Sistema de partículas configurável aplicável em qualquer componente.
- *
- * Variants: `neural` | `aura` | `void` | `cosmic`
- * Events:    lumina-particle-burst
- * CSS parts: canvas, controls
- * Props:     `count`, `mode`
- * Slots:     (none)
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaParticleSystem — Sistema de partículas reutilizável aplicável em qualquer componente.
  */
-
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { ParticleField } from '../core/ParticleField';
+import { intensityToMultiplier, prefersReducedMotion } from '../core/utils';
 
 export class ParticleSystem extends LuminaElement {
   static tagName = 'lumina-particle-system';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'count', 'mode']; }
+  private _count = 60; private _mode = 'plain';
+  private field: ParticleField | null = null;
+  private host: HTMLElement | null = null;
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes, "count", "mode"];
-  }
-
-  get count(): number {
-    return parseFloat(this.getAttribute('count') ?? '60') || 0;
-  }
-  set count(v: number) {
-    this.setAttribute('count', String(v));
-  }
-  get mode(): string {
-    return this.getAttribute('mode') ?? 'plain';
-  }
-  set mode(v: string) {
-    this.setAttribute('mode', v);
-  }
-
-  protected render(): string {
-    return `
-      <div class="lmc" part="root">
-        <div class="lmc__core" part="core"><slot></slot></div>
-        <canvas class="lmc__canvas" part="canvas" aria-hidden="true"></canvas>
-      </div>
-    `;
-  }
-
+  protected render(): string { return `<div class="lmps" part="root"><div class="lmps__bg" aria-hidden="true"></div><div class="lmps__canvas" part="canvas" aria-hidden="true"></div><div class="lmps__content"><slot></slot></div></div>`; }
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        position: relative;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-        border-radius: var(--lumina-radius-lg);
-        overflow: hidden;
-        min-height: 200px;
-      }
-      .lmc {
-        position: relative;
-        width: 100%; height: 100%;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(16px) saturate(1.4);
-        -webkit-backdrop-filter: blur(16px) saturate(1.4);
-        border: 1px solid var(--lumina-border);
-      }
-      .lmc__core {
-        position: relative; z-index: 2;
-        padding: 24px;
-      }
-      .lmc__canvas {
-        position: absolute; inset: 0;
-        width: 100%; height: 100%;
-        pointer-events: none;
-        z-index: 1;
-        opacity: 0.7;
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__canvas { transition: none !important; animation: none !important; }
-      }
-`;
+      :host { display: block; position: relative; font-family: var(--lumina-font-sans); color: var(--lumina-text); min-height: 200px; border-radius: var(--lumina-radius-lg); overflow: hidden; }
+      .lmps { position: relative; width: 100%; height: 100%; min-height: 200px; border-radius: inherit; }
+      .lmps__bg { position: absolute; inset: 0; border-radius: inherit; background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--lumina-border); z-index: 0; }
+      .lmps__canvas { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 1; }
+      .lmps__content { position: relative; z-index: 2; padding: 24px; }
+      :host([variant="cosmic"]) .lmps__bg { background: radial-gradient(ellipse at center, #0a0420, #000); }
+      :host([variant="void"]) .lmps__bg { background: rgb(0 0 0 / 0.7); }
+      @media (prefers-reduced-motion: reduce) { .lmps__canvas { opacity: 0.3; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._count = parseInt(this.getAttribute('count') ?? '60', 10) || 60;
+    this._mode = this.getAttribute('mode') ?? 'plain';
+    this.host = this.$$('.lmps__canvas');
+    if (!prefersReducedMotion()) this.buildField();
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { this.field?.destroy(); this.field = null; }
+  protected onConfigChange(changed: Partial<LuminaElementAttributes>): void {
+    if (changed.intensity || changed['accent-color'] || changed.variant) this.rebuild();
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'count') { this._count = parseInt(value ?? '60', 10) || 60; this.rebuild(); }
+    else if (name === 'mode') { this._mode = value ?? 'plain'; this.rebuild(); }
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  private rebuild(): void { this.field?.destroy(); this.field = null; if (!prefersReducedMotion()) this.buildField(); }
+  private buildField(): void {
+    if (!this.host) return;
+    const rgb = (this.shadow.host as HTMLElement).style.getPropertyValue('--lumina-accent-rgb').trim() || '124 92 255';
+    const intensity = intensityToMultiplier(this.intensity);
+    this.field = new ParticleField(this.shadow.host as HTMLElement, {
+      count: Math.round(this._count * intensity), rgb,
+      sizeRange: [0.6, 2.5], speedRange: [0.1, 0.6], lifeRange: [120, 280],
+      connect: this._mode === 'connect', starfield: this._mode === 'starfield',
+    });
+    this.field.mount(this.host);
   }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-particle-system': ParticleSystem;
+  /** Public API: burst particles at position */
+  public burst(x: number, y: number, count = 20): void {
+    this.dispatchEvent(new CustomEvent('lumina-particle-burst', { bubbles: true, composed: true, detail: { x, y, count } }));
   }
 }
-
-if (!customElements.get(ParticleSystem.tagName)) {
-  customElements.define(ParticleSystem.tagName, ParticleSystem);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-particle-system': ParticleSystem } }
+if (!customElements.get(ParticleSystem.tagName)) customElements.define(ParticleSystem.tagName, ParticleSystem);

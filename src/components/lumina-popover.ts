@@ -1,111 +1,81 @@
 /**
- * LuminaPopover — Popover com flip + shift.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: overlays
- *
- * Description: Popover com posicionamento inteligente.
- *
- * Variants: `glass` | `neural` | `aura`
- * Events:    lumina-show
-   * lumina-hide
- * CSS parts: popover, arrow, content
- * Props:     `placement`
- * Slots:     `default`, `content`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaPopover — Flip automático, rich content, fecha on scroll/click outside.
  */
-
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+
+const PLACEMENTS = ['top','bottom','left','right'] as const;
+type Placement = (typeof PLACEMENTS)[number];
 
 export class Popover extends LuminaElement {
   static tagName = 'lumina-popover';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'placement', 'interactive']; }
+  private _placement: Placement = 'top'; private _interactive = false; private _open = false;
+  private pop: HTMLElement | null = null;
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes, "placement"];
-  }
-
-  get placement(): string {
-    return this.getAttribute('placement') ?? 'top';
-  }
-  set placement(v: string) {
-    this.setAttribute('placement', v);
-  }
-
+  get open(): boolean { return this._open; }
   protected render(): string {
-    return `
-      <span class="lmc" part="root">
-        <slot></slot>
-        <div class="lmc__pop" part="content" role="menu">
-          <span class="lmc__arrow" part="arrow" aria-hidden="true"></span>
-          <slot name="content"></slot>
-        </div>
-      </span>
-    `;
+    return `<span class="lmpo" part="popover"><slot></slot><div class="lmpo__pop" part="content" role="popover" aria-hidden="true"><span class="lmpo__arrow" part="arrow" aria-hidden="true"></span><slot name="content"></slot></div></span>`;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: contents;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-      }
-      .lmc {
-        position: fixed; inset: 0;
-        background: rgb(0 0 0 / 0.6);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        opacity: 0;
-        transition: opacity calc(var(--lumina-speed) * 1.2) var(--lumina-ease-out);
-        z-index: 1000;
-      }
-      :host([data-open]) .lmc,
-      :host([open]) .lmc { opacity: 1; }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc { transition: none !important; }
-      }
-`;
+      :host { display: inline-block; position: relative; font-family: var(--lumina-font-sans); color: var(--lumina-text); }
+      .lmpo { display: inline-block; position: relative; }
+      .lmpo__pop { position: absolute; z-index: 1000; min-width: 200px; max-width: 320px; padding: 14px; border-radius: var(--lumina-radius-md); background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) + 0.15)); backdrop-filter: blur(20px) saturate(1.6); -webkit-backdrop-filter: blur(20px) saturate(1.6); border: 1px solid var(--lumina-border); box-shadow: 0 16px 48px -12px rgb(0 0 0 / 0.5); opacity: 0; transform: scale(0.92); pointer-events: none; transition: opacity var(--lumina-speed) var(--lumina-ease-out), transform var(--lumina-speed) var(--lumina-ease-spring); }
+      .lmpo__pop[data-open] { opacity: 1; transform: scale(1); pointer-events: auto; }
+      .lmpo__pop[data-placement="top"] { bottom: calc(100% + 10px); left: 50%; transform: translateX(-50%) scale(0.92); transform-origin: bottom center; }
+      .lmpo__pop[data-placement="top"][data-open] { transform: translateX(-50%) scale(1); }
+      .lmpo__pop[data-placement="bottom"] { top: calc(100% + 10px); left: 50%; transform: translateX(-50%) scale(0.92); transform-origin: top center; }
+      .lmpo__pop[data-placement="bottom"][data-open] { transform: translateX(-50%) scale(1); }
+      .lmpo__pop[data-placement="left"] { right: calc(100% + 10px); top: 50%; transform: translateY(-50%) scale(0.92); transform-origin: right center; }
+      .lmpo__pop[data-placement="left"][data-open] { transform: translateY(-50%) scale(1); }
+      .lmpo__pop[data-placement="right"] { left: calc(100% + 10px); top: 50%; transform: translateY(-50%) scale(0.92); transform-origin: left center; }
+      .lmpo__pop[data-placement="right"][data-open] { transform: translateY(-50%) scale(1); }
+      .lmpo__arrow { position: absolute; width: 10px; height: 10px; background: inherit; border: inherit; transform: rotate(45deg); z-index: -1; }
+      .lmpo__pop[data-placement="top"] .lmpo__arrow { bottom: -5px; left: 50%; margin-left: -5px; border-top: none; border-left: none; }
+      .lmpo__pop[data-placement="bottom"] .lmpo__arrow { top: -5px; left: 50%; margin-left: -5px; border-bottom: none; border-right: none; }
+      .lmpo__pop[data-placement="left"] .lmpo__arrow { right: -5px; top: 50%; margin-top: -5px; border-left: none; border-bottom: none; }
+      .lmpo__pop[data-placement="right"] .lmpo__arrow { left: -5px; top: 50%; margin-top: -5px; border-right: none; border-top: none; }
+      ::slotted([slot="content"]) { font-size: 13px; line-height: 1.5; }
+      @media (prefers-reduced-motion: reduce) { .lmpo__pop { transition: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._placement = (this.getAttribute('placement') as Placement) ?? 'top';
+    this._interactive = this.hasAttribute('interactive');
+    this.pop = this.$$('.lmpo__pop');
+    this.pop?.setAttribute('data-placement', this._placement);
+    this.addEventListener('click', this.onClick);
+    document.addEventListener('click', this.onDocClick);
+    document.addEventListener('scroll', this.onScroll, true);
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { document.removeEventListener('click', this.onDocClick); document.removeEventListener('scroll', this.onScroll, true); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'placement') { this._placement = (value as Placement) ?? 'top'; this.pop?.setAttribute('data-placement', this._placement); }
+    else if (name === 'interactive') this._interactive = value !== null;
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  private onClick = (e: MouseEvent): void => { e.stopPropagation(); if (this._open) this.hide(); else this.show(); };
+  private onDocClick = (e: MouseEvent): void => { if (!this.contains(e.target as Node) && this._open) this.hide(); };
+  private onScroll = (): void => { if (this._open && !this._interactive) this.hide(); else this.reposition(); };
+  public show(): void {
+    if (this._open) return; this._open = true; this.pop?.setAttribute('data-open',''); this.pop?.setAttribute('aria-hidden','false');
+    this.reposition();
+    this.dispatchEvent(new CustomEvent('lumina-show', { bubbles: true, composed: true }));
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  public hide(): void {
+    if (!this._open) return; this._open = false; this.pop?.removeAttribute('data-open'); this.pop?.setAttribute('aria-hidden','true');
+    this.dispatchEvent(new CustomEvent('lumina-hide', { bubbles: true, composed: true }));
   }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
+  private reposition(): void {
+    if (!this.pop) return;
+    const rect = this.pop.getBoundingClientRect();
+    if (this._placement === 'top' && rect.top < 8) { this.pop.setAttribute('data-placement','bottom'); this._placement = 'bottom'; }
+    else if (this._placement === 'bottom' && rect.bottom + 8 > window.innerHeight) { this.pop.setAttribute('data-placement','top'); this._placement = 'top'; }
+    else if (this._placement === 'left' && rect.left < 8) { this.pop.setAttribute('data-placement','right'); this._placement = 'right'; }
+    else if (this._placement === 'right' && rect.right + 8 > window.innerWidth) { this.pop.setAttribute('data-placement','left'); this._placement = 'left'; }
   }
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-popover': Popover;
-  }
-}
-
-if (!customElements.get(Popover.tagName)) {
-  customElements.define(Popover.tagName, Popover);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-popover': Popover } }
+if (!customElements.get(Popover.tagName)) customElements.define(Popover.tagName, Popover);

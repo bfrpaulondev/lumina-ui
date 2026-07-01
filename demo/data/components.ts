@@ -3890,9 +3890,10 @@ export class Skeleton extends LuminaElement {
   // CSS parts:       skeleton
   // Events:          (inherits standard lumina-* events)
   // Props:
-   * shape: "text"|"circle"|"rectangle"
+   * shape: "text" | "circle" | "rectangle" | "card"
    * width: string
    * height: string
+   * count: number
   // Slots:           (none)
 
   protected render(): string {
@@ -3919,12 +3920,13 @@ customElements.define(Skeleton.tagName, Skeleton);
   accent-color="#7c5cff"
   speed="0.5"
   shape="text"
+  count="1"
 ></lumina-skeleton>`,
     react: `import 'lumina-ui';
 
 export function SkeletonExample() {
   return (
-    <lumina-skeleton variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} shape="text" />
+    <lumina-skeleton variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} shape="text" count={1} />
   );
 }`,
   },
@@ -4105,6 +4107,7 @@ export class Spinner extends LuminaElement {
   // Events:          (inherits standard lumina-* events)
   // Props:
    * size: number
+   * speed: number
   // Slots:           (none)
 
   protected render(): string {
@@ -4148,9 +4151,10 @@ export class StatusIndicator extends LuminaElement {
 
   // Accepts variants: 'online' | 'offline' | 'busy' | 'neural'
   // CSS parts:       dot, label, pulse
-  // Events:          (inherits standard lumina-* events)
+  // Events:          lumina-status-change
   // Props:
-   * (only shared LuminaElement props)
+   * status: "online" | "offline" | "busy" | "away"
+   * tooltip: string
   // Slots:           default
 
   protected render(): string {
@@ -4176,12 +4180,20 @@ customElements.define(StatusIndicator.tagName, StatusIndicator);
   intensity="intense"
   accent-color="#22c55e"
   speed="0.5"
-></lumina-status-indicator>`,
+  status="online"
+></lumina-status-indicator>
+<script type="module">
+  const el = document.querySelector('lumina-status-indicator');
+  el.addEventListener('lumina-status-change', (e) => {
+    console.log('lumina-status-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function StatusIndicatorExample() {
   return (
-    <lumina-status-indicator variant="online" intensity="intense" accent-color="#22c55e" speed={0.5}>
+    <lumina-status-indicator variant="online" intensity="intense" accent-color="#22c55e" speed={0.5} status="online"
+      onLuminaStatusChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-status-indicator>
   );
@@ -4195,7 +4207,7 @@ export class NotificationBadge extends LuminaElement {
 
   // Accepts variants: 'glass' | 'neural' | 'aura'
   // CSS parts:       badge, count
-  // Events:          lumina-click
+  // Events:          lumina-click, lumina-clear
   // Props:
    * count: number
   // Slots:           default
@@ -4254,7 +4266,7 @@ export class PulseIndicator extends LuminaElement {
   // CSS parts:       dot, pulse
   // Events:          (inherits standard lumina-* events)
   // Props:
-   * (only shared LuminaElement props)
+   * intensity: number
   // Slots:           (none)
 
   protected render(): string {
@@ -4299,9 +4311,9 @@ export class NeuralLoader extends LuminaElement {
 
   // Accepts variants: 'neural' | 'intense' | 'subtle'
   // CSS parts:       loader, network
-  // Events:          (inherits standard lumina-* events)
+  // Events:          lumina-progress
   // Props:
-   * (only shared LuminaElement props)
+   * progress: number
   // Slots:           (none)
 
   protected render(): string {
@@ -4327,12 +4339,20 @@ customElements.define(NeuralLoader.tagName, NeuralLoader);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-></lumina-neural-loader>`,
+  progress="0"
+></lumina-neural-loader>
+<script type="module">
+  const el = document.querySelector('lumina-neural-loader');
+  el.addEventListener('lumina-progress', (e) => {
+    console.log('lumina-progress', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function NeuralLoaderExample() {
   return (
-    <lumina-neural-loader variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}>
+    <lumina-neural-loader variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} progress={0}
+      onLuminaProgress={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-neural-loader>
   );
@@ -4409,7 +4429,8 @@ export class DrawerModal extends LuminaElement {
   // Events:          lumina-open, lumina-close
   // Props:
    * open: boolean
-   * side: "left"|"right"|"bottom"
+   * side: "left" | "right" | "bottom"
+   * size: "sm" | "md" | "lg" | "full"
   // Slots:           default, title
 
   protected render(): string {
@@ -4436,6 +4457,7 @@ customElements.define(DrawerModal.tagName, DrawerModal);
   accent-color="#7c5cff"
   speed="0.5"
   side="right"
+  size="md"
 >
   <span slot="title">Título</span>
   <p>Conteúdo do modal.</p>
@@ -4451,7 +4473,7 @@ customElements.define(DrawerModal.tagName, DrawerModal);
 
 export function DrawerModalExample() {
   return (
-    <lumina-drawer-modal variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} side="right"
+    <lumina-drawer-modal variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} side="right" size="md"
       onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-drawer-modal>
@@ -4469,6 +4491,9 @@ export class Dialog extends LuminaElement {
   // Events:          lumina-open, lumina-close, lumina-confirm, lumina-cancel
   // Props:
    * open: boolean
+   * title: string
+   * confirm-label: string
+   * cancel-label: string
   // Slots:           default, title
 
   protected render(): string {
@@ -4494,6 +4519,8 @@ customElements.define(Dialog.tagName, Dialog);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  confirm-label="Confirmar"
+  cancel-label="Cancelar"
 >
   <span slot="title">Título</span>
   <p>Conteúdo do modal.</p>
@@ -4509,7 +4536,7 @@ customElements.define(Dialog.tagName, Dialog);
 
 export function DialogExample() {
   return (
-    <lumina-dialog variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+    <lumina-dialog variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} confirm-label="Confirmar" cancel-label="Cancelar"
       onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-dialog>
@@ -4526,7 +4553,8 @@ export class Popover extends LuminaElement {
   // CSS parts:       popover, arrow, content
   // Events:          lumina-show, lumina-hide
   // Props:
-   * placement: "top"|"bottom"|"left"|"right"
+   * placement: "top" | "bottom" | "left" | "right"
+   * interactive: boolean
   // Slots:           default, content
 
   protected render(): string {
@@ -4643,7 +4671,7 @@ export class ContextMenu extends LuminaElement {
   // CSS parts:       menu, item, separator
   // Events:          lumina-show, lumina-hide, lumina-select
   // Props:
-   * (only shared LuminaElement props)
+   * items: string
   // Slots:           default
 
   protected render(): string {
@@ -4700,6 +4728,7 @@ export class Lightbox extends LuminaElement {
   // Events:          lumina-open, lumina-close, lumina-navigate
   // Props:
    * src: string
+   * images: string
   // Slots:           default, caption
 
   protected render(): string {
@@ -4757,6 +4786,7 @@ export class ImageZoom extends LuminaElement {
   // Props:
    * src: string
    * zoom: number
+   * max-zoom: number
   // Slots:           (none)
 
   protected render(): string {
@@ -4783,6 +4813,7 @@ customElements.define(ImageZoom.tagName, ImageZoom);
   accent-color="#7c5cff"
   speed="0.5"
   zoom="1"
+  max-zoom="5"
 >
   Conteúdo
 </lumina-image-zoom>
@@ -4796,7 +4827,7 @@ customElements.define(ImageZoom.tagName, ImageZoom);
 
 export function ImageZoomExample() {
   return (
-    <lumina-image-zoom variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} zoom={1}
+    <lumina-image-zoom variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} zoom={1} max-zoom={5}
       onLuminaZoomChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-image-zoom>
@@ -4872,6 +4903,9 @@ export class ConfirmationDialog extends LuminaElement {
    * open: boolean
    * title: string
    * message: string
+   * confirm-label: string
+   * cancel-label: string
+   * destructive: boolean
   // Slots:           default
 
   protected render(): string {
@@ -4897,6 +4931,8 @@ customElements.define(ConfirmationDialog.tagName, ConfirmationDialog);
   intensity="intense"
   accent-color="#ff5577"
   speed="0.5"
+  confirm-label="Confirmar"
+  cancel-label="Cancelar"
 >
   <span slot="title">Título</span>
   <p>Conteúdo do modal.</p>
@@ -4912,7 +4948,7 @@ customElements.define(ConfirmationDialog.tagName, ConfirmationDialog);
 
 export function ConfirmationDialogExample() {
   return (
-    <lumina-confirmation-dialog variant="glass" intensity="intense" accent-color="#ff5577" speed={0.5}
+    <lumina-confirmation-dialog variant="glass" intensity="intense" accent-color="#ff5577" speed={0.5} confirm-label="Confirmar" cancel-label="Cancelar"
       onLuminaConfirm={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-confirmation-dialog>

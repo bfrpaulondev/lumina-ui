@@ -1,131 +1,110 @@
 /**
- * LuminaSpinner — Spinner com partículas orbitando.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: feedback
- *
- * Description: Spinner avançado com partículas.
- *
- * Variants: `neural` | `aura` | `glass`
- * Events:    (none — inherits standard)
- * CSS parts: spinner, particles
- * Props:     `size`
- * Slots:     (none)
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaSpinner — Partículas orbitando o centro + glow pulsante.
+ * Variants: neural | aura | glass
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { prefersReducedMotion } from '../core/utils';
 
 export class Spinner extends LuminaElement {
   static tagName = 'lumina-spinner';
-
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes, "size"];
-  }
-
-  get size(): number {
-    return parseFloat(this.getAttribute('size') ?? '40') || 0;
-  }
-  set size(v: number) {
-    this.setAttribute('size', String(v));
-  }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'size', 'speed']; }
+  private _size = 40;
+  private _spinSpeed = 1;
+  private canvas: HTMLCanvasElement | null = null;
+  private ctx: CanvasRenderingContext2D | null = null;
+  private raf = 0;
+  private particles: Array<{angle:number;radius:number;speed:number;size:number}> = [];
+  private time = 0;
 
   protected render(): string {
     return `
-      <div class="lmc" part="spinner" role="status" aria-label="Loading">
-        <span class="lmc__particles" part="particles" aria-hidden="true"></span>
+      <div class="lmsp" part="spinner" role="status" aria-label="Carregando">
+        <div class="lmsp__ring" aria-hidden="true"></div>
+        <canvas class="lmsp__particles" part="particles" aria-hidden="true"></canvas>
+        <div class="lmsp__core" aria-hidden="true"></div>
       </div>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: inline-flex;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-      }
-      .lmc {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 14px;
-        border-radius: var(--lumina-radius-pill);
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid var(--lumina-border);
-        font-size: 13px; font-weight: 600;
-        box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08), var(--lumina-shadow);
-      }
-      .lmc__dot {
-        width: 8px; height: 8px;
-        border-radius: 50%;
-        background: var(--lumina-accent);
-        box-shadow: 0 0 8px var(--lumina-accent);
-      }
-      .lmc__pulse {
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        pointer-events: none;
-        opacity: 0;
-      }
-      :host([variant="pulse"]) .lmc__dot,
-      :host([variant="aura"]) .lmc__dot,
-      :host([variant="online"]) .lmc__dot {
-        animation: lmc-pulse 1.6s ease-in-out infinite;
-      }
-      @keyframes lmc-pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.5); opacity: 0.6; }
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__dot, .lmc__pulse { animation: none !important; transition: none !important; }
-      }
-`;
+      :host { display: inline-block; font-family: var(--lumina-font-sans); color: var(--lumina-text); --lmsp-size: 40px; }
+      .lmsp { position: relative; width: var(--lmsp-size); height: var(--lmsp-size); display: inline-flex; align-items: center; justify-content: center; }
+      .lmsp__ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid transparent; border-top-color: var(--lumina-accent); border-right-color: rgb(var(--lumina-accent-rgb) / 0.3); animation: lmsp-spin 1s linear infinite; }
+      @keyframes lmsp-spin { to { transform: rotate(360deg); } }
+      .lmsp__core { width: 20%; height: 20%; border-radius: 50%; background: var(--lumina-accent); box-shadow: 0 0 12px var(--lumina-accent), 0 0 24px rgb(var(--lumina-accent-rgb) / 0.5); animation: lmsp-pulse 1s ease-in-out infinite; }
+      @keyframes lmsp-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.4); opacity: 0.7; } }
+      .lmsp__particles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+      :host([variant="aura"]) .lmsp__ring { border-top-color: #ffd166; border-right-color: rgb(255 209 102 / 0.3); animation-duration: 1.5s; }
+      :host([variant="aura"]) .lmsp__core { background: #ffd166; box-shadow: 0 0 12px #ffd166, 0 0 32px rgb(255 209 102 / 0.5); }
+      :host([variant="glass"]) .lmsp__ring { border-top-color: rgb(255 255 255 / 0.6); border-right-color: rgb(255 255 255 / 0.15); }
+      @media (prefers-reduced-motion: reduce) { .lmsp__ring, .lmsp__core { animation: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._size = parseInt(this.getAttribute('size') ?? '40', 10) || 40;
+    this._spinSpeed = parseFloat(this.getAttribute('speed') ?? '1') || 1;
+    this.style.setProperty('--lmsp-size', `${this._size}px`);
+    this.canvas = this.$$('.lmsp__particles') as HTMLCanvasElement | null;
+    this.ctx = this.canvas?.getContext('2d') ?? null;
+    // Init particles
+    for (let i = 0; i < 6; i++) {
+      this.particles.push({
+        angle: (i / 6) * Math.PI * 2,
+        radius: this._size * 0.35,
+        speed: 0.03 + Math.random() * 0.02,
+        size: 1.5 + Math.random() * 1,
+      });
+    }
+    if (!prefersReducedMotion()) {
+      this.resize();
+      this.raf = requestAnimationFrame(this.tick);
+    }
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { cancelAnimationFrame(this.raf); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'size') { this._size = parseInt(value ?? '40', 10) || 40; this.style.setProperty('--lmsp-size', `${this._size}px`); this.particles.forEach((p) => p.radius = this._size * 0.35); }
+    else if (name === 'speed') this._spinSpeed = parseFloat(value ?? '1') || 1;
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  private resize(): void {
+    if (!this.canvas || !this.ctx) return;
+    const dpr = window.devicePixelRatio || 1;
+    this.canvas.width = this._size * dpr;
+    this.canvas.height = this._size * dpr;
+    this.canvas.style.width = `${this._size}px`;
+    this.canvas.style.height = `${this._size}px`;
+    this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private tick = (): void => {
+    if (!this.ctx) { this.raf = requestAnimationFrame(this.tick); return; }
+    const w = this._size; const h = this._size; const cx = w / 2; const cy = h / 2;
+    this.ctx.clearRect(0, 0, w, h);
+    this.time += 0.016 * this._spinSpeed;
+    const rgb = (this.shadow.host as HTMLElement).style.getPropertyValue('--lumina-accent-rgb').trim() || '124 92 255';
+    // Glow pulse intensity
+    const glowIntensity = 0.3 + 0.4 * Math.sin(this.time * 2);
+    for (const p of this.particles) {
+      p.angle += p.speed * this._spinSpeed;
+      const x = cx + Math.cos(p.angle) * p.radius;
+      const y = cy + Math.sin(p.angle) * p.radius;
+      // Particle trail
+      const trailLen = 5;
+      for (let t = 0; t < trailLen; t++) {
+        const ta = p.angle - t * 0.05 * this._spinSpeed;
+        const tx = cx + Math.cos(ta) * p.radius;
+        const ty = cy + Math.sin(ta) * p.radius;
+        const a = (1 - t / trailLen) * glowIntensity;
+        this.ctx.fillStyle = `rgba(${rgb} / ${a})`;
+        this.ctx.beginPath();
+        this.ctx.arc(tx, ty, p.size * (1 - t / trailLen), 0, Math.PI * 2);
+        this.ctx.fill();
+      }
+    }
+    this.raf = requestAnimationFrame(this.tick);
+  };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-spinner': Spinner;
-  }
-}
-
-if (!customElements.get(Spinner.tagName)) {
-  customElements.define(Spinner.tagName, Spinner);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-spinner': Spinner } }
+if (!customElements.get(Spinner.tagName)) customElements.define(Spinner.tagName, Spinner);

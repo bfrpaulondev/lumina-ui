@@ -1,115 +1,97 @@
 /**
- * LuminaMorphLab — Morph entre componentes em tempo real.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: unique
- *
- * Description: Laboratório interativo de morphing entre componentes e variantes.
- *
- * Variants: `glass` | `neural` | `void`
- * Events:    lumina-morph
- * CSS parts: stage, controls, timeline
- * Props:     (none beyond shared)
- * Slots:     `default`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaMorphLab — Morphing entre componentes diferentes em tempo real.
+ * Permite trocar o componente exibido com transição morfica.
  */
-
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+
+const MORPHABLE = ['lumina-button','lumina-card','lumina-badge','lumina-chip','lumina-input','lumina-toggle-button'];
 
 export class MorphLab extends LuminaElement {
   static tagName = 'lumina-morph-lab';
-
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
-  }
-
-
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'target']; }
+  private _target = 'lumina-button';
+  private stage: HTMLElement | null = null;
+  private currentIdx = 0;
 
   protected render(): string {
     return `
-      <div class="lmc" part="root">
-        <div class="lmc__core" part="core"><slot></slot></div>
-        <canvas class="lmc__canvas" part="canvas" aria-hidden="true"></canvas>
+      <div class="lmml" part="root">
+        <div class="lmml__stage" part="stage" data-stage></div>
+        <div class="lmml__controls" part="controls">
+          <button class="lmml__btn" data-dir="prev">← Anterior</button>
+          <span class="lmml__label" part="label"></span>
+          <button class="lmml__btn" data-dir="next">Próximo →</button>
+        </div>
+        <div class="lmml__timeline" part="timeline"></div>
       </div>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        position: relative;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-        border-radius: var(--lumina-radius-lg);
-        overflow: hidden;
-        min-height: 200px;
-      }
-      .lmc {
-        position: relative;
-        width: 100%; height: 100%;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(16px) saturate(1.4);
-        -webkit-backdrop-filter: blur(16px) saturate(1.4);
-        border: 1px solid var(--lumina-border);
-      }
-      .lmc__core {
-        position: relative; z-index: 2;
-        padding: 24px;
-      }
-      .lmc__canvas {
-        position: absolute; inset: 0;
-        width: 100%; height: 100%;
-        pointer-events: none;
-        z-index: 1;
-        opacity: 0.7;
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__canvas { transition: none !important; animation: none !important; }
-      }
-`;
+      :host { display: block; font-family: var(--lumina-font-sans); color: var(--lumina-text); }
+      .lmml { display: flex; flex-direction: column; gap: 16px; padding: 24px; border-radius: var(--lumina-radius-lg); background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(16px) saturate(1.4); -webkit-backdrop-filter: blur(16px) saturate(1.4); border: 1px solid var(--lumina-border); }
+      .lmml__stage { min-height: 120px; display: flex; align-items: center; justify-content: center; border-radius: var(--lumina-radius-md); background: radial-gradient(circle at 50% 50%, rgb(var(--lumina-accent-rgb) / 0.05), transparent 70%); overflow: hidden; position: relative; }
+      .lmml__stage > * { animation: lmml-morph 0.6s var(--lumina-ease-spring); }
+      @keyframes lmml-morph { 0% { opacity: 0; transform: scale(0.3) rotate(180deg); filter: blur(20px); } 50% { opacity: 0.5; filter: blur(8px); } 100% { opacity: 1; transform: scale(1) rotate(0); filter: blur(0); } }
+      .lmml__controls { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+      .lmml__btn { appearance: none; border: 1px solid var(--lumina-border); background: rgb(var(--lumina-accent-rgb) / 0.1); color: var(--lumina-text); padding: 8px 16px; border-radius: var(--lumina-radius-pill); cursor: pointer; font: 600 13px var(--lumina-font-sans); transition: all 0.2s; }
+      .lmml__btn:hover { background: rgb(var(--lumina-accent-rgb) / 0.25); transform: translateY(-1px); }
+      .lmml__label { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 600; color: var(--lumina-accent); }
+      .lmml__timeline { display: flex; gap: 4px; }
+      .lmml__dot { flex: 1; height: 3px; border-radius: 2px; background: var(--lumina-border); transition: background 0.3s; cursor: pointer; }
+      .lmml__dot[data-active] { background: var(--lumina-accent); box-shadow: 0 0 6px var(--lumina-accent); }
+      @media (prefers-reduced-motion: reduce) { .lmml__stage > * { animation: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this.stage = this.$$('.lmml__stage');
+    this._target = this.getAttribute('target') ?? MORPHABLE[0];
+    this.currentIdx = Math.max(0, MORPHABLE.indexOf(this._target));
+    this.renderTimeline();
+    this.renderTarget();
+    this.$$('.lmml__btn[data-dir="prev"]')?.addEventListener('click', () => this.morph(-1));
+    this.$$('.lmml__btn[data-dir="next"]')?.addEventListener('click', () => this.morph(1));
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void {}
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'target') { this._target = value ?? MORPHABLE[0]; this.currentIdx = Math.max(0, MORPHABLE.indexOf(this._target)); this.renderTarget(); this.renderTimeline(); }
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  private morph(dir: number): void {
+    this.currentIdx = (this.currentIdx + dir + MORPHABLE.length) % MORPHABLE.length;
+    this._target = MORPHABLE[this.currentIdx];
+    this.setAttribute('target', this._target);
+    this.renderTarget();
+    this.renderTimeline();
+    this.dispatchEvent(new CustomEvent('lumina-morph', { bubbles: true, composed: true, detail: { target: this._target, index: this.currentIdx } }));
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  private renderTarget(): void {
+    if (!this.stage) return;
+    const tag = this._target;
+    const el = document.createElement(tag);
+    el.setAttribute('variant','glass'); el.setAttribute('intensity','intense'); el.setAttribute('accent-color','#7c5cff');
+    if (tag === 'lumina-button' || tag === 'lumina-toggle-button') el.textContent = 'Morph me';
+    else if (tag === 'lumina-card') el.innerHTML = '<h3 slot="title">Morph Card</h3><p>Morphing em tempo real.</p>';
+    else if (tag === 'lumina-badge') { el.textContent = 'MORPH'; el.setAttribute('dot',''); }
+    else if (tag === 'lumina-chip') el.textContent = 'Morph Chip';
+    else if (tag === 'lumina-input') el.setAttribute('placeholder','Morph input...');
+    this.stage.innerHTML = '';
+    this.stage.appendChild(el);
+    const label = this.$$('.lmml__label');
+    if (label) label.textContent = `<${tag}>`;
   }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
+  private renderTimeline(): void {
+    const tl = this.$$('.lmml__timeline'); if (!tl) return;
+    tl.innerHTML = '';
+    MORPHABLE.forEach((tag, i) => {
+      const dot = document.createElement('div'); dot.className = 'lmml__dot';
+      if (i === this.currentIdx) dot.setAttribute('data-active','');
+      dot.addEventListener('click', () => { this.currentIdx = i; this._target = tag; this.setAttribute('target', tag); this.renderTarget(); this.renderTimeline(); });
+      tl.appendChild(dot);
+    });
   }
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-morph-lab': MorphLab;
-  }
-}
-
-if (!customElements.get(MorphLab.tagName)) {
-  customElements.define(MorphLab.tagName, MorphLab);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-morph-lab': MorphLab } }
+if (!customElements.get(MorphLab.tagName)) customElements.define(MorphLab.tagName, MorphLab);

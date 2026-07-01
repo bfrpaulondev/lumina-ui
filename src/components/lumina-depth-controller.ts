@@ -1,115 +1,47 @@
 /**
- * LuminaDepthController — Controla o 3D de todos os filhos.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: unique
- *
- * Description: Controlador global de profundidade 3D que afeta componentes filhos.
- *
- * Variants: `flat` | `medium` | `deep` | `extrude`
- * Events:    lumina-depth-change
- * CSS parts: controller, children
- * Props:     `depth`
- * Slots:     `default`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaDepthController — Controla o nível de 3D (tilt, extrusão, parallax) de componentes filhos.
  */
-
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
 
 export class DepthController extends LuminaElement {
   static tagName = 'lumina-depth-controller';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'depth']; }
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes, "depth"];
-  }
-
-
-
-  protected render(): string {
-    return `
-      <div class="lmc" part="root">
-        <div class="lmc__core" part="core"><slot></slot></div>
-        <canvas class="lmc__canvas" part="canvas" aria-hidden="true"></canvas>
-      </div>
-    `;
-  }
-
+  protected render(): string { return `<div class="lmdc" part="controller"><div class="lmdc__children" part="children"><slot></slot></div></div>`; }
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        position: relative;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-        border-radius: var(--lumina-radius-lg);
-        overflow: hidden;
-        min-height: 200px;
-      }
-      .lmc {
-        position: relative;
-        width: 100%; height: 100%;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(16px) saturate(1.4);
-        -webkit-backdrop-filter: blur(16px) saturate(1.4);
-        border: 1px solid var(--lumina-border);
-      }
-      .lmc__core {
-        position: relative; z-index: 2;
-        padding: 24px;
-      }
-      .lmc__canvas {
-        position: absolute; inset: 0;
-        width: 100%; height: 100%;
-        pointer-events: none;
-        z-index: 1;
-        opacity: 0.7;
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__canvas { transition: none !important; animation: none !important; }
-      }
-`;
+      :host { display: block; font-family: var(--lumina-font-sans); color: var(--lumina-text); perspective: 1000px; }
+      .lmdc { position: relative; width: 100%; transform-style: preserve-3d; }
+      .lmdc__children { transform-style: preserve-3d; transition: transform 0.3s var(--lumina-ease-out); }
+      :host([depth="flat"]) .lmdc__children { transform: none; }
+      :host([depth="medium"]) { perspective: 800px; }
+      :host([depth="deep"]) { perspective: 600px; }
+      :host([depth="extrude"]) { perspective: 400px; }
+      :host([depth="medium"]) ::slotted(*), :host([depth="deep"]) ::slotted(*), :host([depth="extrude"]) ::slotted(*) { transform: translateZ(0); transition: transform 0.2s var(--lumina-ease-out); }
+      :host([depth="deep"]) ::slotted(*) { transform: translateZ(10px); }
+      :host([depth="extrude"]) ::slotted(*) { transform: translateZ(20px); box-shadow: 0 20px 0 -10px rgb(var(--lumina-accent-rgb) / 0.3); }
+      :host([depth="extrude"]) ::slotted(*:hover) { transform: translateZ(40px) rotateX(5deg); }
+      @media (prefers-reduced-motion: reduce) { .lmdc__children, ::slotted(*) { transition: none !important; transform: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    if (!this.hasAttribute('depth')) this.setAttribute('depth', 'medium');
+    this.addEventListener('pointermove', this.onMove);
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
-  }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
-  }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  protected unmounted(): void { this.removeEventListener('pointermove', this.onMove); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  private onMove = (e: PointerEvent): void => {
+    const depth = this.getAttribute('depth') ?? 'medium';
+    if (depth === 'flat') return;
+    const rect = this.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / rect.width - 0.5;
+    const py = (e.clientY - rect.top) / rect.height - 0.5;
+    const intensity = depth === 'extrude' ? 1 : depth === 'deep' ? 0.7 : 0.4;
+    const children = this.$$('.lmdc__children');
+    if (children) children.style.transform = `rotateY(${px * 10 * intensity}deg) rotateX(${-py * 10 * intensity}deg)`;
+    this.dispatchEvent(new CustomEvent('lumina-depth-change', { bubbles: true, composed: true, detail: { depth, rx: -py * 10 * intensity, ry: px * 10 * intensity } }));
+  };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-depth-controller': DepthController;
-  }
-}
-
-if (!customElements.get(DepthController.tagName)) {
-  customElements.define(DepthController.tagName, DepthController);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-depth-controller': DepthController } }
+if (!customElements.get(DepthController.tagName)) customElements.define(DepthController.tagName, DepthController);

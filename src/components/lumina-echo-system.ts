@@ -1,116 +1,73 @@
 /**
- * LuminaEchoSystem — Cliques geram ondas em outros elementos.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: unique
- *
- * Description: Cria ecos visuais entre componentes quando há interação.
- *
- * Variants: `aura` | `neural` | `void`
- * Events:    lumina-echo
-   * lumina-pulse
- * CSS parts: echoes, source
- * Props:     (none beyond shared)
- * Slots:     `default`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaEchoSystem — Ecos visuais entre componentes. Cliques em um geram ondas em outros.
  */
-
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { prefersReducedMotion } from '../core/utils';
 
 export class EchoSystem extends LuminaElement {
   static tagName = 'lumina-echo-system';
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
-  }
-
-
-
-  protected render(): string {
-    return `
-      <div class="lmc" part="root">
-        <div class="lmc__core" part="core"><slot></slot></div>
-        <canvas class="lmc__canvas" part="canvas" aria-hidden="true"></canvas>
-      </div>
-    `;
-  }
-
+  protected render(): string { return `<div class="lmes" part="root"><div class="lmes__source" part="source"><slot></slot></div><canvas class="lmes__echoes" aria-hidden="true"></canvas></div>`; }
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        position: relative;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-        border-radius: var(--lumina-radius-lg);
-        overflow: hidden;
-        min-height: 200px;
-      }
-      .lmc {
-        position: relative;
-        width: 100%; height: 100%;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(16px) saturate(1.4);
-        -webkit-backdrop-filter: blur(16px) saturate(1.4);
-        border: 1px solid var(--lumina-border);
-      }
-      .lmc__core {
-        position: relative; z-index: 2;
-        padding: 24px;
-      }
-      .lmc__canvas {
-        position: absolute; inset: 0;
-        width: 100%; height: 100%;
-        pointer-events: none;
-        z-index: 1;
-        opacity: 0.7;
-      }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__canvas { transition: none !important; animation: none !important; }
-      }
-`;
+      :host { display: block; position: relative; font-family: var(--lumina-font-sans); color: var(--lumina-text); }
+      .lmes { position: relative; }
+      .lmes__source { position: relative; z-index: 1; }
+      .lmes__echoes { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }
+    `;
   }
+  private canvas: HTMLCanvasElement | null = null;
+  private ctx: CanvasRenderingContext2D | null = null;
+  private echoes: Array<{x:number;y:number;radius:number;life:number;maxLife:number}> = [];
+  private raf = 0;
 
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this.canvas = this.$$('.lmes__echoes') as HTMLCanvasElement | null;
+    this.ctx = this.canvas?.getContext('2d') ?? null;
+    // Listen for lumina-click events from children
+    this.addEventListener('lumina-click', this.onInteract);
+    this.addEventListener('lumina-press', this.onInteract);
+    this.addEventListener('click', this.onInteract);
+    if (!prefersReducedMotion()) this.raf = requestAnimationFrame(this.tick);
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
-  }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
-  }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  protected unmounted(): void { cancelAnimationFrame(this.raf); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  private onInteract = (e: Event): void => {
+    const me = e as MouseEvent;
+    const rect = this.getBoundingClientRect();
+    const x = me.clientX ? me.clientX - rect.left : rect.width / 2;
+    const y = me.clientY ? me.clientY - rect.top : rect.height / 2;
+    this.echoes.push({ x, y, radius: 0, life: 0, maxLife: 60 });
+    // Also pulse child lumina components
+    this.querySelectorAll('lumina-card, lumina-button, lumina-badge, lumina-chip').forEach((el, i) => {
+      setTimeout(() => {
+        (el as HTMLElement).style.transition = 'box-shadow 0.4s var(--lumina-ease-out)';
+        const oldShadow = (el as HTMLElement).style.boxShadow;
+        (el as HTMLElement).style.boxShadow = `0 0 20px rgb(var(--lumina-accent-rgb) / 0.6)`;
+        setTimeout(() => { (el as HTMLElement).style.boxShadow = oldShadow; }, 400);
+      }, i * 50);
+    });
+    this.dispatchEvent(new CustomEvent('lumina-echo', { bubbles: true, composed: true, detail: { x, y } }));
+    this.dispatchEvent(new CustomEvent('lumina-pulse', { bubbles: true, composed: true }));
+  };
+  private tick = (): void => {
+    if (!this.ctx || !this.canvas) { this.raf = requestAnimationFrame(this.tick); return; }
+    const dpr = window.devicePixelRatio || 1;
+    const w = this.clientWidth; const h = this.clientHeight;
+    if (this.canvas.width !== w * dpr) { this.canvas.width = w * dpr; this.canvas.height = h * dpr; this.canvas.style.width = `${w}px`; this.canvas.style.height = `${h}px`; this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+    this.ctx.clearRect(0, 0, w, h);
+    const rgb = (this.shadow.host as HTMLElement).style.getPropertyValue('--lumina-accent-rgb').trim() || '124 92 255';
+    this.echoes = this.echoes.filter((e) => e.life < e.maxLife);
+    for (const e of this.echoes) {
+      e.life += 1; e.radius = (e.life / e.maxLife) * Math.max(w, h) * 0.5;
+      const a = (1 - e.life / e.maxLife) * 0.3 * (this.getAttribute("variant") === "intense" ? 1.5 : this.getAttribute("variant") === "subtle" ? 0.5 : 1);
+      this.ctx.strokeStyle = `rgba(${rgb} / ${a})`;
+      this.ctx.lineWidth = 2;
+      this.ctx.beginPath(); this.ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2); this.ctx.stroke();
+    }
+    this.raf = requestAnimationFrame(this.tick);
+  };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-echo-system': EchoSystem;
-  }
-}
-
-if (!customElements.get(EchoSystem.tagName)) {
-  customElements.define(EchoSystem.tagName, EchoSystem);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-echo-system': EchoSystem } }
+if (!customElements.get(EchoSystem.tagName)) customElements.define(EchoSystem.tagName, EchoSystem);
