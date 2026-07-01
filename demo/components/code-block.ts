@@ -102,7 +102,19 @@ export class CodeBlock extends HTMLElement {
     this.shadow.querySelector('.code-block__copy')?.addEventListener('click', async (e) => {
       const btn = e.currentTarget as HTMLButtonElement;
       try {
-        await navigator.clipboard.writeText(code);
+        try {
+          await navigator.clipboard.writeText(code);
+        } catch(e) {
+          // Fallback
+          const ta = document.createElement('textarea');
+          ta.value = code;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          try { document.execCommand('copy'); } catch(e2) {}
+          ta.remove();
+        }
         btn.setAttribute('data-copied', '');
         btn.textContent = 'Copiado!';
         setTimeout(() => {

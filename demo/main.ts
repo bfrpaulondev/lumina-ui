@@ -16,8 +16,8 @@ if (document.readyState === 'loading') {
 }
 
 // Guard against duplicate initialization (BUG 8 fix)
-if (!(window as any).__luminaInitialized) {
-  (window as any).__luminaInitialized = true;
+if (!(globalThis as any).__LUMINA_VERSION) {
+  (globalThis as any).__LUMINA_VERSION = '0.3.0';
   console.log(
     '%cLuminaUI Playground v0.3.0 ✨',
     'color: #7c5cff; font-size: 14px; font-weight: bold;',

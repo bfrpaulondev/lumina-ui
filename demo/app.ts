@@ -205,7 +205,15 @@ async function render(): Promise<void> {
 
   outlet.innerHTML = `<div class="route-loading">Carregando…</div>`;
 
-  const sectionDef = SECTIONS.find((s) => s.id === route.section) ?? SECTIONS[0];
+  const sectionDef = SECTIONS.find((s) => s.id === route.section);
+  if (!sectionDef) {
+    outlet.innerHTML = `<div style="padding:80px;text-align:center;">
+      <h1 style="font-size:48px;font-weight:800;color:var(--lumina-accent,#7c5cff);">404</h1>
+      <p style="color:rgba(245,245,255,0.6);font-size:16px;margin:12px 0 24px;">Página não encontrada: <code style="font-family:monospace;color:#78f0ff;">${route.section}</code></p>
+      <a href="#/home" style="display:inline-block;padding:10px 24px;border-radius:999px;background:rgba(124,92,255,0.2);border:1px solid rgba(124,92,255,0.4);color:#fff;text-decoration:none;font-weight:600;">← Voltar ao início</a>
+    </div>`;
+    return;
+  }
   try {
     const mod = await sectionDef.loader();
     const el = await mod.default(route);
