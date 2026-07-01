@@ -1,149 +1,147 @@
 /**
- * LuminaRangeSlider — Range com 2 handles e fill conectado.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: inputs
- *
- * Description: Slider de intervalo com handles conectados.
- *
- * Variants: `glass` | `neural` | `dimensional`
- * Events:    lumina-change
- * CSS parts: track, thumb-min, thumb-max, fill
- * Props:     (none beyond shared)
- * Slots:     (none)
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaRangeSlider — 2 handles conectados com tensão visual e tooltip duplo.
+ * Variants: glass | neural | dimensional
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { clamp } from '../core/utils';
 
 export class RangeSlider extends LuminaElement {
   static tagName = 'lumina-range-slider';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'min-value', 'max-value', 'min', 'max']; }
+  private _min = 0;
+  private _max = 100;
+  private _minVal = 25;
+  private _maxVal = 75;
+  private track: HTMLElement | null = null;
+  private fill: HTMLElement | null = null;
+  private thumbMin: HTMLElement | null = null;
+  private thumbMax: HTMLElement | null = null;
+  private tooltipMin: HTMLElement | null = null;
+  private tooltipMax: HTMLElement | null = null;
+  private dragging: 'min' | 'max' | null = null;
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
-  }
-
-
+  get minValue(): number { return this._minVal; }
+  set minValue(v: number) { this._minVal = clamp(v, this._min, this._maxVal); this.setAttribute('min-value', String(this._minVal)); this.updateUI(); }
+  get maxValue(): number { return this._maxVal; }
+  set maxValue(v: number) { this._maxVal = clamp(v, this._minVal, this._max); this.setAttribute('max-value', String(this._maxVal)); this.updateUI(); }
 
   protected render(): string {
     return `
-      <label class="lmc" part="field">
-        <span class="lmc__label" part="label"><slot name="label"></slot></span>
-        <span class="lmc__shell" part="control">
-          <span class="lmc__bg" aria-hidden="true"></span>
-          <span class="lmc__glow" part="glow" aria-hidden="true"></span>
-          <slot name="left-icon"></slot>
-          <input class="lmc__el" part="control" type="text" />
-          <slot name="right-icon"></slot>
-          <span class="lmc__echo" part="echo" aria-hidden="true"></span>
-        </span>
-      </label>
+      <div class="lmrs" part="track">
+        <div class="lmrs__rail" aria-hidden="true"></div>
+        <div class="lmrs__fill" part="fill" aria-hidden="true"></div>
+        <div class="lmrs__thumb lmrs__thumb--min" part="thumb-min" role="slider" tabindex="0" aria-label="Mínimo">
+          <div class="lmrs__tooltip" part="tooltip"></div>
+        </div>
+        <div class="lmrs__thumb lmrs__thumb--max" part="thumb-max" role="slider" tabindex="0" aria-label="Máximo">
+          <div class="lmrs__tooltip" part="tooltip"></div>
+        </div>
+      </div>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        --lumina-input-h: 48px;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-      }
-      .lmc { display: flex; flex-direction: column; gap: 6px; }
-      .lmc__label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lumina-text-muted); }
-      .lmc__label:empty { display: none; }
-      .lmc__shell {
-        position: relative;
-        display: flex;
-        align-items: center;
-        height: var(--lumina-input-h);
-        border-radius: var(--lumina-radius-md);
-        overflow: hidden;
-      }
-      .lmc__bg {
-        position: absolute; inset: 0;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(12px) saturate(1.3);
-        -webkit-backdrop-filter: blur(12px) saturate(1.3);
-        border: 1px solid var(--lumina-border);
-        box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow);
-        transition: border-color var(--lumina-speed) var(--lumina-ease-out);
-      }
-      .lmc__glow {
-        position: absolute; inset: -2px;
-        border-radius: inherit;
-        pointer-events: none;
-        opacity: 0;
-        background: conic-gradient(from 0deg, transparent 0%, var(--lumina-accent) 25%, transparent 50%, var(--lumina-accent) 75%, transparent 100%);
-        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-        -webkit-mask-composite: xor; mask-composite: exclude;
-        padding: 2px;
-        animation: lmc-spin 4s linear infinite;
-        animation-play-state: paused;
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      :host(:focus-within) .lmc__glow { opacity: 0.7; animation-play-state: running; }
-      :host(:focus-within) .lmc__bg { border-color: rgb(var(--lumina-accent-rgb) / 0.5); }
-      .lmc__el {
-        position: relative; z-index: 2;
-        width: 100%; height: 100%;
-        padding: 0 16px;
-        border: 0; background: transparent;
-        color: var(--lumina-text);
-        font: inherit;
-        font-size: 14px;
-        outline: none;
-        caret-color: var(--lumina-accent);
-      }
-      .lmc__el::placeholder { color: var(--lumina-text-muted); }
-      .lmc__echo { position: absolute; inset: 0; pointer-events: none; }
-      @keyframes lmc-spin { to { transform: rotate(360deg); } }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc__glow, .lmc__bg { animation: none !important; transition: none !important; }
-      }
-`;
+      :host { display: block; font-family: var(--lumina-font-sans); color: var(--lumina-text); padding: 20px 0; }
+      .lmrs { position: relative; height: 8px; cursor: pointer; touch-action: none; }
+      .lmrs__rail { position: absolute; top: 50%; left: 0; right: 0; height: 8px; transform: translateY(-50%); border-radius: var(--lumina-radius-pill); background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) - 0.05)); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); border: 1px solid var(--lumina-border); box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.25); }
+      .lmrs__fill { position: absolute; top: 50%; height: 8px; transform: translateY(-50%); border-radius: var(--lumina-radius-pill); background: linear-gradient(90deg, rgb(var(--lumina-accent-rgb) / 0.7), var(--lumina-accent)); box-shadow: 0 0 12px rgb(var(--lumina-accent-rgb) / 0.6), inset 0 1px 0 rgb(255 255 255 / 0.25); transition: width 0.05s linear, left 0.05s linear; }
+      :host([data-tension]) .lmrs__fill { animation: lmrs-tension 0.6s ease-in-out; }
+      @keyframes lmrs-tension { 0%, 100% { transform: translateY(-50%) scaleY(1); } 50% { transform: translateY(-50%) scaleY(1.5); box-shadow: 0 0 24px rgb(var(--lumina-accent-rgb) / 1); } }
+      .lmrs__thumb { position: absolute; top: 50%; width: 20px; height: 20px; transform: translate(-50%, -50%); border-radius: 50%; background: linear-gradient(135deg, #fff, #d8d8e8); box-shadow: 0 2px 8px rgb(0 0 0 / 0.4), 0 0 0 4px rgb(var(--lumina-accent-rgb) / 0.15), inset 0 1px 0 rgb(255 255 255 / 0.8); cursor: grab; z-index: 2; transition: transform 0.15s var(--lumina-ease-spring); will-change: left; }
+      .lmrs__thumb:hover { transform: translate(-50%, -50%) scale(1.15); }
+      .lmrs__thumb[data-dragging] { cursor: grabbing; transform: translate(-50%, -50%) scale(1.3); }
+      .lmrs__thumb:focus-visible { outline: 2px solid var(--lumina-accent); outline-offset: 4px; }
+      .lmrs__tooltip { position: absolute; bottom: calc(100% + 12px); left: 50%; transform: translateX(-50%); padding: 4px 10px; border-radius: 6px; background: rgb(var(--lumina-surface) / 0.95); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--lumina-border); color: var(--lumina-text); font: 600 11px 'JetBrains Mono', monospace; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity var(--lumina-speed) var(--lumina-ease-out); }
+      .lmrs__thumb:hover .lmrs__tooltip, .lmrs__thumb[data-dragging] .lmrs__tooltip, .lmrs__thumb:focus-visible .lmrs__tooltip { opacity: 1; }
+      :host([variant="neural"]) .lmrs__fill { animation: lmrs-pulse 2s ease-in-out infinite; }
+      @keyframes lmrs-pulse { 0%, 100% { box-shadow: 0 0 12px rgb(var(--lumina-accent-rgb) / 0.6); } 50% { box-shadow: 0 0 24px rgb(var(--lumina-accent-rgb) / 0.9); } }
+      @media (prefers-reduced-motion: reduce) { .lmrs__fill, .lmrs__thumb { transition: none !important; animation: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._min = parseFloat(this.getAttribute('min') ?? '0') || 0;
+    this._max = parseFloat(this.getAttribute('max') ?? '100') || 100;
+    this._minVal = clamp(parseFloat(this.getAttribute('min-value') ?? '25') || 25, this._min, this._max);
+    this._maxVal = clamp(parseFloat(this.getAttribute('max-value') ?? '75') || 75, this._minVal, this._max);
+    this.track = this.$$('.lmrs');
+    this.fill = this.$$('.lmrs__fill');
+    this.thumbMin = this.$$('.lmrs__thumb--min');
+    this.thumbMax = this.$$('.lmrs__thumb--max');
+    this.tooltipMin = this.thumbMin?.querySelector('.lmrs__tooltip') ?? null;
+    this.tooltipMax = this.thumbMax?.querySelector('.lmrs__tooltip') ?? null;
+    this.updateUI();
+    this.track?.addEventListener('pointerdown', this.onPointerDown);
+    document.addEventListener('pointermove', this.onPointerMove);
+    document.addEventListener('pointerup', this.onPointerUp);
+    this.thumbMin?.addEventListener('keydown', (e) => this.onKeydown(e, 'min'));
+    this.thumbMax?.addEventListener('keydown', (e) => this.onKeydown(e, 'max'));
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { document.removeEventListener('pointermove', this.onPointerMove); document.removeEventListener('pointerup', this.onPointerUp); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'min') this._min = parseFloat(value ?? '0') || 0;
+    else if (name === 'max') this._max = parseFloat(value ?? '100') || 100;
+    else if (name === 'min-value') this._minVal = clamp(parseFloat(value ?? '25') || 25, this._min, this._max);
+    else if (name === 'max-value') this._maxVal = clamp(parseFloat(value ?? '75') || 75, this._min, this._max);
+    this.updateUI();
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  private updateUI(): void {
+    if (!this.fill || !this.thumbMin || !this.thumbMax) return;
+    const minPct = ((this._minVal - this._min) / (this._max - this._min)) * 100;
+    const maxPct = ((this._maxVal - this._min) / (this._max - this._min)) * 100;
+    this.fill.style.left = `${minPct}%`;
+    this.fill.style.width = `${maxPct - minPct}%`;
+    this.thumbMin.style.left = `${minPct}%`;
+    this.thumbMax.style.left = `${maxPct}%`;
+    if (this.tooltipMin) this.tooltipMin.textContent = String(this._minVal);
+    if (this.tooltipMax) this.tooltipMax.textContent = String(this._maxVal);
+    this.thumbMin.setAttribute('aria-valuenow', String(this._minVal));
+    this.thumbMax.setAttribute('aria-valuenow', String(this._maxVal));
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  private setValueFromPointer(clientX: number, which: 'min' | 'max'): void {
+    if (!this.track) return;
+    const rect = this.track.getBoundingClientRect();
+    const pct = clamp((clientX - rect.left) / rect.width, 0, 1);
+    const raw = this._min + pct * (this._max - this._min);
+    if (which === 'min') this._minVal = clamp(Math.round(raw), this._min, this._maxVal);
+    else this._maxVal = clamp(Math.round(raw), this._minVal, this._max);
+    this.setAttribute('min-value', String(this._minVal));
+    this.setAttribute('max-value', String(this._maxVal));
+    this.updateUI();
+    this.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, composed: true, detail: { minValue: this._minVal, maxValue: this._maxVal } }));
   }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
+  private onPointerDown = (e: PointerEvent): void => {
+    if (!this.track) return;
+    const rect = this.track.getBoundingClientRect();
+    const pct = (e.clientX - rect.left) / rect.width;
+    const val = this._min + pct * (this._max - this._min);
+    const distMin = Math.abs(val - this._minVal);
+    const distMax = Math.abs(val - this._maxVal);
+    this.dragging = distMin < distMax ? 'min' : 'max';
+    (this.dragging === 'min' ? this.thumbMin : this.thumbMax)?.setAttribute('data-dragging', '');
+    this.setAttribute('data-tension', '');
+    setTimeout(() => this.removeAttribute('data-tension'), 600);
+    this.setValueFromPointer(e.clientX, this.dragging);
+    e.preventDefault();
+  };
+  private onPointerMove = (e: PointerEvent): void => { if (this.dragging) this.setValueFromPointer(e.clientX, this.dragging); };
+  private onPointerUp = (): void => {
+    if (this.dragging) { (this.dragging === 'min' ? this.thumbMin : this.thumbMax)?.removeAttribute('data-dragging'); this.dragging = null; }
+  };
+  private onKeydown(e: KeyboardEvent, which: 'min' | 'max'): void {
+    const step = (this._max - this._min) / 20;
+    let delta = 0;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') delta = step;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') delta = -step;
+    else return;
+    e.preventDefault();
+    if (which === 'min') this.minValue = this._minVal + delta;
+    else this.maxValue = this._maxVal + delta;
+    this.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, composed: true, detail: { minValue: this._minVal, maxValue: this._maxVal } }));
   }
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-range-slider': RangeSlider;
-  }
-}
-
-if (!customElements.get(RangeSlider.tagName)) {
-  customElements.define(RangeSlider.tagName, RangeSlider);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-range-slider': RangeSlider } }
+if (!customElements.get(RangeSlider.tagName)) customElements.define(RangeSlider.tagName, RangeSlider);

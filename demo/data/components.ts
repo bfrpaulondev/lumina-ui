@@ -2006,6 +2006,8 @@ export class Textarea extends LuminaElement {
   // Props:
    * value: string
    * rows: number
+   * max-length: number
+   * auto-grow: boolean
   // Slots:           (none)
 
   protected render(): string {
@@ -2032,6 +2034,8 @@ customElements.define(Textarea.tagName, Textarea);
   accent-color="#7c5cff"
   speed="0.5"
   rows="4"
+  max-length="0"
+  auto-grow
 ></lumina-textarea>
 <script type="module">
   const el = document.querySelector('lumina-textarea');
@@ -2043,7 +2047,7 @@ customElements.define(Textarea.tagName, Textarea);
 
 export function TextareaExample() {
   return (
-    <lumina-textarea variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} rows={4}
+    <lumina-textarea variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} rows={4} max-length={0} auto-grow
       onLuminaInput={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2056,9 +2060,11 @@ export class SearchInput extends LuminaElement {
 
   // Accepts variants: 'glass' | 'neural' | 'minimal'
   // CSS parts:       field, control, icon, suggestions
-  // Events:          lumina-search, lumina-suggest
+  // Events:          lumina-search, lumina-suggestion-select
   // Props:
    * value: string
+   * suggestions: string
+   * voice: boolean
   // Slots:           (none)
 
   protected render(): string {
@@ -2108,7 +2114,7 @@ export class PasswordInput extends LuminaElement {
 
   // Accepts variants: 'glass' | 'neural' | 'secure'
   // CSS parts:       field, control, toggle, strength-meter
-  // Events:          lumina-change, lumina-strength
+  // Events:          lumina-visibility-toggle, lumina-strength-change
   // Props:
    * value: string
   // Slots:           (none)
@@ -2139,8 +2145,8 @@ customElements.define(PasswordInput.tagName, PasswordInput);
 ></lumina-password-input>
 <script type="module">
   const el = document.querySelector('lumina-password-input');
-  el.addEventListener('lumina-change', (e) => {
-    console.log('lumina-change', e.detail);
+  el.addEventListener('lumina-visibility-toggle', (e) => {
+    console.log('lumina-visibility-toggle', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
@@ -2148,7 +2154,7 @@ customElements.define(PasswordInput.tagName, PasswordInput);
 export function PasswordInputExample() {
   return (
     <lumina-password-input variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-      onLuminaChange={(e) => console.log(e.detail)} />
+      onLuminaVisibilityToggle={(e) => console.log(e.detail)} />
   );
 }`,
   },
@@ -2215,9 +2221,11 @@ export class MultiSelect extends LuminaElement {
 
   // Accepts variants: 'glass' | 'neural' | 'compact'
   // CSS parts:       trigger, chips, menu
-  // Events:          lumina-change
+  // Events:          lumina-change, lumina-chip-remove
   // Props:
-   * (only shared LuminaElement props)
+   * options: string
+   * value: string
+   * max: number
   // Slots:           (none)
 
   protected render(): string {
@@ -2243,6 +2251,7 @@ customElements.define(MultiSelect.tagName, MultiSelect);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  max="0"
 ></lumina-multi-select>
 <script type="module">
   const el = document.querySelector('lumina-multi-select');
@@ -2254,7 +2263,7 @@ customElements.define(MultiSelect.tagName, MultiSelect);
 
 export function MultiSelectExample() {
   return (
-    <lumina-multi-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+    <lumina-multi-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max={0}
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2267,9 +2276,10 @@ export class Autocomplete extends LuminaElement {
 
   // Accepts variants: 'neural' | 'glass' | 'contextual'
   // CSS parts:       field, control, suggestions
-  // Events:          lumina-change, lumina-select
+  // Events:          lumina-select, lumina-suggestion-highlight
   // Props:
-   * (only shared LuminaElement props)
+   * suggestions: string
+   * memory-key: string
   // Slots:           (none)
 
   protected render(): string {
@@ -2298,8 +2308,8 @@ customElements.define(Autocomplete.tagName, Autocomplete);
 ></lumina-autocomplete>
 <script type="module">
   const el = document.querySelector('lumina-autocomplete');
-  el.addEventListener('lumina-change', (e) => {
-    console.log('lumina-change', e.detail);
+  el.addEventListener('lumina-select', (e) => {
+    console.log('lumina-select', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
@@ -2307,7 +2317,7 @@ customElements.define(Autocomplete.tagName, Autocomplete);
 export function AutocompleteExample() {
   return (
     <lumina-autocomplete variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-      onLuminaChange={(e) => console.log(e.detail)} />
+      onLuminaSelect={(e) => console.log(e.detail)} />
   );
 }`,
   },
@@ -2381,7 +2391,10 @@ export class RangeSlider extends LuminaElement {
   // CSS parts:       track, thumb-min, thumb-max, fill
   // Events:          lumina-change
   // Props:
-   * (only shared LuminaElement props)
+   * min-value: number
+   * max-value: number
+   * min: number
+   * max: number
   // Slots:           (none)
 
   protected render(): string {
@@ -2407,6 +2420,10 @@ customElements.define(RangeSlider.tagName, RangeSlider);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
+  min-value="0"
+  max-value="0"
+  min="0"
+  max="100"
 ></lumina-range-slider>
 <script type="module">
   const el = document.querySelector('lumina-range-slider');
@@ -2418,7 +2435,7 @@ customElements.define(RangeSlider.tagName, RangeSlider);
 
 export function RangeSliderExample() {
   return (
-    <lumina-range-slider variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
+    <lumina-range-slider variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} min-value={0} max-value={0} min={0} max={100}
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2429,8 +2446,8 @@ export function RangeSliderExample() {
 export class Switch extends LuminaElement {
   static tagName = 'lumina-switch';
 
-  // Accepts variants: 'glass' | 'neural' | 'minimal'
-  // CSS parts:       track, thumb
+  // Accepts variants: 'glass' | 'neural' | 'aura' | 'void'
+  // CSS parts:       track, thumb, glow, particles
   // Events:          lumina-change
   // Props:
    * checked: boolean
@@ -2486,6 +2503,7 @@ export class Checkbox extends LuminaElement {
   // Events:          lumina-change
   // Props:
    * checked: boolean
+   * indeterminate: boolean
   // Slots:           (none)
 
   protected render(): string {
@@ -2537,7 +2555,7 @@ export class RadioGroup extends LuminaElement {
   // CSS parts:       group, option, indicator
   // Events:          lumina-change
   // Props:
-   * (only shared LuminaElement props)
+   * value: string
   // Slots:           default
 
   protected render(): string {
@@ -2587,9 +2605,11 @@ export class FileUpload extends LuminaElement {
 
   // Accepts variants: 'glass' | 'neural' | 'drag'
   // CSS parts:       dropzone, preview, progress
-  // Events:          lumina-file-select, lumina-progress, lumina-complete
+  // Events:          lumina-file-add, lumina-file-remove, lumina-upload-progress
   // Props:
-   * (only shared LuminaElement props)
+   * accept: string
+   * multiple: boolean
+   * max-size: number
   // Slots:           (none)
 
   protected render(): string {
@@ -2615,19 +2635,20 @@ customElements.define(FileUpload.tagName, FileUpload);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  max-size="0"
 ></lumina-file-upload>
 <script type="module">
   const el = document.querySelector('lumina-file-upload');
-  el.addEventListener('lumina-file-select', (e) => {
-    console.log('lumina-file-select', e.detail);
+  el.addEventListener('lumina-file-add', (e) => {
+    console.log('lumina-file-add', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
 
 export function FileUploadExample() {
   return (
-    <lumina-file-upload variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-      onLuminaFileSelect={(e) => console.log(e.detail)} />
+    <lumina-file-upload variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max-size={0}
+      onLuminaFileAdd={(e) => console.log(e.detail)} />
   );
 }`,
   },
@@ -2639,9 +2660,9 @@ export class ColorPicker extends LuminaElement {
 
   // Accepts variants: 'glass' | 'neural' | 'holo'
   // CSS parts:       trigger, swatch, panel, preview
-  // Events:          lumina-change
+  // Events:          lumina-color-change
   // Props:
-   * (only shared LuminaElement props)
+   * value: string
   // Slots:           (none)
 
   protected render(): string {
@@ -2667,19 +2688,20 @@ customElements.define(ColorPicker.tagName, ColorPicker);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
+  value="#7c5cff"
 ></lumina-color-picker>
 <script type="module">
   const el = document.querySelector('lumina-color-picker');
-  el.addEventListener('lumina-change', (e) => {
-    console.log('lumina-change', e.detail);
+  el.addEventListener('lumina-color-change', (e) => {
+    console.log('lumina-color-change', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
 
 export function ColorPickerExample() {
   return (
-    <lumina-color-picker variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-      onLuminaChange={(e) => console.log(e.detail)} />
+    <lumina-color-picker variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5} value="#7c5cff"
+      onLuminaColorChange={(e) => console.log(e.detail)} />
   );
 }`,
   },
@@ -2691,9 +2713,9 @@ export class DatePicker extends LuminaElement {
 
   // Accepts variants: 'glass' | 'neural' | 'minimal'
   // CSS parts:       trigger, calendar, day, month
-  // Events:          lumina-change
+  // Events:          lumina-date-change
   // Props:
-   * (only shared LuminaElement props)
+   * value: string
   // Slots:           (none)
 
   protected render(): string {
@@ -2722,8 +2744,8 @@ customElements.define(DatePicker.tagName, DatePicker);
 ></lumina-date-picker>
 <script type="module">
   const el = document.querySelector('lumina-date-picker');
-  el.addEventListener('lumina-change', (e) => {
-    console.log('lumina-change', e.detail);
+  el.addEventListener('lumina-date-change', (e) => {
+    console.log('lumina-date-change', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
@@ -2731,7 +2753,7 @@ customElements.define(DatePicker.tagName, DatePicker);
 export function DatePickerExample() {
   return (
     <lumina-date-picker variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-      onLuminaChange={(e) => console.log(e.detail)} />
+      onLuminaDateChange={(e) => console.log(e.detail)} />
   );
 }`,
   },
@@ -2743,9 +2765,10 @@ export class TimePicker extends LuminaElement {
 
   // Accepts variants: 'glass' | 'neural' | 'circular'
   // CSS parts:       trigger, dial, hand
-  // Events:          lumina-change
+  // Events:          lumina-time-change
   // Props:
-   * (only shared LuminaElement props)
+   * value: string
+   * format: "12h" | "24h"
   // Slots:           (none)
 
   protected render(): string {
@@ -2771,19 +2794,20 @@ customElements.define(TimePicker.tagName, TimePicker);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
+  format="24h"
 ></lumina-time-picker>
 <script type="module">
   const el = document.querySelector('lumina-time-picker');
-  el.addEventListener('lumina-change', (e) => {
-    console.log('lumina-change', e.detail);
+  el.addEventListener('lumina-time-change', (e) => {
+    console.log('lumina-time-change', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
 
 export function TimePickerExample() {
   return (
-    <lumina-time-picker variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
-      onLuminaChange={(e) => console.log(e.detail)} />
+    <lumina-time-picker variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} format="24h"
+      onLuminaTimeChange={(e) => console.log(e.detail)} />
   );
 }`,
   },
@@ -2795,7 +2819,7 @@ export class SignaturePad extends LuminaElement {
 
   // Accepts variants: 'glass' | 'neural' | 'minimal'
   // CSS parts:       canvas, toolbar
-  // Events:          lumina-sign, lumina-clear
+  // Events:          lumina-signature-start, lumina-signature-end
   // Props:
    * (only shared LuminaElement props)
   // Slots:           (none)
@@ -2826,8 +2850,8 @@ customElements.define(SignaturePad.tagName, SignaturePad);
 ></lumina-signature-pad>
 <script type="module">
   const el = document.querySelector('lumina-signature-pad');
-  el.addEventListener('lumina-sign', (e) => {
-    console.log('lumina-sign', e.detail);
+  el.addEventListener('lumina-signature-start', (e) => {
+    console.log('lumina-signature-start', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
@@ -2835,7 +2859,7 @@ customElements.define(SignaturePad.tagName, SignaturePad);
 export function SignaturePadExample() {
   return (
     <lumina-signature-pad variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-      onLuminaSign={(e) => console.log(e.detail)} />
+      onLuminaSignatureStart={(e) => console.log(e.detail)} />
   );
 }`,
   },
@@ -2899,7 +2923,7 @@ export class NeuralInput extends LuminaElement {
 
   // Accepts variants: 'neural' | 'echo' | 'adaptive'
   // CSS parts:       field, control, reaction
-  // Events:          lumina-change, lumina-react
+  // Events:          lumina-input, lumina-sentiment-change
   // Props:
    * (only shared LuminaElement props)
   // Slots:           (none)
@@ -2930,8 +2954,8 @@ customElements.define(NeuralInput.tagName, NeuralInput);
 ></lumina-neural-input>
 <script type="module">
   const el = document.querySelector('lumina-neural-input');
-  el.addEventListener('lumina-change', (e) => {
-    console.log('lumina-change', e.detail);
+  el.addEventListener('lumina-input', (e) => {
+    console.log('lumina-input', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
@@ -2939,7 +2963,7 @@ customElements.define(NeuralInput.tagName, NeuralInput);
 export function NeuralInputExample() {
   return (
     <lumina-neural-input variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-      onLuminaChange={(e) => console.log(e.detail)} />
+      onLuminaInput={(e) => console.log(e.detail)} />
   );
 }`,
   },
@@ -2951,9 +2975,9 @@ export class ContextInput extends LuminaElement {
 
   // Accepts variants: 'adaptive' | 'neural' | 'glass'
   // CSS parts:       field, control
-  // Events:          lumina-change
+  // Events:          lumina-context-change
   // Props:
-   * (only shared LuminaElement props)
+   * value: string
   // Slots:           (none)
 
   protected render(): string {
@@ -2982,8 +3006,8 @@ customElements.define(ContextInput.tagName, ContextInput);
 ></lumina-context-input>
 <script type="module">
   const el = document.querySelector('lumina-context-input');
-  el.addEventListener('lumina-change', (e) => {
-    console.log('lumina-change', e.detail);
+  el.addEventListener('lumina-context-change', (e) => {
+    console.log('lumina-context-change', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
@@ -2991,7 +3015,7 @@ customElements.define(ContextInput.tagName, ContextInput);
 export function ContextInputExample() {
   return (
     <lumina-context-input variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5}
-      onLuminaChange={(e) => console.log(e.detail)} />
+      onLuminaContextChange={(e) => console.log(e.detail)} />
   );
 }`,
   },

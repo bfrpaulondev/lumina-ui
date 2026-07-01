@@ -1,161 +1,116 @@
 /**
- * LuminaTextarea — Textarea com contador e resize.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: inputs
- *
- * Description: Área de texto com feedback visual avançado.
- *
- * Variants: `glass` | `neural` | `adaptive`
- * Events:    lumina-input
-   * lumina-change
- * CSS parts: field, control, footer
- * Props:     `value`, `rows`
- * Slots:     (none)
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaTextarea — Expansão automática, contador animado que muda de cor, respiração na borda.
+ * Variants: glass | neural | adaptive
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
 
 export class Textarea extends LuminaElement {
   static tagName = 'lumina-textarea';
-
   static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes, "value", "rows"];
+    return [...LuminaElement.observedAttributes, 'value', 'rows', 'max-length', 'auto-grow'];
   }
+  private _value = '';
+  private _rows = 4;
+  private _maxLength = 0;
+  private _autoGrow = true;
+  private textarea: HTMLTextAreaElement | null = null;
+  private counter: HTMLElement | null = null;
 
-  get value(): string {
-    return this.getAttribute('value') ?? '';
-  }
-  set value(v: string) {
-    this.setAttribute('value', v);
-  }
-  get rows(): number {
-    return parseFloat(this.getAttribute('rows') ?? '4') || 0;
-  }
-  set rows(v: number) {
-    this.setAttribute('rows', String(v));
-  }
+  get value(): string { return this._value; }
+  set value(v: string) { this._value = v; this.setAttribute('value', v); if (this.textarea) this.textarea.value = v; this.updateCounter(); this.autoResize(); }
+  get rows(): number { return this._rows; }
+  set rows(v: number) { this._rows = v; this.setAttribute('rows', String(v)); }
+  get maxLength(): number { return this._maxLength; }
+  set maxLength(v: number) { this._maxLength = v; this.setAttribute('max-length', String(v)); this.updateCounter(); }
+  get autoGrow(): boolean { return this._autoGrow; }
+  set autoGrow(v: boolean) { this._autoGrow = v; if (v) this.setAttribute('auto-grow',''); else this.removeAttribute('auto-grow'); }
 
   protected render(): string {
     return `
-      <label class="lmc" part="field">
-        <span class="lmc__label" part="label"><slot name="label"></slot></span>
-        <span class="lmc__shell" part="control">
-          <span class="lmc__bg" aria-hidden="true"></span>
-          <span class="lmc__glow" part="glow" aria-hidden="true"></span>
-          <slot name="left-icon"></slot>
-          <input class="lmc__el" part="control" type="text" />
-          <slot name="right-icon"></slot>
-          <span class="lmc__echo" part="echo" aria-hidden="true"></span>
-        </span>
+      <label class="lmtx" part="field">
+        <div class="lmtx__shell">
+          <div class="lmtx__bg" aria-hidden="true"></div>
+          <div class="lmtx__glow" aria-hidden="true"></div>
+          <textarea class="lmtx__el" part="control" rows="${this._rows}" placeholder="Digite algo..."></textarea>
+        </div>
+        <div class="lmtx__footer" part="footer">
+          <span class="lmtx__counter" aria-hidden="true"></span>
+        </div>
       </label>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        --lumina-input-h: 48px;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-      }
-      .lmc { display: flex; flex-direction: column; gap: 6px; }
-      .lmc__label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lumina-text-muted); }
-      .lmc__label:empty { display: none; }
-      .lmc__shell {
-        position: relative;
-        display: flex;
-        align-items: center;
-        height: var(--lumina-input-h);
-        border-radius: var(--lumina-radius-md);
-        overflow: hidden;
-      }
-      .lmc__bg {
-        position: absolute; inset: 0;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(12px) saturate(1.3);
-        -webkit-backdrop-filter: blur(12px) saturate(1.3);
-        border: 1px solid var(--lumina-border);
-        box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow);
-        transition: border-color var(--lumina-speed) var(--lumina-ease-out);
-      }
-      .lmc__glow {
-        position: absolute; inset: -2px;
-        border-radius: inherit;
-        pointer-events: none;
-        opacity: 0;
-        background: conic-gradient(from 0deg, transparent 0%, var(--lumina-accent) 25%, transparent 50%, var(--lumina-accent) 75%, transparent 100%);
-        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-        -webkit-mask-composite: xor; mask-composite: exclude;
-        padding: 2px;
-        animation: lmc-spin 4s linear infinite;
-        animation-play-state: paused;
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      :host(:focus-within) .lmc__glow { opacity: 0.7; animation-play-state: running; }
-      :host(:focus-within) .lmc__bg { border-color: rgb(var(--lumina-accent-rgb) / 0.5); }
-      .lmc__el {
-        position: relative; z-index: 2;
-        width: 100%; height: 100%;
-        padding: 0 16px;
-        border: 0; background: transparent;
-        color: var(--lumina-text);
-        font: inherit;
-        font-size: 14px;
-        outline: none;
-        caret-color: var(--lumina-accent);
-      }
-      .lmc__el::placeholder { color: var(--lumina-text-muted); }
-      .lmc__echo { position: absolute; inset: 0; pointer-events: none; }
-      @keyframes lmc-spin { to { transform: rotate(360deg); } }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc__glow, .lmc__bg { animation: none !important; transition: none !important; }
-      }
-`;
+      :host { display: block; font-family: var(--lumina-font-sans); color: var(--lumina-text); }
+      .lmtx { display: flex; flex-direction: column; gap: 6px; }
+      .lmtx__shell { position: relative; border-radius: var(--lumina-radius-md); overflow: hidden; }
+      .lmtx__bg { position: absolute; inset: 0; border-radius: inherit; background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(12px) saturate(1.3); -webkit-backdrop-filter: blur(12px) saturate(1.3); border: 1px solid var(--lumina-border); box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow); transition: border-color var(--lumina-speed) var(--lumina-ease-out); }
+      :host(:focus-within) .lmtx__bg { border-color: rgb(var(--lumina-accent-rgb) / 0.5); animation: lmtx-breathe 2s ease-in-out infinite; }
+      @keyframes lmtx-breathe { 0%, 100% { box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), 0 0 0 0 rgb(var(--lumina-accent-rgb) / 0); } 50% { box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), 0 0 0 4px rgb(var(--lumina-accent-rgb) / 0.15); } }
+      .lmtx__glow { position: absolute; inset: -2px; border-radius: inherit; pointer-events: none; opacity: 0; background: conic-gradient(from 0deg, transparent 0%, var(--lumina-accent) 25%, transparent 50%, var(--lumina-accent) 75%, transparent 100%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; padding: 2px; animation: lmtx-spin 4s linear infinite; animation-play-state: paused; transition: opacity var(--lumina-speed) var(--lumina-ease-out); }
+      :host(:focus-within) .lmtx__glow { opacity: 0.6; animation-play-state: running; }
+      .lmtx__el { position: relative; z-index: 1; width: 100%; min-height: calc(var(--lumina-input-h, 48px) * 2); padding: 12px 16px; border: 0; background: transparent; color: var(--lumina-text); font: 500 14px var(--lumina-font-sans); outline: none; resize: none; line-height: 1.5; caret-color: var(--lumina-accent); transition: height 0.2s var(--lumina-ease-out); }
+      .lmtx__el::placeholder { color: var(--lumina-text-muted); }
+      .lmtx__footer { display: flex; justify-content: flex-end; padding: 0 4px; }
+      .lmtx__counter { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--lumina-text-muted); transition: color 0.3s; }
+      .lmtx__counter[data-warning] { color: #f59e0b; }
+      .lmtx__counter[data-danger] { color: #ef4444; }
+      @keyframes lmtx-spin { to { transform: rotate(360deg); } }
+      :host([variant="neural"]) .lmtx__bg { border-color: rgb(var(--lumina-accent-rgb) / 0.25); }
+      @media (prefers-reduced-motion: reduce) { .lmtx__glow, .lmtx__bg { animation: none !important; transition: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._value = this.getAttribute('value') ?? '';
+    this._rows = parseInt(this.getAttribute('rows') ?? '4', 10) || 4;
+    this._maxLength = parseInt(this.getAttribute('max-length') ?? '0', 10) || 0;
+    this._autoGrow = this.getAttribute('auto-grow') !== 'false';
+    this.textarea = this.$$('.lmtx__el') as HTMLTextAreaElement | null;
+    this.counter = this.$$('.lmtx__counter');
+    if (this.textarea) {
+      this.textarea.value = this._value;
+      this.textarea.addEventListener('input', this.onInput);
+      this.textarea.addEventListener('change', this.onChange);
+    }
+    this.updateCounter();
+    this.autoResize();
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void {}
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'value') { this._value = value ?? ''; if (this.textarea) this.textarea.value = this._value; this.updateCounter(); this.autoResize(); }
+    else if (name === 'rows') this._rows = parseInt(value ?? '4', 10) || 4;
+    else if (name === 'max-length') { this._maxLength = parseInt(value ?? '0', 10) || 0; this.updateCounter(); }
+    else if (name === 'auto-grow') this._autoGrow = value !== 'false';
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  private onInput = (e: Event): void => {
+    this._value = (e.target as HTMLTextAreaElement).value;
+    this.updateCounter();
+    this.autoResize();
+    this.dispatchEvent(new CustomEvent('lumina-input', { bubbles: true, composed: true, detail: { value: this._value } }));
+  };
+  private onChange = (): void => { this.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, composed: true, detail: { value: this._value } })); };
+  private updateCounter(): void {
+    if (!this.counter) return;
+    const len = this._value.length;
+    if (this._maxLength > 0) {
+      this.counter.textContent = `${len} / ${this._maxLength}`;
+      this.counter.removeAttribute('data-warning');
+      this.counter.removeAttribute('data-danger');
+      if (len > this._maxLength * 0.9) this.counter.setAttribute('data-warning', '');
+      if (len >= this._maxLength) this.counter.setAttribute('data-danger', '');
+    } else {
+      this.counter.textContent = `${len} chars`;
+    }
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
+  private autoResize(): void {
+    if (!this._autoGrow || !this.textarea) return;
+    this.textarea.style.height = 'auto';
+    this.textarea.style.height = `${this.textarea.scrollHeight}px`;
   }
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-textarea': Textarea;
-  }
-}
-
-if (!customElements.get(Textarea.tagName)) {
-  customElements.define(Textarea.tagName, Textarea);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-textarea': Textarea } }
+if (!customElements.get(Textarea.tagName)) customElements.define(Textarea.tagName, Textarea);

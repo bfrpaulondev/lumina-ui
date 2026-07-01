@@ -1,151 +1,113 @@
 /**
- * LuminaVoiceInput — Input por voz com waveform.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: inputs
- *
- * Description: Campo que aceita entrada por voz com visualização.
- *
- * Variants: `neural` | `aura` | `glass`
- * Events:    lumina-voice-start
-   * lumina-voice-end
-   * lumina-transcript
- * CSS parts: field, waveform, mic-button
- * Props:     (none beyond shared)
- * Slots:     (none)
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaVoiceInput — Waveform animada, transcrição em tempo real, botão com pulso.
+ * Variants: neural | aura | glass
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
 
 export class VoiceInput extends LuminaElement {
   static tagName = 'lumina-voice-input';
-
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
-  }
-
-
+  private input: HTMLInputElement | null = null;
+  private micBtn: HTMLElement | null = null;
+  private canvas: HTMLCanvasElement | null = null;
+  private ctx: CanvasRenderingContext2D | null = null;
+  private recording = false;
+  private raf = 0;
+  private waveform: number[] = new Array(40).fill(0);
+  private recognition: any = null;
 
   protected render(): string {
     return `
-      <label class="lmc" part="field">
-        <span class="lmc__label" part="label"><slot name="label"></slot></span>
-        <span class="lmc__shell" part="control">
-          <span class="lmc__bg" aria-hidden="true"></span>
-          <span class="lmc__glow" part="glow" aria-hidden="true"></span>
-          <slot name="left-icon"></slot>
-          <input class="lmc__el" part="control" type="text" />
-          <slot name="right-icon"></slot>
-          <span class="lmc__echo" part="echo" aria-hidden="true"></span>
-        </span>
-      </label>
+      <div class="lmvi" part="field">
+        <div class="lmvi__shell" part="control">
+          <div class="lmvi__bg" aria-hidden="true"></div>
+          <input class="lmvi__el" type="text" placeholder="Fale ou digite..." />
+          <button class="lmvi__mic" part="mic-button" type="button" aria-label="Falar">🎤</button>
+        </div>
+        <canvas class="lmvi__waveform" part="waveform" aria-hidden="true"></canvas>
+      </div>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        --lumina-input-h: 48px;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-      }
-      .lmc { display: flex; flex-direction: column; gap: 6px; }
-      .lmc__label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lumina-text-muted); }
-      .lmc__label:empty { display: none; }
-      .lmc__shell {
-        position: relative;
-        display: flex;
-        align-items: center;
-        height: var(--lumina-input-h);
-        border-radius: var(--lumina-radius-md);
-        overflow: hidden;
-      }
-      .lmc__bg {
-        position: absolute; inset: 0;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(12px) saturate(1.3);
-        -webkit-backdrop-filter: blur(12px) saturate(1.3);
-        border: 1px solid var(--lumina-border);
-        box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow);
-        transition: border-color var(--lumina-speed) var(--lumina-ease-out);
-      }
-      .lmc__glow {
-        position: absolute; inset: -2px;
-        border-radius: inherit;
-        pointer-events: none;
-        opacity: 0;
-        background: conic-gradient(from 0deg, transparent 0%, var(--lumina-accent) 25%, transparent 50%, var(--lumina-accent) 75%, transparent 100%);
-        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-        -webkit-mask-composite: xor; mask-composite: exclude;
-        padding: 2px;
-        animation: lmc-spin 4s linear infinite;
-        animation-play-state: paused;
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      :host(:focus-within) .lmc__glow { opacity: 0.7; animation-play-state: running; }
-      :host(:focus-within) .lmc__bg { border-color: rgb(var(--lumina-accent-rgb) / 0.5); }
-      .lmc__el {
-        position: relative; z-index: 2;
-        width: 100%; height: 100%;
-        padding: 0 16px;
-        border: 0; background: transparent;
-        color: var(--lumina-text);
-        font: inherit;
-        font-size: 14px;
-        outline: none;
-        caret-color: var(--lumina-accent);
-      }
-      .lmc__el::placeholder { color: var(--lumina-text-muted); }
-      .lmc__echo { position: absolute; inset: 0; pointer-events: none; }
-      @keyframes lmc-spin { to { transform: rotate(360deg); } }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc__glow, .lmc__bg { animation: none !important; transition: none !important; }
-      }
-`;
+      :host { display: block; font-family: var(--lumina-font-sans); color: var(--lumina-text); }
+      .lmvi__shell { position: relative; display: flex; align-items: center; height: 44px; border-radius: var(--lumina-radius-md); overflow: hidden; }
+      .lmvi__bg { position: absolute; inset: 0; border-radius: inherit; background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(12px) saturate(1.3); -webkit-backdrop-filter: blur(12px) saturate(1.3); border: 1px solid var(--lumina-border); transition: border-color var(--lumina-speed) var(--lumina-ease-out); }
+      :host(:focus-within) .lmvi__bg { border-color: rgb(var(--lumina-accent-rgb) / 0.5); }
+      .lmvi__el { position: relative; z-index: 1; flex: 1; height: 100%; padding: 0 16px; border: 0; background: transparent; color: var(--lumina-text); font: 500 14px var(--lumina-font-sans); outline: none; caret-color: var(--lumina-accent); }
+      .lmvi__el::placeholder { color: var(--lumina-text-muted); }
+      .lmvi__mic { position: relative; z-index: 1; margin-right: 8px; appearance: none; border: 0; background: rgb(var(--lumina-accent-rgb) / 0.15); color: var(--lumina-accent); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+      .lmvi__mic:hover { transform: scale(1.1); }
+      .lmvi__mic[recording] { background: rgb(239 68 68 / 0.3); color: #f87171; animation: lmvi-pulse 1s ease-in-out infinite; }
+      @keyframes lmvi-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgb(239 68 68 / 0.5); } 50% { box-shadow: 0 0 0 10px rgb(239 68 68 / 0); } }
+      .lmvi__waveform { display: block; width: 100%; height: 40px; margin-top: 4px; opacity: 0; transition: opacity var(--lumina-speed) var(--lumina-ease-out); }
+      .lmvi__waveform[data-active] { opacity: 1; }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this.input = this.$$('.lmvi__el') as HTMLInputElement | null;
+    this.micBtn = this.$$('.lmvi__mic');
+    this.canvas = this.$$('.lmvi__waveform') as HTMLCanvasElement | null;
+    this.ctx = this.canvas?.getContext('2d') ?? null;
+    this.micBtn?.addEventListener('click', this.toggleRecording);
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { cancelAnimationFrame(this.raf); if (this.recognition) this.recognition.stop(); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  private toggleRecording = (): void => {
+    if (this.recording) { this.stopRecording(); } else { this.startRecording(); }
+  };
+  private startRecording(): void {
+    const SR = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SR) { console.warn('Speech Recognition not supported'); return; }
+    this.recognition = new SR();
+    this.recognition.lang = 'pt-BR';
+    this.recognition.interimResults = true;
+    this.recognition.continuous = true;
+    this.recognition.onstart = () => {
+      this.recording = true;
+      this.micBtn?.setAttribute('recording', '');
+      this.canvas?.setAttribute('data-active', '');
+      this.raf = requestAnimationFrame(this.drawWaveform);
+      this.dispatchEvent(new CustomEvent('lumina-voice-start', { bubbles: true, composed: true }));
+    };
+    this.recognition.onresult = (event: any) => {
+      const transcript = Array.from(event.results).map((r: any) => r[0].transcript).join('');
+      if (this.input) this.input.value = transcript;
+      this.dispatchEvent(new CustomEvent('lumina-transcript', { bubbles: true, composed: true, detail: { transcript } }));
+    };
+    this.recognition.onend = () => { this.stopRecording(); };
+    this.recognition.start();
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  private stopRecording(): void {
+    this.recording = false;
+    this.micBtn?.removeAttribute('recording');
+    this.canvas?.removeAttribute('data-active');
+    cancelAnimationFrame(this.raf);
+    if (this.recognition) { try { this.recognition.stop(); } catch {} }
+    this.dispatchEvent(new CustomEvent('lumina-voice-end', { bubbles: true, composed: true }));
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private drawWaveform = (): void => {
+    if (!this.ctx || !this.canvas) { this.raf = requestAnimationFrame(this.drawWaveform); return; }
+    const dpr = window.devicePixelRatio || 1;
+    const w = this.canvas.clientWidth; const h = this.canvas.clientHeight;
+    if (this.canvas.width !== w * dpr) { this.canvas.width = w * dpr; this.canvas.height = h * dpr; this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
+    this.ctx.clearRect(0, 0, w, h);
+    // Shift waveform and add new random value (simulated)
+    this.waveform.shift();
+    this.waveform.push(this.recording ? Math.random() * 0.8 + 0.2 : 0);
+    const barWidth = w / this.waveform.length;
+    const color = (this.shadow.host as HTMLElement).style.getPropertyValue('--lumina-accent').trim() || '#7c5cff';
+    this.ctx.fillStyle = color;
+    for (let i = 0; i < this.waveform.length; i++) {
+      const val = this.waveform[i];
+      const barH = val * h * 0.8;
+      const x = i * barWidth + barWidth * 0.2;
+      const y = (h - barH) / 2;
+      this.ctx.fillRect(x, y, barWidth * 0.6, barH);
+    }
+    this.raf = requestAnimationFrame(this.drawWaveform);
+  };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-voice-input': VoiceInput;
-  }
-}
-
-if (!customElements.get(VoiceInput.tagName)) {
-  customElements.define(VoiceInput.tagName, VoiceInput);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-voice-input': VoiceInput } }
+if (!customElements.get(VoiceInput.tagName)) customElements.define(VoiceInput.tagName, VoiceInput);

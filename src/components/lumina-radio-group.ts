@@ -1,149 +1,117 @@
 /**
- * LuminaRadioGroup — Radio group com indicador FLIP.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: inputs
- *
- * Description: Grupo de radio buttons com transições suaves.
- *
- * Variants: `glass` | `neural` | `segmented`
- * Events:    lumina-change
- * CSS parts: group, option, indicator
- * Props:     (none beyond shared)
- * Slots:     `default`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaRadioGroup — Indicador animado que viaja entre opções (FLIP).
+ * Variants: glass | neural | segmented
+ * Slot: children with data-value
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
 
 export class RadioGroup extends LuminaElement {
   static tagName = 'lumina-radio-group';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value']; }
+  private _value = '';
+  private indicator: HTMLElement | null = null;
+  private observer: MutationObserver | null = null;
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
-  }
-
-
+  get value(): string { return this._value; }
+  set value(v: string) { this._value = v; this.setAttribute('value', v); this.moveIndicator(); }
 
   protected render(): string {
     return `
-      <label class="lmc" part="field">
-        <span class="lmc__label" part="label"><slot name="label"></slot></span>
-        <span class="lmc__shell" part="control">
-          <span class="lmc__bg" aria-hidden="true"></span>
-          <span class="lmc__glow" part="glow" aria-hidden="true"></span>
-          <slot name="left-icon"></slot>
-          <input class="lmc__el" part="control" type="text" />
-          <slot name="right-icon"></slot>
-          <span class="lmc__echo" part="echo" aria-hidden="true"></span>
-        </span>
-      </label>
+      <div class="lmrg" part="group" role="radiogroup">
+        <div class="lmrg__indicator" part="indicator" aria-hidden="true"></div>
+        <slot></slot>
+      </div>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        --lumina-input-h: 48px;
-        font-family: var(--lumina-font-sans);
-        color: var(--lumina-text);
-      }
-      .lmc { display: flex; flex-direction: column; gap: 6px; }
-      .lmc__label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lumina-text-muted); }
-      .lmc__label:empty { display: none; }
-      .lmc__shell {
-        position: relative;
-        display: flex;
-        align-items: center;
-        height: var(--lumina-input-h);
-        border-radius: var(--lumina-radius-md);
-        overflow: hidden;
-      }
-      .lmc__bg {
-        position: absolute; inset: 0;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(12px) saturate(1.3);
-        -webkit-backdrop-filter: blur(12px) saturate(1.3);
-        border: 1px solid var(--lumina-border);
-        box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow);
-        transition: border-color var(--lumina-speed) var(--lumina-ease-out);
-      }
-      .lmc__glow {
-        position: absolute; inset: -2px;
-        border-radius: inherit;
-        pointer-events: none;
-        opacity: 0;
-        background: conic-gradient(from 0deg, transparent 0%, var(--lumina-accent) 25%, transparent 50%, var(--lumina-accent) 75%, transparent 100%);
-        -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-        -webkit-mask-composite: xor; mask-composite: exclude;
-        padding: 2px;
-        animation: lmc-spin 4s linear infinite;
-        animation-play-state: paused;
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      :host(:focus-within) .lmc__glow { opacity: 0.7; animation-play-state: running; }
-      :host(:focus-within) .lmc__bg { border-color: rgb(var(--lumina-accent-rgb) / 0.5); }
-      .lmc__el {
-        position: relative; z-index: 2;
-        width: 100%; height: 100%;
-        padding: 0 16px;
-        border: 0; background: transparent;
-        color: var(--lumina-text);
-        font: inherit;
-        font-size: 14px;
-        outline: none;
-        caret-color: var(--lumina-accent);
-      }
-      .lmc__el::placeholder { color: var(--lumina-text-muted); }
-      .lmc__echo { position: absolute; inset: 0; pointer-events: none; }
-      @keyframes lmc-spin { to { transform: rotate(360deg); } }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc__glow, .lmc__bg { animation: none !important; transition: none !important; }
-      }
-`;
+      :host { display: inline-block; font-family: var(--lumina-font-sans); color: var(--lumina-text); }
+      .lmrg { position: relative; display: inline-flex; gap: 0; padding: 4px; border-radius: var(--lumina-radius-pill); background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(20px) saturate(1.5); -webkit-backdrop-filter: blur(20px) saturate(1.5); border: 1px solid var(--lumina-border); box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.06); }
+      .lmrg__indicator { position: absolute; top: 4px; left: 4px; width: 0; height: calc(100% - 8px); border-radius: var(--lumina-radius-pill); background: linear-gradient(135deg, rgb(var(--lumina-accent-rgb) / 0.9), rgb(var(--lumina-accent-rgb) / 0.6)); box-shadow: 0 4px 16px rgb(var(--lumina-accent-rgb) / 0.4), inset 0 1px 0 rgb(255 255 255 / 0.25); opacity: 0; transition: transform var(--lumina-speed) var(--lumina-ease-spring), width var(--lumina-speed) var(--lumina-ease-spring), opacity var(--lumina-speed) var(--lumina-ease-out); z-index: 0; pointer-events: none; }
+      .lmrg__indicator[data-active] { opacity: 1; }
+      ::slotted([data-value]) { position: relative; z-index: 1; appearance: none; border: 0; background: transparent; color: var(--lumina-text-muted); font: 600 13px var(--lumina-font-sans); padding: 8px 16px; cursor: pointer; border-radius: var(--lumina-radius-pill); transition: color var(--lumina-speed) var(--lumina-ease-out); white-space: nowrap; }
+      ::slotted([data-value]:hover) { color: var(--lumina-text); }
+      ::slotted([data-value][data-active]) { color: #fff; }
+      ::slotted([data-value]:focus-visible) { outline: 2px solid var(--lumina-accent); outline-offset: 2px; }
+      :host([variant="segmented"]) .lmrg { border-radius: var(--lumina-radius-md); }
+      :host([variant="segmented"]) ::slotted([data-value]) { flex: 1; justify-content: center; border-radius: var(--lumina-radius-sm); }
+      :host([variant="neural"]) .lmrg { border-color: rgb(var(--lumina-accent-rgb) / 0.25); }
+      :host([variant="neural"]) .lmrg__indicator { box-shadow: 0 0 20px rgb(var(--lumina-accent-rgb) / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.25); }
+      @media (prefers-reduced-motion: reduce) { .lmrg__indicator { transition: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._value = this.getAttribute('value') ?? '';
+    this.indicator = this.$$('.lmrg__indicator');
+    this.buildOptions();
+    this.observer = new MutationObserver(() => this.buildOptions());
+    this.observer.observe(this, { childList: true, subtree: true });
+    this.addEventListener('click', this.onClick);
+    this.addEventListener('keydown', this.onKeydown);
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { this.observer?.disconnect(); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'value') { this._value = value ?? ''; this.moveIndicator(); this.updateActive(); }
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  private buildOptions(): void {
+    const items = Array.from(this.querySelectorAll('[data-value]')) as HTMLElement[];
+    items.forEach((item) => {
+      if (!item.hasAttribute('role')) item.setAttribute('role', 'radio');
+      if (!item.hasAttribute('tabindex')) item.setAttribute('tabindex', '-1');
+    });
+    if (!this._value && items.length > 0) { this._value = items[0].getAttribute('data-value') ?? ''; this.setAttribute('value', this._value); }
+    this.updateActive();
+    requestAnimationFrame(() => this.moveIndicator());
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  private updateActive(): void {
+    const items = Array.from(this.querySelectorAll('[data-value]')) as HTMLElement[];
+    items.forEach((item) => {
+      const v = item.getAttribute('data-value') ?? '';
+      if (v === this._value) { item.setAttribute('data-active', ''); item.setAttribute('tabindex', '0'); item.setAttribute('aria-checked', 'true'); }
+      else { item.removeAttribute('data-active'); item.setAttribute('tabindex', '-1'); item.setAttribute('aria-checked', 'false'); }
+    });
   }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
+  private moveIndicator(): void {
+    if (!this.indicator) return;
+    const active = this.querySelector(`[data-value="${this._value}"]`) as HTMLElement | null;
+    if (!active) { this.indicator.removeAttribute('data-active'); return; }
+    const groupRect = this.$$('.lmrg')!.getBoundingClientRect();
+    const itemRect = active.getBoundingClientRect();
+    this.indicator.style.transform = `translateX(${itemRect.left - groupRect.left - 4}px)`;
+    this.indicator.style.width = `${itemRect.width}px`;
+    this.indicator.setAttribute('data-active', '');
   }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private onClick = (e: MouseEvent): void => {
+    const target = (e.target as HTMLElement).closest('[data-value]') as HTMLElement | null;
+    if (!target) return;
+    this._value = target.getAttribute('data-value') ?? '';
+    this.setAttribute('value', this._value);
+    this.updateActive();
+    this.moveIndicator();
+    this.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, composed: true, detail: { value: this._value } }));
+  };
+  private onKeydown = (e: KeyboardEvent): void => {
+    const target = (e.target as HTMLElement).closest('[data-value]') as HTMLElement | null;
+    if (!target) return;
+    const items = Array.from(this.querySelectorAll('[data-value]')) as HTMLElement[];
+    const idx = items.indexOf(target);
+    if (idx === -1) return;
+    let nextIdx = idx;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') nextIdx = (idx + 1) % items.length;
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') nextIdx = (idx - 1 + items.length) % items.length;
+    else return;
+    e.preventDefault();
+    items[nextIdx].focus();
+    this._value = items[nextIdx].getAttribute('data-value') ?? '';
+    this.setAttribute('value', this._value);
+    this.updateActive();
+    this.moveIndicator();
+    this.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, composed: true, detail: { value: this._value } }));
+  };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-radio-group': RadioGroup;
-  }
-}
-
-if (!customElements.get(RadioGroup.tagName)) {
-  customElements.define(RadioGroup.tagName, RadioGroup);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-radio-group': RadioGroup } }
+if (!customElements.get(RadioGroup.tagName)) customElements.define(RadioGroup.tagName, RadioGroup);
