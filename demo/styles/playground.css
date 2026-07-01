@@ -727,6 +727,8 @@ body {
   max-width: 100%;
   min-width: 0;
 }
+.playground__preview-inner > * { width: 100%; max-width: 100%; }
+.playground__preview-inner > * { width: 100%; max-width: 100%; }
 .playground__code {
   height: 100%;
   min-height: 0;
@@ -1554,7 +1556,8 @@ kbd {
 
 @media (max-width: 1100px) {
   .playground__split { grid-template-columns: 1fr; height: auto; }
-  .playground__preview, .playground__code { min-height: 320px; }
+  .playground__preview, .playground__preview-inner > * { width: 100%; max-width: 100%; }
+.playground__code { min-height: 320px; }
   .studio__layout { grid-template-columns: 1fr; }
   .particle-physics__layout, .depth-explorer__layout { grid-template-columns: 1fr; }
   .a11y__layout { grid-template-columns: 1fr; }
@@ -1572,7 +1575,8 @@ kbd {
   .playground__layout { grid-template-columns: 1fr !important; }
   .playground__sidebar { position: relative !important; top: 0; max-height: 40vh; overflow-y: auto; }
   .playground__split { grid-template-columns: 1fr !important; height: auto !important; }
-  .playground__preview, .playground__code { min-height: 320px; }
+  .playground__preview, .playground__preview-inner > * { width: 100%; max-width: 100%; }
+.playground__code { min-height: 320px; }
   .morph-lab__controls { grid-template-columns: 1fr !important; }
   .studio__layout { grid-template-columns: 1fr !important; }
   .particle-physics__layout, .depth-explorer__layout { grid-template-columns: 1fr !important; }

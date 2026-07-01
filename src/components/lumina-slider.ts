@@ -105,6 +105,7 @@ export class LuminaSlider extends LuminaElement {
   protected styles(): string {
     return `
       :host {
+        width: 100%;
         display: block;
         font-family: var(--lumina-font-sans);
         color: var(--lumina-text);
