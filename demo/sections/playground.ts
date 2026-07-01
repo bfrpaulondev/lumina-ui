@@ -311,6 +311,28 @@ function buildPreviewHTML(meta: ComponentMeta, state: { variant: string; intensi
       if (tag === 'lumina-slider') {
         return `<${tag} ${attrs} min="0" max="100" value="50" step="5" marks='[{"value":0,"label":"0"},{"value":50,"label":"Médio"},{"value":100,"label":"Máx"}]'></${tag}>`;
       }
+      if (tag === 'lumina-radio-group') {
+        return `<${tag} ${attrs} value="b">
+          <button data-value="a">Opção A</button>
+          <button data-value="b">Opção B</button>
+          <button data-value="c">Opção C</button>
+        </${tag}>`;
+      }
+      if (tag === 'lumina-checkbox') {
+        return `<${tag} ${attrs}>Aceito os termos</${tag}>`;
+      }
+      if (tag === 'lumina-switch') {
+        return `<${tag} ${attrs} checked>Notificações</${tag}>`;
+      }
+      if (tag === 'lumina-multi-select') {
+        return `<${tag} ${attrs} options='[{"value":"js","label":"JavaScript"},{"value":"ts","label":"TypeScript"},{"value":"py","label":"Python"},{"value":"go","label":"Go"}]' value="ts"></${tag}>`;
+      }
+      if (tag === 'lumina-autocomplete') {
+        return `<${tag} ${attrs} suggestions='[{"value":"react","label":"React"},{"value":"vue","label":"Vue"},{"value":"svelte","label":"Svelte"},{"value":"angular","label":"Angular"}]'></${tag}>`;
+      }
+      if (tag === 'lumina-search-input') {
+        return `<${tag} ${attrs} suggestions='["React","Vue","Svelte","Angular","Solid","Qwik"]'></${tag}>`;
+      }
       return `<${tag} ${attrs} placeholder="Digite algo..."></${tag}>`;
     case 'navigation':
       if (tag === 'lumina-tabs') {

@@ -21,7 +21,7 @@ export class Checkbox extends LuminaElement {
 
   protected render(): string {
     return `
-      <label class="lmcb" part="box">
+      <div class="lmcb" part="box">
         <input class="lmcb__input" type="checkbox" />
         <span class="lmcb__box" part="box">
           <span class="lmcb__check" part="check">
@@ -31,7 +31,7 @@ export class Checkbox extends LuminaElement {
           <span class="lmcb__ripple" aria-hidden="true"></span>
         </span>
         <span class="lmcb__label" part="label"><slot></slot></span>
-      </label>
+      </div>
     `;
   }
   protected styles(): string {
