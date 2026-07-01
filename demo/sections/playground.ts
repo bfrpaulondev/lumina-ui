@@ -201,13 +201,106 @@ function buildPreviewHTML(meta: ComponentMeta, state: { variant: string; intensi
     }
   }
 
+  // Special previews for each card type
+  if (cat === 'cards') {
+    switch (tag) {
+      case 'lumina-card':
+        return `<${tag} ${attrs}>
+          <h3 slot="title">Card principal</h3>
+          <p slot="subtitle">tilt 3D + glow contextual</p>
+          <p>Passe o cursor para ver o tilt e o glow seguir.</p>
+        </${tag}>`;
+      case 'lumina-glass-card':
+        return `<${tag} ${attrs} blur="24">
+          <h3>Glass com refração</h3>
+          <p>Borda com refração de luz que reage ao cursor.</p>
+        </${tag}>`;
+      case 'lumina-morph-card':
+        return `<${tag} ${attrs}>
+          <h3>Morph card</h3>
+          <p>Hover para ver o clip-path morph.</p>
+        </${tag}>`;
+      case 'lumina-neural-card':
+        return `<${tag} ${attrs} particle-count="50">
+          <h3>Neural card</h3>
+          <p>Rede neural canvas reativa ao cursor.</p>
+        </${tag}>`;
+      case 'lumina-void-card':
+        return `<${tag} ${attrs}>
+          <h3>Void card</h3>
+          <p>Portal giratório com sucção de partículas.</p>
+        </${tag}>`;
+      case 'lumina-dimensional-card':
+        return `<${tag} ${attrs} interactive depth="deep">
+          <h3>Dimensional card</h3>
+          <p>3 camadas 3D com parallax — mova o cursor.</p>
+        </${tag}>`;
+      case 'lumina-hover-card':
+        return `<${tag} ${attrs}>
+          <div slot="preview"><strong>Hover me</strong></div>
+          <p>Conteúdo revelado ao hover! Esta seção fica oculta até o cursor entrar.</p>
+        </${tag}>`;
+      case 'lumina-context-card':
+        return `<${tag} ${attrs} auto-adapt>
+          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='100'%3E%3Crect fill='%237c5cff' width='200' height='100'/%3E%3C/svg%3E" alt="demo" style="width:100%;border-radius:8px;" />
+          <p style="padding:12px;">Card detecta conteúdo (imagem) e ajusta padding/glow automaticamente.</p>
+        </${tag}>`;
+      case 'lumina-breath-card':
+        return `<${tag} ${attrs}>
+          <h3>Breath card</h3>
+          <p>Respirando em loop contínuo.</p>
+        </${tag}>`;
+      case 'lumina-stack-card':
+        return `<${tag} ${attrs} count="3" style="width:300px;height:200px;"></${tag}>`;
+      case 'lumina-reveal-card':
+        return `<${tag} ${attrs}>
+          <h3>Reveal card</h3>
+          <p>Role a página (ou recarregue) para ver o reveal animation.</p>
+        </${tag}>`;
+      case 'lumina-parallax-card':
+        return `<${tag} ${attrs}>
+          <h3>Parallax card</h3>
+          <p>3 camadas com velocidades diferentes — mova o cursor.</p>
+        </${tag}>`;
+      case 'lumina-glow-card':
+        return `<${tag} ${attrs} glow-intensity="0.8">
+          <h3>Glow card</h3>
+          <p>Glow que segue o cursor e pulsa.</p>
+        </${tag}>`;
+      case 'lumina-particle-card':
+        return `<${tag} ${attrs} particle-count="60">
+          <h3>Particle card</h3>
+          <p>Clique para ver o burst de partículas.</p>
+        </${tag}>`;
+      case 'lumina-liquid-card':
+        return `<${tag} ${attrs}>
+          <h3>Liquid card</h3>
+          <p>Arraste o cursor — a superfície deforma. Clique para ondas.</p>
+        </${tag}>`;
+      case 'lumina-holo-card':
+        return `<${tag} ${attrs}>
+          <h3>Holo card</h3>
+          <p>Iridescência que muda com o ângulo do mouse.</p>
+        </${tag}>`;
+      case 'lumina-memory-card':
+        return `<${tag} ${attrs} memory-enabled>
+          <h3>Memory card</h3>
+          <p>Passe o cursor e clique — o card "lembra" das interações.</p>
+        </${tag}>`;
+      case 'lumina-echo-card':
+        return `<${tag} ${attrs} echo-intensity="0.8">
+          <h3>Echo card</h3>
+          <p>Clique para ver ondas se propagando.</p>
+        </${tag}>`;
+      default:
+        return `<${tag} ${attrs}>
+          <h3>${meta.name.replace('Lumina', '')}</h3>
+          <p>Conteúdo de exemplo.</p>
+        </${tag}>`;
+    }
+  }
+
   switch (cat) {
-    case 'cards':
-      return `<${tag} ${attrs}>
-        <h3 slot="title">${meta.name.replace('Lumina', '')}</h3>
-        <p slot="subtitle">${meta.tier}</p>
-        <p>Conteúdo de exemplo para ${tag}.</p>
-      </${tag}>`;
     case 'inputs':
       if (tag === 'lumina-textarea' || tag === 'lumina-signature-pad' || tag === 'lumina-file-upload') {
         return `<${tag} ${attrs} placeholder="Digite algo..."></${tag}>`;

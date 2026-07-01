@@ -1,131 +1,71 @@
 /**
- * LuminaRevealCard — Revela conteúdo ao entrar na viewport.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: cards
- *
- * Description: Cartão que revela conteúdo progressivamente ao scroll.
- *
- * Variants: `glass` | `morph` | `neural`
- * Events:    lumina-reveal
- * CSS parts: card, mask, content
- * Props:     (none beyond shared)
- * Slots:     `default`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaRevealCard — Revela conteúdo via IntersectionObserver ao entrar na viewport.
+ * Variants: glass | morph | neural
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
 
 export class RevealCard extends LuminaElement {
   static tagName = 'lumina-reveal-card';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'reveal-on-scroll']; }
+  private _revealOnScroll = true;
+  private observer: IntersectionObserver | null = null;
+  private revealed = false;
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
-  }
-
-
+  get revealOnScroll(): boolean { return this._revealOnScroll; }
+  set revealOnScroll(v: boolean) { this._revealOnScroll = v; if (v) this.setAttribute('reveal-on-scroll',''); else this.removeAttribute('reveal-on-scroll'); }
 
   protected render(): string {
     return `
-      <article class="lmc" part="card">
-        <div class="lmc__glow" part="glow" aria-hidden="true"></div>
-        <div class="lmc__surface" part="surface">
-        <div class="lmc__body" part="body"><slot></slot></div>
+      <article class="lmrc" part="card">
+        <div class="lmrc__content" part="content">
+          <slot></slot>
         </div>
       </article>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        position: relative;
-        border-radius: var(--lumina-radius-lg);
-        color: var(--lumina-text);
-        perspective: 800px;
-      }
-      .lmc {
-        position: relative;
-        display: block;
-        border-radius: inherit;
-        transition: transform var(--lumina-speed) var(--lumina-ease-spring);
-        will-change: transform;
-      }
-      .lmc__glow {
-        position: absolute; inset: -10%;
-        border-radius: inherit;
-        pointer-events: none; z-index: 0;
-        opacity: 0;
-        background: radial-gradient(400px circle at var(--lx, 50%) var(--ly, 50%),
-          rgb(var(--lumina-accent-rgb) / calc(0.45 * var(--lumina-intensity))), transparent 60%);
-        filter: blur(30px);
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      :host(:hover) .lmc__glow { opacity: 1; }
-      :host(:hover) .lmc { transform: translateY(-4px); }
-      .lmc__surface {
-        position: relative; z-index: 2;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(18px) saturate(1.5);
-        -webkit-backdrop-filter: blur(18px) saturate(1.5);
-        border: 1px solid var(--lumina-border);
-        box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow);
-        overflow: hidden;
-      }
-      .lmc__header { padding: 16px 20px; border-bottom: 1px solid var(--lumina-border); }
-      .lmc__media { display: block; }
-      .lmc__body { padding: 20px; }
-      .lmc__footer { padding: 12px 20px; border-top: 1px solid var(--lumina-border); }
-      ::slotted([slot="header"]) { margin: 0; font-size: 16px; font-weight: 700; }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__glow { animation: none !important; transition: none !important; }
-      }
-
-      :host([variant="morph"]) .lmc { clip-path: polygon(0 8%, 8% 0, 92% 0, 100% 8%, 100% 92%, 92% 100%, 8% 100%, 0 92%); border-radius: 0; }
-`;
+      :host { display: block; position: relative; border-radius: var(--lumina-radius-lg); color: var(--lumina-text); }
+      .lmrc { position: relative; display: block; border-radius: inherit; }
+      .lmrc__content { position: relative; border-radius: inherit; background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5); border: 1px solid var(--lumina-border); box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow); padding: 24px; overflow: hidden; opacity: 0; transform: translateY(40px) scale(0.95); transition: opacity calc(var(--lumina-speed) * 2) var(--lumina-ease-out), transform calc(var(--lumina-speed) * 2) var(--lumina-ease-spring); }
+      :host([data-revealed]) .lmrc__content { opacity: 1; transform: translateY(0) scale(1); }
+      :host([reveal-on-scroll="false"]) .lmrc__content { opacity: 1; transform: none; }
+      :host([variant="morph"]) .lmrc__content { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transition: clip-path calc(var(--lumina-speed) * 2) var(--lumina-ease-spring), opacity calc(var(--lumina-speed) * 2) var(--lumina-ease-out); }
+      :host([variant="morph"]) .lmrc__content { clip-path: polygon(0 50%, 100% 50%, 100% 50%, 0 50%); }
+      :host([variant="morph"][data-revealed]) .lmrc__content { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); }
+      :host([variant="neural"]) .lmrc__content { border-color: rgb(var(--lumina-accent-rgb) / 0.25); }
+      @media (prefers-reduced-motion: reduce) { .lmrc__content { transition: none !important; opacity: 1 !important; transform: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._revealOnScroll = this.getAttribute('reveal-on-scroll') !== 'false';
+    if (this._revealOnScroll && 'IntersectionObserver' in window) {
+      this.observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !this.revealed) {
+            this.revealed = true;
+            this.dispatchEvent(new CustomEvent('lumina-reveal-start', { bubbles: true, composed: true }));
+            requestAnimationFrame(() => {
+              this.setAttribute('data-revealed', '');
+              setTimeout(() => this.dispatchEvent(new CustomEvent('lumina-reveal-complete', { bubbles: true, composed: true })), 800);
+            });
+            this.observer?.disconnect();
+          }
+        });
+      }, { threshold: 0.2 });
+      this.observer.observe(this);
+    } else {
+      this.setAttribute('data-revealed', '');
+    }
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
-  }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
-  }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-reveal-card': RevealCard;
+  protected unmounted(): void { this.observer?.disconnect(); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'reveal-on-scroll') this._revealOnScroll = value !== 'false';
   }
 }
-
-if (!customElements.get(RevealCard.tagName)) {
-  customElements.define(RevealCard.tagName, RevealCard);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-reveal-card': RevealCard } }
+if (!customElements.get(RevealCard.tagName)) customElements.define(RevealCard.tagName, RevealCard);

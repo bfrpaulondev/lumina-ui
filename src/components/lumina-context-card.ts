@@ -1,129 +1,73 @@
 /**
- * LuminaContextCard — Adapta estilo ao conteúdo.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: cards
- *
- * Description: Cartão que adapta seu estilo conforme o conteúdo interno.
- *
- * Variants: `adaptive` | `neural` | `glass`
- * Events:    (none — inherits standard)
- * CSS parts: card, surface
- * Props:     (none beyond shared)
- * Slots:     `default`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaContextCard — Detecta tipo de conteúdo (imagem/texto/vídeo) e adapta estilo.
+ * Variants: adaptive | neural | glass
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+
+type ContentType = 'text' | 'image' | 'video' | 'mixed' | 'empty';
 
 export class ContextCard extends LuminaElement {
   static tagName = 'lumina-context-card';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'auto-adapt']; }
+  private _autoAdapt = true;
+  private observer: MutationObserver | null = null;
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
-  }
-
-
+  get autoAdapt(): boolean { return this._autoAdapt; }
+  set autoAdapt(v: boolean) { this._autoAdapt = v; if (v) this.setAttribute('auto-adapt',''); else this.removeAttribute('auto-adapt'); }
 
   protected render(): string {
     return `
-      <article class="lmc" part="card">
-        <div class="lmc__glow" part="glow" aria-hidden="true"></div>
-        <div class="lmc__surface" part="surface">
-        <div class="lmc__body" part="body"><slot></slot></div>
+      <article class="lmcc" part="card">
+        <div class="lmcc__surface" part="surface">
+          <slot></slot>
         </div>
       </article>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        position: relative;
-        border-radius: var(--lumina-radius-lg);
-        color: var(--lumina-text);
-        perspective: 800px;
-      }
-      .lmc {
-        position: relative;
-        display: block;
-        border-radius: inherit;
-        transition: transform var(--lumina-speed) var(--lumina-ease-spring);
-        will-change: transform;
-      }
-      .lmc__glow {
-        position: absolute; inset: -10%;
-        border-radius: inherit;
-        pointer-events: none; z-index: 0;
-        opacity: 0;
-        background: radial-gradient(400px circle at var(--lx, 50%) var(--ly, 50%),
-          rgb(var(--lumina-accent-rgb) / calc(0.45 * var(--lumina-intensity))), transparent 60%);
-        filter: blur(30px);
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      :host(:hover) .lmc__glow { opacity: 1; }
-      :host(:hover) .lmc { transform: translateY(-4px); }
-      .lmc__surface {
-        position: relative; z-index: 2;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(18px) saturate(1.5);
-        -webkit-backdrop-filter: blur(18px) saturate(1.5);
-        border: 1px solid var(--lumina-border);
-        box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow);
-        overflow: hidden;
-      }
-      .lmc__header { padding: 16px 20px; border-bottom: 1px solid var(--lumina-border); }
-      .lmc__media { display: block; }
-      .lmc__body { padding: 20px; }
-      .lmc__footer { padding: 12px 20px; border-top: 1px solid var(--lumina-border); }
-      ::slotted([slot="header"]) { margin: 0; font-size: 16px; font-weight: 700; }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__glow { animation: none !important; transition: none !important; }
-      }
-`;
+      :host { display: block; position: relative; border-radius: var(--lumina-radius-lg); color: var(--lumina-text); --lmcc-padding: 24px; --lmcc-glow: 0; }
+      .lmcc { position: relative; display: block; border-radius: inherit; transition: all var(--lumina-speed) var(--lumina-ease-out); }
+      .lmcc__surface { position: relative; border-radius: inherit; background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5); border: 1px solid var(--lumina-border); box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), 0 0 calc(var(--lmcc-glow) * 1px) rgb(var(--lumina-accent-rgb) / 0.3), var(--lumina-shadow); padding: var(--lmcc-padding); transition: all var(--lumina-speed) var(--lumina-ease-out); }
+      :host([data-content="image"]) { --lmcc-padding: 0px; --lmcc-glow: 20; }
+      :host([data-content="image"]) .lmcc__surface { border-color: rgb(var(--lumina-accent-rgb) / 0.3); }
+      :host([data-content="text"]) { --lmcc-padding: 28px; }
+      :host([data-content="video"]) { --lmcc-padding: 0px; --lmcc-glow: 30; }
+      :host([data-content="video"]) .lmcc__surface { border-color: rgb(var(--lumina-accent-rgb) / 0.4); }
+      :host([data-content="mixed"]) { --lmcc-padding: 20px; --lmcc-glow: 15; }
+      :host([variant="neural"]) .lmcc__surface { border-color: rgb(var(--lumina-accent-rgb) / 0.25); }
+      :host(:hover) { --lmcc-glow: 30; }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._autoAdapt = this.getAttribute('auto-adapt') !== 'false';
+    this.detectContent();
+    if (this._autoAdapt) {
+      this.observer = new MutationObserver(() => this.detectContent());
+      this.observer.observe(this, { childList: true, subtree: true });
+    }
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { this.observer?.disconnect(); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'auto-adapt') { this._autoAdapt = value !== 'false'; if (this._autoAdapt) { this.detectContent(); this.observer?.observe(this, { childList: true, subtree: true }); } else this.observer?.disconnect(); }
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
-  }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-context-card': ContextCard;
+  private detectContent(): void {
+    const imgs = this.querySelectorAll('img').length;
+    const videos = this.querySelectorAll('video').length;
+    const text = this.textContent?.trim().length ?? 0;
+    let type: ContentType = 'empty';
+    if (imgs > 0 && videos > 0) type = 'mixed';
+    else if (videos > 0) type = 'video';
+    else if (imgs > 0 && text > 20) type = 'mixed';
+    else if (imgs > 0) type = 'image';
+    else if (text > 0) type = 'text';
+    this.setAttribute('data-content', type);
+    this.dispatchEvent(new CustomEvent('lumina-context-change', { bubbles: true, composed: true, detail: { type } }));
   }
 }
-
-if (!customElements.get(ContextCard.tagName)) {
-  customElements.define(ContextCard.tagName, ContextCard);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-context-card': ContextCard } }
+if (!customElements.get(ContextCard.tagName)) customElements.define(ContextCard.tagName, ContextCard);

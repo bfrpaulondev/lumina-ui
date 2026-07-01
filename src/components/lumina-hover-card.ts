@@ -1,132 +1,67 @@
 /**
- * LuminaHoverCard — Expande ao hover revelando conteúdo.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: cards
- *
- * Description: Cartão que expande e revela mais conteúdo ao hover.
- *
- * Variants: `glass` | `morph` | `neural`
- * Events:    lumina-expand
-   * lumina-collapse
- * CSS parts: card, preview, expanded
- * Props:     (none beyond shared)
- * Slots:     `preview`, `default`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaHoverCard — Expande e revela mais conteúdo ao hover com efeito 3D de elevação.
+ * Variants: glass | morph | neural
+ * Slots: preview (always visible), default (revealed on hover)
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
 
 export class HoverCard extends LuminaElement {
   static tagName = 'lumina-hover-card';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'expand-on-hover']; }
+  private _expandOnHover = true;
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
-  }
-
-
+  get expandOnHover(): boolean { return this._expandOnHover; }
+  set expandOnHover(v: boolean) { this._expandOnHover = v; if (v) this.setAttribute('expand-on-hover',''); else this.removeAttribute('expand-on-hover'); }
 
   protected render(): string {
     return `
-      <article class="lmc" part="card">
-        <div class="lmc__glow" part="glow" aria-hidden="true"></div>
-        <div class="lmc__surface" part="surface">
-        <div class="lmc__body" part="body"><slot></slot></div>
+      <article class="lmhc" part="card">
+        <div class="lmhc__surface" part="surface">
+          <div class="lmhc__preview" part="preview">
+            <slot name="preview"></slot>
+          </div>
+          <div class="lmhc__expanded" part="expanded-content">
+            <slot></slot>
+          </div>
         </div>
       </article>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        position: relative;
-        border-radius: var(--lumina-radius-lg);
-        color: var(--lumina-text);
-        perspective: 800px;
-      }
-      .lmc {
-        position: relative;
-        display: block;
-        border-radius: inherit;
-        transition: transform var(--lumina-speed) var(--lumina-ease-spring);
-        will-change: transform;
-      }
-      .lmc__glow {
-        position: absolute; inset: -10%;
-        border-radius: inherit;
-        pointer-events: none; z-index: 0;
-        opacity: 0;
-        background: radial-gradient(400px circle at var(--lx, 50%) var(--ly, 50%),
-          rgb(var(--lumina-accent-rgb) / calc(0.45 * var(--lumina-intensity))), transparent 60%);
-        filter: blur(30px);
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      :host(:hover) .lmc__glow { opacity: 1; }
-      :host(:hover) .lmc { transform: translateY(-4px); }
-      .lmc__surface {
-        position: relative; z-index: 2;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(18px) saturate(1.5);
-        -webkit-backdrop-filter: blur(18px) saturate(1.5);
-        border: 1px solid var(--lumina-border);
-        box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow);
-        overflow: hidden;
-      }
-      .lmc__header { padding: 16px 20px; border-bottom: 1px solid var(--lumina-border); }
-      .lmc__media { display: block; }
-      .lmc__body { padding: 20px; }
-      .lmc__footer { padding: 12px 20px; border-top: 1px solid var(--lumina-border); }
-      ::slotted([slot="header"]) { margin: 0; font-size: 16px; font-weight: 700; }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__glow { animation: none !important; transition: none !important; }
-      }
-
-      :host([variant="morph"]) .lmc { clip-path: polygon(0 8%, 8% 0, 92% 0, 100% 8%, 100% 92%, 92% 100%, 8% 100%, 0 92%); border-radius: 0; }
-`;
+      :host { display: block; position: relative; border-radius: var(--lumina-radius-lg); color: var(--lumina-text); }
+      .lmhc { position: relative; display: block; border-radius: inherit; transition: transform var(--lumina-speed) var(--lumina-ease-spring), box-shadow var(--lumina-speed) var(--lumina-ease-out); will-change: transform; }
+      :host(:hover) .lmhc { transform: translateY(-8px) scale(1.02); box-shadow: 0 24px 60px -20px rgb(var(--lumina-accent-rgb) / 0.4); }
+      .lmhc__surface { position: relative; border-radius: inherit; background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(18px) saturate(1.5); -webkit-backdrop-filter: blur(18px) saturate(1.5); border: 1px solid var(--lumina-border); box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow); padding: 20px; overflow: hidden; }
+      .lmhc__preview { position: relative; z-index: 1; }
+      .lmhc__expanded { position: relative; z-index: 1; max-height: 0; opacity: 0; overflow: hidden; transition: max-height calc(var(--lumina-speed) * 1.5) var(--lumina-ease-spring), opacity var(--lumina-speed) var(--lumina-ease-out), margin var(--lumina-speed) var(--lumina-ease-spring); margin-top: 0; }
+      :host(:hover) .lmhc__expanded, :host([expand-on-hover="false"]) .lmhc__expanded { max-height: 300px; opacity: 1; margin-top: 12px; }
+      :host([expand-on-hover="false"]) .lmhc__expanded { transition: none; }
+      :host([variant="morph"]) .lmhc { clip-path: polygon(0 8%, 8% 0, 92% 0, 100% 8%, 100% 92%, 92% 100%, 8% 100%, 0 92%); }
+      :host([variant="neural"]) .lmhc__surface { border-color: rgb(var(--lumina-accent-rgb) / 0.25); }
+      @media (prefers-reduced-motion: reduce) { .lmhc, .lmhc__expanded { transition: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._expandOnHover = this.getAttribute('expand-on-hover') !== 'false';
+    this.addEventListener('pointerenter', this.onEnter);
+    this.addEventListener('pointerleave', this.onLeave);
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { this.removeEventListener('pointerenter', this.onEnter); this.removeEventListener('pointerleave', this.onLeave); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'expand-on-hover') this._expandOnHover = value !== 'false';
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
-  }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private onEnter = (): void => {
+    this.dispatchEvent(new CustomEvent('lumina-hover', { bubbles: true, composed: true, detail: { hovering: true } }));
+    if (this._expandOnHover) this.dispatchEvent(new CustomEvent('lumina-expand', { bubbles: true, composed: true, detail: { expanded: true } }));
+  };
+  private onLeave = (): void => {
+    this.dispatchEvent(new CustomEvent('lumina-hover', { bubbles: true, composed: true, detail: { hovering: false } }));
+  };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-hover-card': HoverCard;
-  }
-}
-
-if (!customElements.get(HoverCard.tagName)) {
-  customElements.define(HoverCard.tagName, HoverCard);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-hover-card': HoverCard } }
+if (!customElements.get(HoverCard.tagName)) customElements.define(HoverCard.tagName, HoverCard);

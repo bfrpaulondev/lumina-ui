@@ -954,10 +954,10 @@ export class GlassCard extends LuminaElement {
   static tagName = 'lumina-glass-card';
 
   // Accepts variants: 'light' | 'dark' | 'cosmic'
-  // CSS parts:       card, surface, refraction
-  // Events:          (inherits standard lumina-* events)
+  // CSS parts:       card, surface, glow
+  // Events:          lumina-hover
   // Props:
-   * (only shared LuminaElement props)
+   * blur: number
   // Slots:           default
 
   protected render(): string {
@@ -983,16 +983,24 @@ customElements.define(GlassCard.tagName, GlassCard);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  blur="18"
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
   <p>Conteúdo de exemplo.</p>
-</lumina-glass-card>`,
+</lumina-glass-card>
+<script type="module">
+  const el = document.querySelector('lumina-glass-card');
+  el.addEventListener('lumina-hover', (e) => {
+    console.log('lumina-hover', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function GlassCardExample() {
   return (
-    <lumina-glass-card variant="light" intensity="intense" accent-color="#7c5cff" speed={0.5}>
+    <lumina-glass-card variant="light" intensity="intense" accent-color="#7c5cff" speed={0.5} blur={18}
+      onLuminaHover={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-glass-card>
   );
@@ -1005,8 +1013,8 @@ export class MorphCard extends LuminaElement {
   static tagName = 'lumina-morph-card';
 
   // Accepts variants: 'subtle' | 'intense' | 'extreme'
-  // CSS parts:       card, shape
-  // Events:          lumina-morph
+  // CSS parts:       card, surface
+  // Events:          lumina-morph-start, lumina-morph-end
   // Props:
    * (only shared LuminaElement props)
   // Slots:           default
@@ -1041,8 +1049,8 @@ customElements.define(MorphCard.tagName, MorphCard);
 </lumina-morph-card>
 <script type="module">
   const el = document.querySelector('lumina-morph-card');
-  el.addEventListener('lumina-morph', (e) => {
-    console.log('lumina-morph', e.detail);
+  el.addEventListener('lumina-morph-start', (e) => {
+    console.log('lumina-morph-start', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
@@ -1050,7 +1058,7 @@ customElements.define(MorphCard.tagName, MorphCard);
 export function MorphCardExample() {
   return (
     <lumina-morph-card variant="subtle" intensity="intense" accent-color="#78f0ff" speed={0.5}
-      onLuminaMorph={(e) => console.log(e.detail)}>
+      onLuminaMorphStart={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-morph-card>
   );
@@ -1063,10 +1071,10 @@ export class NeuralCard extends LuminaElement {
   static tagName = 'lumina-neural-card';
 
   // Accepts variants: 'neural' | 'aura' | 'void'
-  // CSS parts:       card, network, surface
-  // Events:          (inherits standard lumina-* events)
+  // CSS parts:       card, surface, particles
+  // Events:          lumina-hover, lumina-interact
   // Props:
-   * (only shared LuminaElement props)
+   * particle-count: number
   // Slots:           default
 
   protected render(): string {
@@ -1092,16 +1100,24 @@ customElements.define(NeuralCard.tagName, NeuralCard);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
+  particle-count="40"
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
   <p>Conteúdo de exemplo.</p>
-</lumina-neural-card>`,
+</lumina-neural-card>
+<script type="module">
+  const el = document.querySelector('lumina-neural-card');
+  el.addEventListener('lumina-hover', (e) => {
+    console.log('lumina-hover', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function NeuralCardExample() {
   return (
-    <lumina-neural-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}>
+    <lumina-neural-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} particle-count={40}
+      onLuminaHover={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-neural-card>
   );
@@ -1114,8 +1130,8 @@ export class VoidCard extends LuminaElement {
   static tagName = 'lumina-void-card';
 
   // Accepts variants: 'void' | 'dimensional' | 'deep'
-  // CSS parts:       card, void, event-horizon
-  // Events:          (inherits standard lumina-* events)
+  // CSS parts:       card, surface, portal
+  // Events:          lumina-hover
   // Props:
    * (only shared LuminaElement props)
   // Slots:           default
@@ -1147,12 +1163,19 @@ customElements.define(VoidCard.tagName, VoidCard);
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
   <p>Conteúdo de exemplo.</p>
-</lumina-void-card>`,
+</lumina-void-card>
+<script type="module">
+  const el = document.querySelector('lumina-void-card');
+  el.addEventListener('lumina-hover', (e) => {
+    console.log('lumina-hover', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function VoidCardExample() {
   return (
-    <lumina-void-card variant="void" intensity="intense" accent-color="#78f0ff" speed={0.5}>
+    <lumina-void-card variant="void" intensity="intense" accent-color="#78f0ff" speed={0.5}
+      onLuminaHover={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-void-card>
   );
@@ -1165,10 +1188,10 @@ export class DimensionalCard extends LuminaElement {
   static tagName = 'lumina-dimensional-card';
 
   // Accepts variants: 'medium' | 'deep' | 'extrude'
-  // CSS parts:       card, layer-1, layer-2, layer-3
-  // Events:          lumina-tilt-start
+  // CSS parts:       card, surface, layers
+  // Events:          lumina-tilt-start, lumina-tilt-end
   // Props:
-   * (only shared LuminaElement props)
+   * interactive: boolean
   // Slots:           default
 
   protected render(): string {
@@ -1194,6 +1217,7 @@ customElements.define(DimensionalCard.tagName, DimensionalCard);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  interactive
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
@@ -1209,7 +1233,7 @@ customElements.define(DimensionalCard.tagName, DimensionalCard);
 
 export function DimensionalCardExample() {
   return (
-    <lumina-dimensional-card variant="medium" intensity="intense" accent-color="#7c5cff" speed={0.5}
+    <lumina-dimensional-card variant="medium" intensity="intense" accent-color="#7c5cff" speed={0.5} interactive
       onLuminaTiltStart={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-dimensional-card>
@@ -1223,10 +1247,10 @@ export class HoverCard extends LuminaElement {
   static tagName = 'lumina-hover-card';
 
   // Accepts variants: 'glass' | 'morph' | 'neural'
-  // CSS parts:       card, preview, expanded
-  // Events:          lumina-expand, lumina-collapse
+  // CSS parts:       card, surface, expanded-content
+  // Events:          lumina-hover, lumina-expand
   // Props:
-   * (only shared LuminaElement props)
+   * expand-on-hover: boolean
   // Slots:           preview, default
 
   protected render(): string {
@@ -1252,6 +1276,7 @@ customElements.define(HoverCard.tagName, HoverCard);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  expand-on-hover
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
@@ -1259,16 +1284,16 @@ customElements.define(HoverCard.tagName, HoverCard);
 </lumina-hover-card>
 <script type="module">
   const el = document.querySelector('lumina-hover-card');
-  el.addEventListener('lumina-expand', (e) => {
-    console.log('lumina-expand', e.detail);
+  el.addEventListener('lumina-hover', (e) => {
+    console.log('lumina-hover', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
 
 export function HoverCardExample() {
   return (
-    <lumina-hover-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-      onLuminaExpand={(e) => console.log(e.detail)}>
+    <lumina-hover-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} expand-on-hover
+      onLuminaHover={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-hover-card>
   );
@@ -1282,9 +1307,9 @@ export class ContextCard extends LuminaElement {
 
   // Accepts variants: 'adaptive' | 'neural' | 'glass'
   // CSS parts:       card, surface
-  // Events:          (inherits standard lumina-* events)
+  // Events:          lumina-context-change
   // Props:
-   * (only shared LuminaElement props)
+   * auto-adapt: boolean
   // Slots:           default
 
   protected render(): string {
@@ -1310,16 +1335,24 @@ customElements.define(ContextCard.tagName, ContextCard);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
+  auto-adapt
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
   <p>Conteúdo de exemplo.</p>
-</lumina-context-card>`,
+</lumina-context-card>
+<script type="module">
+  const el = document.querySelector('lumina-context-card');
+  el.addEventListener('lumina-context-change', (e) => {
+    console.log('lumina-context-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ContextCardExample() {
   return (
-    <lumina-context-card variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5}>
+    <lumina-context-card variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5} auto-adapt
+      onLuminaContextChange={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-context-card>
   );
@@ -1384,9 +1417,10 @@ export class StackCard extends LuminaElement {
 
   // Accepts variants: 'glass' | 'neural' | 'minimal'
   // CSS parts:       stack, card
-  // Events:          lumina-swipe, lumina-reorder
+  // Events:          lumina-card-select, lumina-stack-change
   // Props:
-   * (only shared LuminaElement props)
+   * count: number
+   * interactive: boolean
   // Slots:           default
 
   protected render(): string {
@@ -1412,6 +1446,8 @@ customElements.define(StackCard.tagName, StackCard);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
+  count="3"
+  interactive
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
@@ -1419,16 +1455,16 @@ customElements.define(StackCard.tagName, StackCard);
 </lumina-stack-card>
 <script type="module">
   const el = document.querySelector('lumina-stack-card');
-  el.addEventListener('lumina-swipe', (e) => {
-    console.log('lumina-swipe', e.detail);
+  el.addEventListener('lumina-card-select', (e) => {
+    console.log('lumina-card-select', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
 
 export function StackCardExample() {
   return (
-    <lumina-stack-card variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-      onLuminaSwipe={(e) => console.log(e.detail)}>
+    <lumina-stack-card variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5} count={3} interactive
+      onLuminaCardSelect={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-stack-card>
   );
@@ -1441,10 +1477,10 @@ export class RevealCard extends LuminaElement {
   static tagName = 'lumina-reveal-card';
 
   // Accepts variants: 'glass' | 'morph' | 'neural'
-  // CSS parts:       card, mask, content
-  // Events:          lumina-reveal
+  // CSS parts:       card, content
+  // Events:          lumina-reveal-start, lumina-reveal-complete
   // Props:
-   * (only shared LuminaElement props)
+   * reveal-on-scroll: boolean
   // Slots:           default
 
   protected render(): string {
@@ -1470,6 +1506,7 @@ customElements.define(RevealCard.tagName, RevealCard);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  reveal-on-scroll
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
@@ -1477,16 +1514,16 @@ customElements.define(RevealCard.tagName, RevealCard);
 </lumina-reveal-card>
 <script type="module">
   const el = document.querySelector('lumina-reveal-card');
-  el.addEventListener('lumina-reveal', (e) => {
-    console.log('lumina-reveal', e.detail);
+  el.addEventListener('lumina-reveal-start', (e) => {
+    console.log('lumina-reveal-start', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
 
 export function RevealCardExample() {
   return (
-    <lumina-reveal-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-      onLuminaReveal={(e) => console.log(e.detail)}>
+    <lumina-reveal-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} reveal-on-scroll
+      onLuminaRevealStart={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-reveal-card>
   );
@@ -1500,7 +1537,7 @@ export class ParallaxCard extends LuminaElement {
 
   // Accepts variants: 'medium' | 'deep' | 'extrude'
   // CSS parts:       card, layer-back, layer-mid, layer-front
-  // Events:          (inherits standard lumina-* events)
+  // Events:          lumina-parallax
   // Props:
    * (only shared LuminaElement props)
   // Slots:           default
@@ -1532,12 +1569,19 @@ customElements.define(ParallaxCard.tagName, ParallaxCard);
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
   <p>Conteúdo de exemplo.</p>
-</lumina-parallax-card>`,
+</lumina-parallax-card>
+<script type="module">
+  const el = document.querySelector('lumina-parallax-card');
+  el.addEventListener('lumina-parallax', (e) => {
+    console.log('lumina-parallax', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ParallaxCardExample() {
   return (
-    <lumina-parallax-card variant="medium" intensity="intense" accent-color="#78f0ff" speed={0.5}>
+    <lumina-parallax-card variant="medium" intensity="intense" accent-color="#78f0ff" speed={0.5}
+      onLuminaParallax={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-parallax-card>
   );
@@ -1550,10 +1594,10 @@ export class GlowCard extends LuminaElement {
   static tagName = 'lumina-glow-card';
 
   // Accepts variants: 'aura' | 'neural' | 'void'
-  // CSS parts:       card, glow, surface
-  // Events:          lumina-glow-move
+  // CSS parts:       card, surface, glow
+  // Events:          lumina-hover
   // Props:
-   * (only shared LuminaElement props)
+   * glow-intensity: number
   // Slots:           default
 
   protected render(): string {
@@ -1579,6 +1623,7 @@ customElements.define(GlowCard.tagName, GlowCard);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
+  glow-intensity="0.6"
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
@@ -1586,16 +1631,16 @@ customElements.define(GlowCard.tagName, GlowCard);
 </lumina-glow-card>
 <script type="module">
   const el = document.querySelector('lumina-glow-card');
-  el.addEventListener('lumina-glow-move', (e) => {
-    console.log('lumina-glow-move', e.detail);
+  el.addEventListener('lumina-hover', (e) => {
+    console.log('lumina-hover', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
 
 export function GlowCardExample() {
   return (
-    <lumina-glow-card variant="aura" intensity="intense" accent-color="#ffd166" speed={0.5}
-      onLuminaGlowMove={(e) => console.log(e.detail)}>
+    <lumina-glow-card variant="aura" intensity="intense" accent-color="#ffd166" speed={0.5} glow-intensity={0.6}
+      onLuminaHover={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-glow-card>
   );
@@ -1608,10 +1653,10 @@ export class ParticleCard extends LuminaElement {
   static tagName = 'lumina-particle-card';
 
   // Accepts variants: 'neural' | 'aura' | 'void'
-  // CSS parts:       card, particles, surface
-  // Events:          (inherits standard lumina-* events)
+  // CSS parts:       card, particles
+  // Events:          lumina-particle-interact
   // Props:
-   * (only shared LuminaElement props)
+   * particle-count: number
   // Slots:           default
 
   protected render(): string {
@@ -1637,16 +1682,24 @@ customElements.define(ParticleCard.tagName, ParticleCard);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
+  particle-count="50"
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
   <p>Conteúdo de exemplo.</p>
-</lumina-particle-card>`,
+</lumina-particle-card>
+<script type="module">
+  const el = document.querySelector('lumina-particle-card');
+  el.addEventListener('lumina-particle-interact', (e) => {
+    console.log('lumina-particle-interact', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ParticleCardExample() {
   return (
-    <lumina-particle-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}>
+    <lumina-particle-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} particle-count={50}
+      onLuminaParticleInteract={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-particle-card>
   );
@@ -1659,8 +1712,8 @@ export class LiquidCard extends LuminaElement {
   static tagName = 'lumina-liquid-card';
 
   // Accepts variants: 'morph' | 'glass' | 'neural'
-  // CSS parts:       card, liquid, surface
-  // Events:          (inherits standard lumina-* events)
+  // CSS parts:       card, surface
+  // Events:          lumina-interact
   // Props:
    * (only shared LuminaElement props)
   // Slots:           default
@@ -1692,12 +1745,19 @@ customElements.define(LiquidCard.tagName, LiquidCard);
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
   <p>Conteúdo de exemplo.</p>
-</lumina-liquid-card>`,
+</lumina-liquid-card>
+<script type="module">
+  const el = document.querySelector('lumina-liquid-card');
+  el.addEventListener('lumina-interact', (e) => {
+    console.log('lumina-interact', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function LiquidCardExample() {
   return (
-    <lumina-liquid-card variant="morph" intensity="intense" accent-color="#78f0ff" speed={0.5}>
+    <lumina-liquid-card variant="morph" intensity="intense" accent-color="#78f0ff" speed={0.5}
+      onLuminaInteract={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-liquid-card>
   );
@@ -1710,8 +1770,8 @@ export class HoloCard extends LuminaElement {
   static tagName = 'lumina-holo-card';
 
   // Accepts variants: 'holo' | 'dimensional' | 'cosmic'
-  // CSS parts:       card, holo, refraction
-  // Events:          (inherits standard lumina-* events)
+  // CSS parts:       card, surface, holo-layer
+  // Events:          lumina-hover
   // Props:
    * (only shared LuminaElement props)
   // Slots:           default
@@ -1743,12 +1803,19 @@ customElements.define(HoloCard.tagName, HoloCard);
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
   <p>Conteúdo de exemplo.</p>
-</lumina-holo-card>`,
+</lumina-holo-card>
+<script type="module">
+  const el = document.querySelector('lumina-holo-card');
+  el.addEventListener('lumina-hover', (e) => {
+    console.log('lumina-hover', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function HoloCardExample() {
   return (
-    <lumina-holo-card variant="holo" intensity="intense" accent-color="#ff6ec7" speed={0.5}>
+    <lumina-holo-card variant="holo" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaHover={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-holo-card>
   );
@@ -1761,10 +1828,10 @@ export class MemoryCard extends LuminaElement {
   static tagName = 'lumina-memory-card';
 
   // Accepts variants: 'neural' | 'glass' | 'aura'
-  // CSS parts:       card, memory-trail
-  // Events:          (inherits standard lumina-* events)
+  // CSS parts:       card, surface, memory-layer
+  // Events:          lumina-memory-update
   // Props:
-   * (only shared LuminaElement props)
+   * memory-enabled: boolean
   // Slots:           default
 
   protected render(): string {
@@ -1790,16 +1857,24 @@ customElements.define(MemoryCard.tagName, MemoryCard);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
+  memory-enabled
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
   <p>Conteúdo de exemplo.</p>
-</lumina-memory-card>`,
+</lumina-memory-card>
+<script type="module">
+  const el = document.querySelector('lumina-memory-card');
+  el.addEventListener('lumina-memory-update', (e) => {
+    console.log('lumina-memory-update', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function MemoryCardExample() {
   return (
-    <lumina-memory-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}>
+    <lumina-memory-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} memory-enabled
+      onLuminaMemoryUpdate={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-memory-card>
   );
@@ -1812,10 +1887,10 @@ export class EchoCard extends LuminaElement {
   static tagName = 'lumina-echo-card';
 
   // Accepts variants: 'aura' | 'neural' | 'glass'
-  // CSS parts:       card, echo
+  // CSS parts:       card, echo-layer
   // Events:          lumina-echo
   // Props:
-   * (only shared LuminaElement props)
+   * echo-intensity: number
   // Slots:           default
 
   protected render(): string {
@@ -1841,6 +1916,7 @@ customElements.define(EchoCard.tagName, EchoCard);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  echo-intensity="0.7"
 >
   <h3 slot="title">Título</h3>
   <p slot="subtitle">subtítulo</p>
@@ -1856,7 +1932,7 @@ customElements.define(EchoCard.tagName, EchoCard);
 
 export function EchoCardExample() {
   return (
-    <lumina-echo-card variant="aura" intensity="intense" accent-color="#7c5cff" speed={0.5}
+    <lumina-echo-card variant="aura" intensity="intense" accent-color="#7c5cff" speed={0.5} echo-intensity={0.7}
       onLuminaEcho={(e) => console.log(e.detail)}>
       <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-echo-card>

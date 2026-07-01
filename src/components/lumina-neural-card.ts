@@ -1,133 +1,78 @@
 /**
- * LuminaNeuralCard — Rede neural reativa ao cursor.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: cards
- *
- * Description: Cartão com rede neural animada e partículas reativas.
- *
- * Variants: `neural` | `aura` | `void`
- * Events:    (none — inherits standard)
- * CSS parts: card, network, surface
- * Props:     (none beyond shared)
- * Slots:     `default`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaNeuralCard — Cartão com rede neural canvas e partículas reativas ao hover/scroll.
+ * Variants: neural | aura | void
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { ParticleField } from '../core/ParticleField';
+import { intensityToMultiplier, prefersReducedMotion } from '../core/utils';
 
 export class NeuralCard extends LuminaElement {
   static tagName = 'lumina-neural-card';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'particle-count']; }
+  private _particleCount = 40;
+  private field: ParticleField | null = null;
+  private fieldHost: HTMLElement | null = null;
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
-  }
-
-
+  get particleCount(): number { return this._particleCount; }
+  set particleCount(v: number) { this._particleCount = v; this.setAttribute('particle-count', String(v)); this.rebuildField(); }
 
   protected render(): string {
     return `
-      <article class="lmc" part="card">
-        <div class="lmc__glow" part="glow" aria-hidden="true"></div>
-        <div class="lmc__surface" part="surface">
-        <div class="lmc__body" part="body"><slot></slot></div>
+      <article class="lmnc" part="card">
+        <div class="lmnc__particles" part="particles" aria-hidden="true"></div>
+        <div class="lmnc__surface" part="surface">
+          <slot></slot>
         </div>
       </article>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        position: relative;
-        border-radius: var(--lumina-radius-lg);
-        color: var(--lumina-text);
-        perspective: 800px;
-      }
-      .lmc {
-        position: relative;
-        display: block;
-        border-radius: inherit;
-        transition: transform var(--lumina-speed) var(--lumina-ease-spring);
-        will-change: transform;
-      }
-      .lmc__glow {
-        position: absolute; inset: -10%;
-        border-radius: inherit;
-        pointer-events: none; z-index: 0;
-        opacity: 0;
-        background: radial-gradient(400px circle at var(--lx, 50%) var(--ly, 50%),
-          rgb(var(--lumina-accent-rgb) / calc(0.45 * var(--lumina-intensity))), transparent 60%);
-        filter: blur(30px);
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      :host(:hover) .lmc__glow { opacity: 1; }
-      :host(:hover) .lmc { transform: translateY(-4px); }
-      .lmc__surface {
-        position: relative; z-index: 2;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(18px) saturate(1.5);
-        -webkit-backdrop-filter: blur(18px) saturate(1.5);
-        border: 1px solid var(--lumina-border);
-        box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow);
-        overflow: hidden;
-      }
-      .lmc__header { padding: 16px 20px; border-bottom: 1px solid var(--lumina-border); }
-      .lmc__media { display: block; }
-      .lmc__body { padding: 20px; }
-      .lmc__footer { padding: 12px 20px; border-top: 1px solid var(--lumina-border); }
-      ::slotted([slot="header"]) { margin: 0; font-size: 16px; font-weight: 700; }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__glow { animation: none !important; transition: none !important; }
-      }
-
-      :host([variant="void"]) .lmc__surface, :host([variant="deep"]) .lmc__surface {
-        background: rgb(0 0 0 / 0.55); backdrop-filter: blur(6px);
-      }
-`;
+      :host { display: block; position: relative; border-radius: var(--lumina-radius-lg); color: var(--lumina-text); }
+      .lmnc { position: relative; display: block; border-radius: inherit; overflow: hidden; }
+      .lmnc__particles { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 1; opacity: 0.5; transition: opacity var(--lumina-speed) var(--lumina-ease-out); }
+      :host(:hover) .lmnc__particles { opacity: 0.9; }
+      .lmnc__surface { position: relative; z-index: 2; border-radius: inherit; background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) - 0.1)); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgb(var(--lumina-accent-rgb) / 0.25); box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.08), var(--lumina-shadow); padding: 24px; }
+      :host([variant="aura"]) .lmnc__surface { background: radial-gradient(120% 100% at 50% 0%, rgb(var(--lumina-accent-rgb) / 0.15), rgb(var(--lumina-surface) / var(--lumina-surface-alpha)) 60%); }
+      :host([variant="void"]) .lmnc__surface { background: rgb(0 0 0 / 0.5); backdrop-filter: blur(6px); }
+      @media (prefers-reduced-motion: reduce) { .lmnc__particles { opacity: 0.3; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._particleCount = parseInt(this.getAttribute('particle-count') ?? '40', 10) || 40;
+    this.fieldHost = this.$$('.lmnc__particles');
+    if (!prefersReducedMotion()) this.buildField();
+    this.addEventListener('pointermove', this.onMove);
+    this.addEventListener('click', this.onClick);
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { this.field?.destroy(); this.field = null; }
+  protected onConfigChange(changed: Partial<LuminaElementAttributes>): void {
+    if (changed.intensity || changed['accent-color']) this.rebuildField();
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'particle-count') { this._particleCount = parseInt(value ?? '40', 10) || 40; this.rebuildField(); }
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  private rebuildField(): void { this.field?.destroy(); this.field = null; if (!prefersReducedMotion()) this.buildField(); }
+  private buildField(): void {
+    if (!this.fieldHost) return;
+    const rgb = (this.shadow.host as HTMLElement).style.getPropertyValue('--lumina-accent-rgb').trim() || '124 92 255';
+    const intensity = intensityToMultiplier(this.intensity);
+    this.field = new ParticleField(this.shadow.host as HTMLElement, {
+      count: Math.round(this._particleCount * intensity),
+      rgb,
+      sizeRange: [0.6, 2],
+      speedRange: [0.1, 0.4],
+      lifeRange: [120, 240],
+      connect: true,
+      starfield: this.variant === 'void',
+    });
+    this.field.mount(this.fieldHost);
   }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private onMove = (): void => { this.dispatchEvent(new CustomEvent('lumina-hover', { bubbles: true, composed: true })); };
+  private onClick = (): void => { this.dispatchEvent(new CustomEvent('lumina-interact', { bubbles: true, composed: true, detail: { type: 'click' } })); };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-neural-card': NeuralCard;
-  }
-}
-
-if (!customElements.get(NeuralCard.tagName)) {
-  customElements.define(NeuralCard.tagName, NeuralCard);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-neural-card': NeuralCard } }
+if (!customElements.get(NeuralCard.tagName)) customElements.define(NeuralCard.tagName, NeuralCard);

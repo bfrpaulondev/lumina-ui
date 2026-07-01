@@ -1,133 +1,124 @@
 /**
- * LuminaParticleCard — Partículas fluindo pelo card.
- *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: cards
- *
- * Description: Cartão com sistema de partículas integrado.
- *
- * Variants: `neural` | `aura` | `void`
- * Events:    (none — inherits standard)
- * CSS parts: card, particles, surface
- * Props:     (none beyond shared)
- * Slots:     `default`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * LuminaParticleCard — Sistema de partículas integrado que reage ao hover/clique.
+ * Variants: neural | aura | void
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { ParticleField } from '../core/ParticleField';
+import { intensityToMultiplier, prefersReducedMotion, randRange } from '../core/utils';
+
+interface BurstParticle { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; size: number; }
 
 export class ParticleCard extends LuminaElement {
   static tagName = 'lumina-particle-card';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'particle-count']; }
+  private _particleCount = 50;
+  private field: ParticleField | null = null;
+  private fieldHost: HTMLElement | null = null;
+  private burstCanvas: HTMLCanvasElement | null = null;
+  private burstCtx: CanvasRenderingContext2D | null = null;
+  private burstParticles: BurstParticle[] = [];
+  private burstRaf = 0;
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
-  }
-
-
+  get particleCount(): number { return this._particleCount; }
+  set particleCount(v: number) { this._particleCount = v; this.setAttribute('particle-count', String(v)); this.rebuildField(); }
 
   protected render(): string {
     return `
-      <article class="lmc" part="card">
-        <div class="lmc__glow" part="glow" aria-hidden="true"></div>
-        <div class="lmc__surface" part="surface">
-        <div class="lmc__body" part="body"><slot></slot></div>
+      <article class="lmpa" part="card">
+        <div class="lmpa__particles" part="particles" aria-hidden="true"></div>
+        <canvas class="lmpa__burst" aria-hidden="true"></canvas>
+        <div class="lmpa__surface">
+          <slot></slot>
         </div>
       </article>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: block;
-        position: relative;
-        border-radius: var(--lumina-radius-lg);
-        color: var(--lumina-text);
-        perspective: 800px;
-      }
-      .lmc {
-        position: relative;
-        display: block;
-        border-radius: inherit;
-        transition: transform var(--lumina-speed) var(--lumina-ease-spring);
-        will-change: transform;
-      }
-      .lmc__glow {
-        position: absolute; inset: -10%;
-        border-radius: inherit;
-        pointer-events: none; z-index: 0;
-        opacity: 0;
-        background: radial-gradient(400px circle at var(--lx, 50%) var(--ly, 50%),
-          rgb(var(--lumina-accent-rgb) / calc(0.45 * var(--lumina-intensity))), transparent 60%);
-        filter: blur(30px);
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      :host(:hover) .lmc__glow { opacity: 1; }
-      :host(:hover) .lmc { transform: translateY(-4px); }
-      .lmc__surface {
-        position: relative; z-index: 2;
-        border-radius: inherit;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(18px) saturate(1.5);
-        -webkit-backdrop-filter: blur(18px) saturate(1.5);
-        border: 1px solid var(--lumina-border);
-        box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.10), var(--lumina-shadow);
-        overflow: hidden;
-      }
-      .lmc__header { padding: 16px 20px; border-bottom: 1px solid var(--lumina-border); }
-      .lmc__media { display: block; }
-      .lmc__body { padding: 20px; }
-      .lmc__footer { padding: 12px 20px; border-top: 1px solid var(--lumina-border); }
-      ::slotted([slot="header"]) { margin: 0; font-size: 16px; font-weight: 700; }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__glow { animation: none !important; transition: none !important; }
-      }
-
-      :host([variant="void"]) .lmc__surface, :host([variant="deep"]) .lmc__surface {
-        background: rgb(0 0 0 / 0.55); backdrop-filter: blur(6px);
-      }
-`;
+      :host { display: block; position: relative; border-radius: var(--lumina-radius-lg); color: var(--lumina-text); }
+      .lmpa { position: relative; display: block; border-radius: inherit; overflow: hidden; }
+      .lmpa__particles { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 0; opacity: 0.6; transition: opacity var(--lumina-speed) var(--lumina-ease-out); }
+      :host(:hover) .lmpa__particles { opacity: 1; }
+      .lmpa__burst { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
+      .lmpa__surface { position: relative; z-index: 2; border-radius: inherit; background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) - 0.05)); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid var(--lumina-border); box-shadow: inset 0 1px 0 0 rgb(255 255 255 / 0.08), var(--lumina-shadow); padding: 24px; }
+      :host([variant="aura"]) .lmpa__surface { background: radial-gradient(120% 100% at 50% 0%, rgb(var(--lumina-accent-rgb) / 0.15), rgb(var(--lumina-surface) / var(--lumina-surface-alpha)) 60%); }
+      :host([variant="void"]) .lmpa__surface { background: rgb(0 0 0 / 0.5); }
+      @media (prefers-reduced-motion: reduce) { .lmpa__particles { opacity: 0.3; } }
+    `;
   }
-
   protected mounted(): void {
-    // (no specific handlers — interactivity is CSS-driven)
+    this._particleCount = parseInt(this.getAttribute('particle-count') ?? '50', 10) || 50;
+    this.fieldHost = this.$$('.lmpa__particles');
+    this.burstCanvas = this.$$('.lmpa__burst') as HTMLCanvasElement | null;
+    this.burstCtx = this.burstCanvas?.getContext('2d') ?? null;
+    if (!prefersReducedMotion()) this.buildField();
+    this.addEventListener('click', this.onClick);
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { this.field?.destroy(); this.field = null; cancelAnimationFrame(this.burstRaf); }
+  protected onConfigChange(changed: Partial<LuminaElementAttributes>): void {
+    if (changed.intensity || changed['accent-color']) this.rebuildField();
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'particle-count') { this._particleCount = parseInt(value ?? '50', 10) || 50; this.rebuildField(); }
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  private rebuildField(): void { this.field?.destroy(); this.field = null; if (!prefersReducedMotion()) this.buildField(); }
+  private buildField(): void {
+    if (!this.fieldHost) return;
+    const rgb = (this.shadow.host as HTMLElement).style.getPropertyValue('--lumina-accent-rgb').trim() || '124 92 255';
+    const intensity = intensityToMultiplier(this.intensity);
+    this.field = new ParticleField(this.shadow.host as HTMLElement, {
+      count: Math.round(this._particleCount * intensity),
+      rgb,
+      sizeRange: [0.6, 2],
+      speedRange: [0.1, 0.5],
+      lifeRange: [120, 240],
+      connect: this.variant === 'neural',
+      starfield: this.variant === 'void',
+    });
+    this.field.mount(this.fieldHost);
   }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
+  private onClick = (e: MouseEvent): void => {
+    const rect = this.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    this.spawnBurst(x, y);
+    this.dispatchEvent(new CustomEvent('lumina-particle-interact', { bubbles: true, composed: true, detail: { x, y, type: 'click' } }));
+  };
+  private spawnBurst(cx: number, cy: number): void {
+    if (prefersReducedMotion() || !this.burstCtx || !this.burstCanvas) return;
+    const dpr = window.devicePixelRatio || 1;
+    const w = this.clientWidth; const h = this.clientHeight;
+    this.burstCanvas.width = w * dpr; this.burstCanvas.height = h * dpr;
+    this.burstCanvas.style.width = `${w}px`; this.burstCanvas.style.height = `${h}px`;
+    this.burstCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const rgb = (this.shadow.host as HTMLElement).style.getPropertyValue('--lumina-accent-rgb').trim() || '124 92 255';
+    const intensity = intensityToMultiplier(this.intensity);
+    const count = Math.round(20 * intensity);
+    for (let i = 0; i < count; i++) {
+      const a = (i / count) * Math.PI * 2 + Math.random() * 0.4;
+      const sp = 2 + Math.random() * 4 * intensity;
+      this.burstParticles.push({ x: cx, y: cy, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 0, maxLife: 40 + Math.random() * 30, size: randRange(1, 2.5) });
+    }
+    if (!this.burstRaf) this.tickBurst(rgb);
   }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private tickBurst = (rgb: string): void => {
+    if (!this.burstCtx) return;
+    this.burstCtx.clearRect(0, 0, this.clientWidth, this.clientHeight);
+    this.burstParticles = this.burstParticles.filter((p) => p.life < p.maxLife);
+    for (const p of this.burstParticles) {
+      p.x += p.vx; p.y += p.vy; p.vx *= 0.94; p.vy *= 0.94; p.life += 1;
+      const a = 1 - p.life / p.maxLife;
+      this.burstCtx.fillStyle = `rgba(${rgb} / ${a})`;
+      this.burstCtx.beginPath();
+      this.burstCtx.arc(p.x, p.y, p.size * a, 0, Math.PI * 2);
+      this.burstCtx.fill();
+    }
+    if (this.burstParticles.length > 0) this.burstRaf = requestAnimationFrame(() => this.tickBurst(rgb));
+    else { this.burstRaf = 0; this.burstCtx.clearRect(0, 0, this.clientWidth, this.clientHeight); }
+  };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-particle-card': ParticleCard;
-  }
-}
-
-if (!customElements.get(ParticleCard.tagName)) {
-  customElements.define(ParticleCard.tagName, ParticleCard);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-particle-card': ParticleCard } }
+if (!customElements.get(ParticleCard.tagName)) customElements.define(ParticleCard.tagName, ParticleCard);
