@@ -31,7 +31,11 @@
   "author": "Bruno Paulon",
   "license": "MIT",
   "devDependencies": {
+    "monaco-editor": "^0.55.1",
     "typescript": "^5.4.5",
     "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "@monaco-editor/loader": "^1.7.0"
   }
 }
