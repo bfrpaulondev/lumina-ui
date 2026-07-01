@@ -293,13 +293,11 @@ export class LuminaDrawer extends LuminaElement {
     }
   }
 
-  private applyPlacement(): void {
-    if (this.getAttribute('placement') !== this._placement) this.setAttribute('placement', this._placement);
-  }
+  private applyPlacement(): void { /* attribute already set — CSS :host([placement=...]) handles styling */ }
 
   private applySize(): void {
     this.style.setProperty('--lmd-width', SIZE_WIDTH[this._size]);
-    if (this.getAttribute('size') !== this._size) this.setAttribute('size', this._size);
+
   }
 
   /** Public API: open the drawer. */

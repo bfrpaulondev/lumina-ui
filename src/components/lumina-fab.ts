@@ -102,7 +102,7 @@ export class Fab extends LuminaElement {
     if (name === 'extended') this._extended = value !== null;
     else if (name === 'position') { this._position = coerceAttr(value, POSITIONS, 'bottom-right'); this.applyPosition(); }
   }
-  private applyPosition(): void { if (this.getAttribute('position') !== this._position) this.setAttribute('position', this._position); }
+  private applyPosition(): void { /* attribute already set — CSS :host([position=...]) handles styling */ }
 }
 declare global { interface HTMLElementTagNameMap { 'lumina-fab': Fab } }
 if (!customElements.get(Fab.tagName)) customElements.define(Fab.tagName, Fab);

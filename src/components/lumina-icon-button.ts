@@ -192,7 +192,7 @@ export class IconButton extends LuminaElement {
   }
 
   private applySize(): void { this.style.setProperty('--lmib-size', `${SIZE_PX[this._size]}px`); }
-  private applyShape(): void { if (this.getAttribute('shape') !== this._shape) this.setAttribute('shape', this._shape); }
+  private applyShape(): void { /* attribute already set via HTML/setter — CSS :host([shape=...]) handles styling */ }
 
   private onClick = (e: MouseEvent): void => {
     if (this._disabled) { e.preventDefault(); e.stopPropagation(); return; }
