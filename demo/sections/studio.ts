@@ -1,30 +1,35 @@
 /**
  * Make it Yours Studio — tweak attributes via controls, see live preview
- * and copy the generated code (HTML + React).
+ * and copy the generated code (HTML + React). Now uses all 100 components.
  */
 import type { Route } from '../app';
-import { COMPONENTS } from '../data/components';
-import { el, sectionHead, VARIANTS, INTENSITIES, DEPTHS, THEMES, ACCENTS } from './_shared';
+import { COMPONENT_METAS, CATEGORIES } from '../data/components';
+import type { ComponentMeta } from '../data/components';
+import { el, sectionHead, INTENSITIES, DEPTHS, THEMES, ACCENTS } from './_shared';
 
 export default async function studioSection(_route: Route): Promise<HTMLElement> {
   const root = el('div', { class: 'studio' });
 
+  // Group components by category for the select
+  const componentOptgroups = CATEGORIES.map((cat) => {
+    const items = COMPONENT_METAS.filter((c) => c.category === cat.id);
+    return `<optgroup label="${cat.label}">
+      ${items.map((c) => `<option value="${c.tag}">&lt;${c.tag}&gt;</option>`).join('')}
+    </optgroup>`;
+  }).join('');
+
   root.innerHTML = `
-    ${sectionHead('✦', 'Make it Yours Studio', 'Escolha componente + variante + intensidade + accent e copie o código pronto para seu projeto.').outerHTML}
+    ${sectionHead('✦', 'Make it Yours Studio', 'Escolha entre os 100 componentes + variante + intensidade + accent e copie o código pronto.').outerHTML}
 
     <div class="studio__layout">
       <div class="studio__controls">
         <label class="control">
-          <div class="control__head"><span class="control__label">component</span></div>
-          <select data-studio-component>
-            ${COMPONENTS.map((c) => `<option value="${c.tag}">&lt;${c.tag}&gt;</option>`).join('')}
-          </select>
+          <div class="control__head"><span class="control__label">component (100)</span></div>
+          <select data-studio-component>${componentOptgroups}</select>
         </label>
         <label class="control">
           <div class="control__head"><span class="control__label">variant</span></div>
-          <select data-studio-variant>
-            ${VARIANTS.map((v) => `<option value="${v}">${v}</option>`).join('')}
-          </select>
+          <select data-studio-variant></select>
         </label>
         <label class="control">
           <div class="control__head"><span class="control__label">intensity</span></div>
@@ -73,9 +78,10 @@ export default async function studioSection(_route: Route): Promise<HTMLElement>
     </div>
   `;
 
+  const initialMeta = COMPONENT_METAS[0];
   const state = {
-    component: COMPONENTS[0].tag,
-    variant: 'glass',
+    component: initialMeta.tag,
+    variant: initialMeta.variants[0] ?? 'glass',
     intensity: 'intense',
     depth: 'medium',
     theme: 'dark',
@@ -94,7 +100,46 @@ export default async function studioSection(_route: Route): Promise<HTMLElement>
   const previewStage = root.querySelector('[data-preview-stage]') as HTMLElement;
   const codeBody = root.querySelector('[data-code-body]') as HTMLElement;
 
-  componentSel.addEventListener('change', () => { state.component = componentSel.value; render(); });
+  function populateVariants(): void {
+    const meta = COMPONENT_METAS.find((c) => c.tag === state.component)!;
+    variantSel.innerHTML = meta.variants.map((v) => `<option value="${v}">${v}</option>`).join('');
+    state.variant = meta.variants[0] ?? 'glass';
+  }
+
+  function attrs(): string {
+    return `variant="${state.variant}" intensity="${state.intensity}" depth="${state.depth}" theme="${state.theme}" speed="${state.speed}" accent-color="${state.accent}"`;
+  }
+
+  function renderPreview(): void {
+    const a = attrs();
+    const tag = state.component;
+    const meta = COMPONENT_METAS.find((c) => c.tag === tag)!;
+    previewStage.innerHTML = buildPreviewFor(meta, a);
+    // Wire any open buttons inside the preview
+    const openBtn = previewStage.querySelector('[data-studio-open]');
+    const modal = previewStage.querySelector('[data-studio-modal]') as any;
+    if (openBtn && modal) {
+      openBtn.addEventListener('lumina-press', () => modal.showModal?.());
+    }
+  }
+
+  function renderCode(): void {
+    const a = attrs();
+    const tag = state.component;
+    const meta = COMPONENT_METAS.find((c) => c.tag === tag)!;
+    let html = '';
+    if (codeMode === 'html') {
+      html = buildHtmlSnippet(meta, a);
+      codeBody.innerHTML = `<lumina-code-block lang="html" title="HTML">${escapeHtml(html)}</lumina-code-block>`;
+    } else {
+      html = buildReactSnippet(meta, a);
+      codeBody.innerHTML = `<lumina-code-block lang="tsx" title="React">${escapeHtml(html)}</lumina-code-block>`;
+    }
+  }
+
+  function render(): void { renderPreview(); renderCode(); }
+
+  componentSel.addEventListener('change', () => { state.component = componentSel.value; populateVariants(); render(); });
   variantSel.addEventListener('change', () => { state.variant = variantSel.value; render(); });
   intensitySel.addEventListener('change', () => { state.intensity = intensitySel.value; render(); });
   depthSel.addEventListener('change', () => { state.depth = depthSel.value; render(); });
@@ -102,11 +147,7 @@ export default async function studioSection(_route: Route): Promise<HTMLElement>
   speedInput.addEventListener('input', () => { state.speed = parseFloat(speedInput.value); render(); });
   accentInput.addEventListener('input', () => { state.accent = accentInput.value; render(); });
   root.querySelectorAll('[data-swatch]').forEach((b) => {
-    b.addEventListener('click', () => {
-      state.accent = (b as HTMLElement).dataset.swatch!;
-      accentInput.value = state.accent;
-      render();
-    });
+    b.addEventListener('click', () => { state.accent = (b as HTMLElement).dataset.swatch!; accentInput.value = state.accent; render(); });
   });
   root.querySelectorAll('[data-code-tab]').forEach((b) => {
     b.addEventListener('click', () => {
@@ -116,74 +157,65 @@ export default async function studioSection(_route: Route): Promise<HTMLElement>
     });
   });
 
-  function attrs(): string {
-    return `variant="${state.variant}" intensity="${state.intensity}" depth="${state.depth}" theme="${state.theme}" speed="${state.speed}" accent-color="${state.accent}"`;
-  }
-
-  function renderPreview(): void {
-    const a = attrs();
-    const tag = state.component;
-    let inner = '';
-    switch (tag) {
-      case 'lumina-button': inner = `<lumina-button ${a}>Clique aqui</lumina-button>`; break;
-      case 'lumina-card': inner = `<lumina-card ${a}><h3 slot="title">Título</h3><p>Conteúdo do card.</p></lumina-card>`; break;
-      case 'lumina-input': inner = `<lumina-input ${a} placeholder="Digite..."></lumina-input>`; break;
-      case 'lumina-toggle': inner = `<lumina-toggle ${a} checked>Toggle</lumina-toggle>`; break;
-      case 'lumina-progress': inner = `<lumina-progress ${a} value="55"></lumina-progress>`; break;
-      case 'lumina-badge': inner = `<lumina-badge ${a} dot pulse>NEW</lumina-badge>`; break;
-      case 'lumina-modal': inner = `<lumina-button ${a} id="studio-open">Abrir modal</lumina-button><lumina-modal ${a}><span slot="title">Modal</span><p>Demo.</p></lumina-modal>`; break;
-      case 'lumina-navigation': inner = `<lumina-navigation ${a}><lumina-nav-item active>Home</lumina-nav-item><lumina-nav-item>About</lumina-nav-item></lumina-navigation>`; break;
-      case 'lumina-tooltip': inner = `<lumina-tooltip ${a} side="top" content="Dica"><lumina-button ${a}>Hover</lumina-button></lumina-tooltip>`; break;
-      case 'lumina-container': inner = `<lumina-container ${a}><div style="padding:20px;"><lumina-button ${a}>Inside</lumina-button></div></lumina-container>`; break;
-      default: inner = `<lumina-button ${a}>Default</lumina-button>`;
-    }
-    previewStage.innerHTML = inner;
-    const openBtn = previewStage.querySelector('#studio-open');
-    const modal = previewStage.querySelector('lumina-modal') as any;
-    if (openBtn && modal) {
-      openBtn.addEventListener('lumina-press', () => modal.showModal());
-    }
-  }
-
-  function renderCode(): void {
-    const a = attrs();
-    const tag = state.component;
-    let html = '';
-    if (codeMode === 'html') {
-      switch (tag) {
-        case 'lumina-button': html = `<lumina-button ${a}>Clique aqui</lumina-button>`; break;
-        case 'lumina-card': html = `<lumina-card ${a}>\n  <h3 slot="title">Título</h3>\n  <p>Conteúdo do card.</p>\n</lumina-card>`; break;
-        case 'lumina-input': html = `<lumina-input ${a} placeholder="Digite..."></lumina-input>`; break;
-        case 'lumina-toggle': html = `<lumina-toggle ${a} checked>Toggle</lumina-toggle>`; break;
-        case 'lumina-progress': html = `<lumina-progress ${a} value="55"></lumina-progress>`; break;
-        case 'lumina-badge': html = `<lumina-badge ${a} dot pulse>NEW</lumina-badge>`; break;
-        case 'lumina-modal': html = `<lumina-modal ${a}>\n  <span slot="title">Modal</span>\n  <p>Conteúdo do modal.</p>\n  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>\n</lumina-modal>`; break;
-        case 'lumina-navigation': html = `<lumina-navigation ${a}>\n  <lumina-nav-item active>Home</lumina-nav-item>\n  <lumina-nav-item>About</lumina-nav-item>\n</lumina-navigation>`; break;
-        case 'lumina-tooltip': html = `<lumina-tooltip ${a} side="top" content="Dica">\n  <lumina-button ${a}>Hover</lumina-button>\n</lumina-tooltip>`; break;
-        case 'lumina-container': html = `<lumina-container ${a}>\n  <lumina-button ${a}>Inside</lumina-button>\n</lumina-container>`; break;
-        default: html = `<lumina-button ${a}>Default</lumina-button>`;
-      }
-      codeBody.innerHTML = `<lumina-code-block lang="html" title="HTML">${escapeHtml(html)}</lumina-code-block>`;
-    } else {
-      const camelAttrs = a
-        .replace(/variant="([^"]+)"/g, 'variant="$1"')
-        .replace(/intensity="([^"]+)"/g, 'intensity="$1"')
-        .replace(/depth="([^"]+)"/g, 'depth="$1"')
-        .replace(/theme="([^"]+)"/g, 'theme="$1"')
-        .replace(/speed="([^"]+)"/g, 'speed={$1}')
-        .replace(/accent-color="([^"]+)"/g, 'accent-color="$1"');
-      html = `import 'lumina-ui';\n\nexport function MyComponent() {\n  return (\n    <${tag} ${camelAttrs}>\n      Conteúdo\n    </${tag}>\n  );\n}`;
-      codeBody.innerHTML = `<lumina-code-block lang="tsx" title="React">${escapeHtml(html)}</lumina-code-block>`;
-    }
-  }
-
-  function render(): void {
-    renderPreview();
-    renderCode();
-  }
-
+  populateVariants();
   render();
   return root;
+}
+
+function buildPreviewFor(meta: ComponentMeta, attrs: string): string {
+  const tag = meta.tag;
+  const cat = meta.category;
+  switch (cat) {
+    case 'buttons':
+      return `<${tag} ${attrs}>Clique aqui</${tag}>`;
+    case 'cards':
+      return `<${tag} ${attrs}><h3 slot="title">Título</h3><p>Conteúdo do ${tag}.</p></${tag}>`;
+    case 'inputs':
+      return `<${tag} ${attrs} placeholder="Digite..."></${tag}>`;
+    case 'feedback':
+      if (tag === 'lumina-progress') return `<${tag} ${attrs} value="55"></${tag}>`;
+      return `<${tag} ${attrs}>${meta.name.replace('Lumina','')}</${tag}>`;
+    case 'overlays':
+      if (tag === 'lumina-modal' || tag.endsWith('-dialog') || tag === 'lumina-drawer-modal') {
+        return `<${tag} ${attrs}><span slot="title">Modal</span><p>Demo.</p></${tag}>`;
+      }
+      return `<${tag} ${attrs}>Trigger</${tag}>`;
+    default:
+      return `<${tag} ${attrs}>Conteúdo</${tag}>`;
+  }
+}
+
+function buildHtmlSnippet(meta: ComponentMeta, attrs: string): string {
+  const tag = meta.tag;
+  const cat = meta.category;
+  switch (cat) {
+    case 'buttons':
+      return `<${tag} ${attrs}>Clique aqui</${tag}>`;
+    case 'cards':
+      return `<${tag} ${attrs}>\n  <h3 slot="title">Título</h3>\n  <p>Conteúdo do ${tag}.</p>\n</${tag}>`;
+    case 'inputs':
+      return `<${tag} ${attrs} placeholder="Digite..."></${tag}>`;
+    case 'feedback':
+      if (tag === 'lumina-progress') return `<${tag} ${attrs} value="55"></${tag}>`;
+      if (tag === 'lumina-skeleton') return `<${tag} ${attrs} shape="rectangle" width="200px" height="60px"></${tag}>`;
+      return `<${tag} ${attrs}>${meta.name.replace('Lumina','')}</${tag}>`;
+    case 'overlays':
+      if (tag === 'lumina-modal' || tag.endsWith('-dialog') || tag === 'lumina-drawer-modal') {
+        return `<${tag} ${attrs}>\n  <span slot="title">Modal</span>\n  <p>Conteúdo do modal.</p>\n  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>\n</${tag}>`;
+      }
+      return `<${tag} ${attrs}>\n  <lumina-button>Trigger</lumina-button>\n</${tag}>`;
+    default:
+      return `<${tag} ${attrs}>\n  Conteúdo\n</${tag}>`;
+  }
+}
+
+function buildReactSnippet(meta: ComponentMeta, attrs: string): string {
+  const tag = meta.tag;
+  const className = meta.name.replace('Lumina', '');
+  const reactAttrs = attrs
+    .replace(/speed="([^"]+)"/g, 'speed={$1}')
+    .replace(/accent-color=/g, 'accent-color=');
+  return `import 'lumina-ui';\n\nexport function ${className}Example() {\n  return (\n    <${tag} ${reactAttrs}>\n      Conteúdo\n    </${tag}>\n  );\n}`;
 }
 
 function escapeHtml(s: string): string {

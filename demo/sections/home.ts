@@ -2,29 +2,74 @@
  * Home section — hero + overview cards for all sections.
  */
 import type { Route } from '../app';
+import { CATEGORIES, COMPONENT_METAS } from '../data/components';
 import { el } from './_shared';
 
 export default async function homeSection(_route: Route): Promise<HTMLElement> {
   const root = el('div', { class: 'home' });
+  const totalComponents = COMPONENT_METAS.length;
+  const totalVariants = COMPONENT_METAS.reduce((sum, c) => sum + c.variants.length, 0);
 
   root.innerHTML = `
     <section class="home__hero">
-      <lumina-badge variant="aura" dot pulse>v0.1.0 · MVP expandido</lumina-badge>
+      <lumina-badge variant="aura" dot pulse>v0.3.0 · ${totalComponents} componentes</lumina-badge>
       <h1 class="home__title">
-        Interfaces <span class="gradient-text">vivas</span>, morfáveis<br />
-        e <span class="gradient-text">adaptativas</span> — exploráveis.
+        Biblioteca completa:<br />
+        <span class="gradient-text">${totalComponents} componentes</span>, 8 categorias.
       </h1>
       <p class="home__lead">
-        Playground completo: veja o código, edite em tempo real, misture variantes,
-        meça performance, inspecione acessibilidade e gere o snippet pronto.
+        Playground expandido: ${totalComponents} Web Components vanilla com ${totalVariants} variantes visuais.
+        Veja o código, edite no Monaco, misture variantes, meça performance e gere snippets prontos.
       </p>
       <div class="home__actions">
-        <lumina-button variant="dimensional" intensity="intense" accent-color="#7c5cff" depth="deep" onclick="location.hash='#/playground'">
+        <lumina-button variant="dimensional" intensity="intense" accent-color="#7c5cff" depth="deep" data-nav="playground">
           Abrir Playground
         </lumina-button>
-        <lumina-button variant="glass" intensity="medium" accent-color="#78f0ff" onclick="location.hash='#/studio'">
+        <lumina-button variant="glass" intensity="medium" accent-color="#78f0ff" data-nav="studio">
           Make it Yours Studio
         </lumina-button>
+      </div>
+
+      <div class="home__stats">
+        <div class="home__stat">
+          <strong>${totalComponents}</strong>
+          <span>componentes</span>
+        </div>
+        <div class="home__stat">
+          <strong>${CATEGORIES.length}</strong>
+          <span>categorias</span>
+        </div>
+        <div class="home__stat">
+          <strong>${totalVariants}</strong>
+          <span>variantes</span>
+        </div>
+        <div class="home__stat">
+          <strong>0kb</strong>
+          <span>deps</span>
+        </div>
+        <div class="home__stat">
+          <strong>WC</strong>
+          <span>padrão</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="home__categories">
+      <h2>Categorias</h2>
+      <div class="home__cat-grid">
+        ${CATEGORIES.map((cat) => {
+          const items = COMPONENT_METAS.filter((c) => c.category === cat.id);
+          return `
+            <a class="home__cat" href="#/playground/${items[0]?.tag ?? ''}">
+              <div class="home__cat-head">
+                <span class="home__cat-icon">${cat.icon}</span>
+                <span class="home__cat-range">${cat.range}</span>
+              </div>
+              <h3>${cat.label}</h3>
+              <p>${items.length} componentes</p>
+            </a>
+          `;
+        }).join('')}
       </div>
     </section>
 
@@ -32,7 +77,7 @@ export default async function homeSection(_route: Route): Promise<HTMLElement> {
       <a class="home__card" href="#/playground">
         <div class="home__card-icon">▷</div>
         <h3>Playground</h3>
-        <p>Veja cada componente com código TypeScript, Vanilla e React. Edite no Monaco.</p>
+        <p>Veja cada um dos ${totalComponents} componentes com código TypeScript, Vanilla e React.</p>
       </a>
       <a class="home__card" href="#/variants">
         <div class="home__card-icon">◇</div>
@@ -88,18 +133,10 @@ export default async function homeSection(_route: Route): Promise<HTMLElement> {
     </section>
   `;
 
-  // Wire buttons (lumina-button uses lumina-press event; onclick works for native, but
-  // lumina-button intercepts click and dispatches lumina-press, so bind to that)
-  root.querySelectorAll('lumina-button').forEach((btn) => {
-    const target = btn.getAttribute('onclick') ?? '';
-    if (target) {
-      btn.removeAttribute('onclick');
-      btn.addEventListener('lumina-press', () => {
-        // Match '#/something' inside the onclick string
-        const match = target.match(/#\/([a-z-]+)/);
-        if (match) location.hash = `#/${match[1]}`;
-      });
-    }
+  // Wire buttons
+  root.querySelectorAll('lumina-button[data-nav]').forEach((btn) => {
+    const target = (btn as HTMLElement).dataset.nav!;
+    btn.addEventListener('lumina-press', () => { location.hash = `#/${target}`; });
   });
 
   return root;

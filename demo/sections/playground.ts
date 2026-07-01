@@ -1,28 +1,46 @@
 /**
  * Playground section — interactive component browser with live preview
  * and Monaco-based code viewer (TypeScript source, Vanilla usage, React usage).
+ *
+ * v0.3.0 — now browses all 100 components grouped by category.
  */
 import type { Route } from '../app';
-import { COMPONENTS } from '../data/components';
-import { el, sectionHead, VARIANTS, INTENSITIES, DEPTHS } from './_shared';
+import { COMPONENT_METAS, CATEGORIES } from '../data/components';
+import type { ComponentMeta } from '../data/components';
+import { el, sectionHead, VARIANTS, INTENSITIES } from './_shared';
 
 export default async function playgroundSection(route: Route): Promise<HTMLElement> {
   const root = el('div', { class: 'playground' });
-  const initialTag = route.param ?? COMPONENTS[0].tag;
-  const current = COMPONENTS.find((c) => c.tag === initialTag) ?? COMPONENTS[0];
+  const initialTag = route.param ?? COMPONENT_METAS[0].tag;
+  const current = COMPONENT_METAS.find((c) => c.tag === initialTag) ?? COMPONENT_METAS[0];
+
+  // Build sidebar grouped by category
+  const sidebarHtml = CATEGORIES.map((cat) => {
+    const items = COMPONENT_METAS.filter((c) => c.category === cat.id);
+    if (items.length === 0) return '';
+    return `
+      <div class="playground__sidebar-group">
+        <div class="playground__sidebar-cat">
+          <span class="playground__sidebar-icon">${cat.icon}</span>
+          <span>${cat.label}</span>
+          <span class="playground__sidebar-count">${items.length}</span>
+        </div>
+        ${items.map((c) => `
+          <a class="playground__link ${c.tag === current.tag ? 'is-active' : ''}" href="#/playground/${c.tag}">
+            <span class="playground__link-tag">&lt;${c.tag}&gt;</span>
+          </a>
+        `).join('')}
+      </div>
+    `;
+  }).join('');
 
   root.innerHTML = `
-    ${sectionHead('01', 'Playground', 'Veja o código de cada Web Component. Edite em tempo real no Monaco. Copie trechos em TypeScript, Vanilla JS/HTML ou React.').outerHTML}
+    ${sectionHead('01', 'Playground', '100 componentes · 8 categorias · código TypeScript/Vanilla/React · Monaco editor embutido.').outerHTML}
 
     <div class="playground__layout">
       <aside class="playground__sidebar">
-        <div class="playground__sidebar-label">Componentes</div>
-        ${COMPONENTS.map((c) => `
-          <a class="playground__link ${c.tag === current.tag ? 'is-active' : ''}" href="#/playground/${c.tag}">
-            <span class="playground__link-tag">&lt;${c.tag}&gt;</span>
-            <span class="playground__link-name">${c.name}</span>
-          </a>
-        `).join('')}
+        <div class="playground__sidebar-label">Componentes (100)</div>
+        ${sidebarHtml}
       </aside>
 
       <div class="playground__main">
@@ -30,13 +48,17 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
           <div>
             <h2 class="playground__title">&lt;${current.tag}&gt;</h2>
             <p class="playground__desc">${current.description}</p>
+            <div class="playground__meta">
+              <span class="playground__meta-pill">${current.tier}</span>
+              <span class="playground__meta-pill">${current.variants.length} variants</span>
+              <span class="playground__meta-pill">${current.parts.length} parts</span>
+              ${(current.events?.length ?? 0) > 0 ? `<span class="playground__meta-pill">${current.events?.length} events</span>` : ''}
+            </div>
           </div>
           <div class="playground__controls" data-controls>
             <label class="control control--inline">
               <span class="control__label">variant</span>
-              <select data-variant>
-                ${VARIANTS.map((v) => `<option value="${v}">${v}</option>`).join('')}
-              </select>
+              <select data-variant></select>
             </label>
             <label class="control control--inline">
               <span class="control__label">intensity</span>
@@ -46,7 +68,7 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
             </label>
             <label class="control control--inline">
               <span class="control__label">accent</span>
-              <input type="color" data-accent value="${current.accent}" />
+              <input type="color" data-accent value="${current.accent ?? '#7c5cff'}" />
             </label>
           </div>
         </div>
@@ -60,40 +82,33 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
           </div>
         </div>
 
-        <div class="playground__variants" data-variants>
-          <!-- Variants quick switcher -->
-        </div>
+        <div class="playground__info" data-info></div>
       </div>
     </div>
   `;
 
-  // ---- Wire up interactivity -------------------------------------------
-
+  // ---- Wire up ----------------------------------------------------------
   const viewer = root.querySelector('[data-viewer]') as any;
   const previewInner = root.querySelector('[data-preview-inner]') as HTMLElement;
   const variantSel = root.querySelector('[data-variant]') as HTMLSelectElement;
   const intensitySel = root.querySelector('[data-intensity]') as HTMLSelectElement;
   const accentInput = root.querySelector('[data-accent]') as HTMLInputElement;
-  const variantsContainer = root.querySelector('[data-variants]') as HTMLElement;
+  const infoHost = root.querySelector('[data-info]') as HTMLElement;
 
-  let state = {
-    variant: 'glass' as string,
+  // Populate variant select with the component's variants
+  const componentVariants = current.variants;
+  variantSel.innerHTML = componentVariants
+    .map((v: string) => `<option value="${v}">${v}</option>`)
+    .join('');
+
+  const state = {
+    variant: componentVariants[0] ?? 'glass',
     intensity: 'intense' as string,
-    accent: current.accent,
+    accent: current.accent ?? '#7c5cff',
   };
 
-  // Initialize variant/intensity selects to current component's recommended
-  const recommended = current.variants[0].recommended;
-  state.variant = (recommended.intensity as any) ? 'glass' : 'glass';
-  variantSel.value = state.variant;
-  intensitySel.value = state.intensity;
-
   function renderPreview(): void {
-    previewInner.innerHTML = buildPreviewHTML(current.tag, state);
-    // Re-register any nested custom elements if they got disconnected
-    previewInner.querySelectorAll('lumina-button, lumina-card, lumina-input, lumina-toggle, lumina-badge, lumina-progress, lumina-tooltip, lumina-navigation, lumina-nav-item, lumina-modal, lumina-container').forEach((el) => {
-      // Trigger attribute application by toggling
-    });
+    previewInner.innerHTML = buildPreviewHTML(current, state);
   }
 
   function renderViewer(): void {
@@ -105,105 +120,102 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
     viewer.setTabs(tabs);
   }
 
-  function renderVariantsRow(): void {
-    variantsContainer.innerHTML = `
-      <div class="playground__variants-label">Trocar variante rapidamente:</div>
-      <div class="playground__variants-row">
-        ${VARIANTS.map((v) => `
-          <button class="playground__variant-chip ${v === state.variant ? 'is-active' : ''}" data-variant-chip="${v}">
-            ${v}
-          </button>
-        `).join('')}
+  function renderInfo(): void {
+    const events = (current.events ?? []).map((e: string) => `<code>${e}</code>`).join(' ');
+    const parts = current.parts.map((p: string) => `<code>${p}</code>`).join(' ');
+    const slots = (current.slots ?? []).map((s: string) => `<code>${s}</code>`).join(' ');
+    const props = (current.props ?? []).map((p: any) => `<code>${p.name}: ${p.type}</code>`).join(' ');
+    infoHost.innerHTML = `
+      <div class="playground__info-grid">
+        <div><strong>Events</strong><div class="playground__info-list">${events || '<em>(none)</em>'}</div></div>
+        <div><strong>CSS parts</strong><div class="playground__info-list">${parts || '<em>(none)</em>'}</div></div>
+        <div><strong>Slots</strong><div class="playground__info-list">${slots || '<em>(none)</em>'}</div></div>
+        <div><strong>Props</strong><div class="playground__info-list">${props || '<em>(only shared)</em>'}</div></div>
       </div>
     `;
-    variantsContainer.querySelectorAll('[data-variant-chip]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const v = (btn as HTMLElement).dataset.variantChip!;
-        state.variant = v;
-        variantSel.value = v;
-        updateVariantChips();
-        renderPreview();
-      });
-    });
   }
 
-  function updateVariantChips(): void {
-    variantsContainer.querySelectorAll('[data-variant-chip]').forEach((btn) => {
-      (btn as HTMLElement).classList.toggle('is-active', btn.getAttribute('data-variant-chip') === state.variant);
-    });
-  }
-
-  variantSel.addEventListener('change', () => {
-    state.variant = variantSel.value;
-    updateVariantChips();
-    renderPreview();
-  });
-  intensitySel.addEventListener('change', () => {
-    state.intensity = intensitySel.value;
-    renderPreview();
-  });
-  accentInput.addEventListener('input', () => {
-    state.accent = accentInput.value;
-    renderPreview();
-  });
+  variantSel.addEventListener('change', () => { state.variant = variantSel.value; renderPreview(); });
+  intensitySel.addEventListener('change', () => { state.intensity = intensitySel.value; renderPreview(); });
+  accentInput.addEventListener('input', () => { state.accent = accentInput.value; renderPreview(); });
 
   renderPreview();
   renderViewer();
-  renderVariantsRow();
+  renderInfo();
 
   return root;
 }
 
-/** Build live preview HTML per component type. */
-function buildPreviewHTML(tag: string, state: { variant: string; intensity: string; accent: string }): string {
+/** Build live preview HTML per component category. */
+function buildPreviewHTML(meta: ComponentMeta, state: { variant: string; intensity: string; accent: string }): string {
+  const tag = meta.tag;
   const attrs = `variant="${state.variant}" intensity="${state.intensity}" accent-color="${state.accent}"`;
-  switch (tag) {
-    case 'lumina-button':
-      return `<lumina-button ${attrs} speed="0.45">Click me</lumina-button>`;
-    case 'lumina-card':
-      return `<lumina-card ${attrs}>
-        <h3 slot="title">Título do card</h3>
-        <p slot="subtitle">subtítulo</p>
-        <p>Conteúdo de exemplo para demonstração do card.</p>
-      </lumina-card>`;
-    case 'lumina-input':
-      return `<lumina-input ${attrs} placeholder="Digite algo..."></lumina-input>`;
-    case 'lumina-toggle':
-      return `<lumina-toggle ${attrs} checked>Ativado</lumina-toggle>`;
-    case 'lumina-modal':
-      return `<div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
-        <lumina-button ${attrs} id="preview-open-modal">Abrir modal</lumina-button>
-        <lumina-modal ${attrs}>
-          <span slot="title">Modal preview</span>
-          <p>Modal de demonstração.</p>
-          <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
-        </lumina-modal>
-      </div>`;
-    case 'lumina-navigation':
-      return `<lumina-navigation ${attrs}>
-        <lumina-nav-item active>Home</lumina-nav-item>
-        <lumina-nav-item>Explore</lumina-nav-item>
-        <lumina-nav-item>Docs</lumina-nav-item>
-      </lumina-navigation>`;
-    case 'lumina-progress':
-      return `<lumina-progress ${attrs} value="62"></lumina-progress>`;
-    case 'lumina-badge':
-      return `<div style="display:flex; gap:12px; flex-wrap:wrap;">
-        <lumina-badge ${attrs} dot>default</lumina-badge>
-        <lumina-badge ${attrs} dot pulse>live</lumina-badge>
-        <lumina-badge ${attrs}>v0.1.0</lumina-badge>
-      </div>`;
-    case 'lumina-tooltip':
-      return `<lumina-tooltip ${attrs} side="top" content="Tooltip no topo">
-        <lumina-button ${attrs}>Hover me</lumina-button>
-      </lumina-tooltip>`;
-    case 'lumina-container':
-      return `<lumina-container ${attrs}>
-        <div style="padding:20px; text-align:center;">
-          <lumina-button ${attrs}>Inside container</lumina-button>
-        </div>
-      </lumina-container>`;
+  const cat = meta.category;
+  switch (cat) {
+    case 'buttons':
+      return `<${tag} ${attrs} speed="0.45">Click me</${tag}>`;
+    case 'cards':
+      return `<${tag} ${attrs}>
+        <h3 slot="title">${meta.name.replace('Lumina', '')}</h3>
+        <p slot="subtitle">${meta.tier}</p>
+        <p>Conteúdo de exemplo para ${tag}.</p>
+      </${tag}>`;
+    case 'inputs':
+      if (tag === 'lumina-textarea' || tag === 'lumina-signature-pad' || tag === 'lumina-file-upload') {
+        return `<${tag} ${attrs} placeholder="Digite algo..."></${tag}>`;
+      }
+      return `<${tag} ${attrs} placeholder="Digite algo..."></${tag}>`;
+    case 'navigation':
+      if (tag === 'lumina-tabs' || tag === 'lumina-breadcrumbs' || tag === 'lumina-pagination' || tag === 'lumina-step-indicator') {
+        return `<${tag} ${attrs}>
+          <span>Item A</span><span>Item B</span><span>Item C</span>
+        </${tag}>`;
+      }
+      return `<${tag} ${attrs}><span>Item 1</span><span>Item 2</span></${tag}>`;
+    case 'feedback':
+      if (tag === 'lumina-progress') return `<${tag} ${attrs} value="62"></${tag}>`;
+      if (tag === 'lumina-skeleton') return `<${tag} ${attrs} shape="rectangle" width="200px" height="60px"></${tag}>`;
+      if (tag === 'lumina-loading' || tag === 'lumina-spinner' || tag === 'lumina-neural-loader') {
+        return `<${tag} ${attrs} size="64"></${tag}>`;
+      }
+      if (tag === 'lumina-status-indicator' || tag === 'lumina-pulse-indicator') {
+        return `<${tag} ${attrs}>Online</${tag}>`;
+      }
+      if (tag === 'lumina-notification-badge') return `<${tag} ${attrs} count="7"><span style="font-size:24px;">🔔</span></${tag}>`;
+      return `<${tag} ${attrs}>${meta.name.replace('Lumina', '')}</${tag}>`;
+    case 'overlays':
+      if (tag === 'lumina-modal' || tag === 'lumina-dialog' || tag === 'lumina-confirmation-dialog' || tag === 'lumina-drawer-modal') {
+        return `<div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
+          <lumina-button ${attrs} id="preview-open-${tag}">Abrir ${meta.name.replace('Lumina', '')}</lumina-button>
+          <${tag} ${attrs}>
+            <span slot="title">${meta.name.replace('Lumina', '')}</span>
+            <p>Preview do ${tag}.</p>
+            <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
+          </${tag}>
+        </div>`;
+      }
+      if (tag === 'lumina-tooltip' || tag === 'lumina-popover') {
+        return `<${tag} ${attrs} content="Hint contextual">
+          <lumina-button ${attrs}>Hover me</lumina-button>
+        </${tag}>`;
+      }
+      return `<${tag} ${attrs}>Trigger</${tag}>`;
+    case 'data':
+      if (tag === 'lumina-avatar') return `<${tag} ${attrs} name="John Doe" size="64"></${tag}>`;
+      if (tag === 'lumina-avatar-group') return `<${tag} ${attrs} max="3">
+        <lumina-avatar name="A"></lumina-avatar>
+        <lumina-avatar name="B"></lumina-avatar>
+        <lumina-avatar name="C"></lumina-avatar>
+        <lumina-avatar name="D"></lumina-avatar>
+      </${tag}>`;
+      return `<${tag} ${attrs}>
+        <div>Row 1</div><div>Row 2</div><div>Row 3</div>
+      </${tag}>`;
+    case 'unique':
+      return `<${tag} ${attrs}>
+        <p>Unique component — ${meta.tagline}</p>
+      </${tag}>`;
     default:
-      return `<lumina-button ${attrs}>Default</lumina-button>`;
+      return `<${tag} ${attrs}>Default</${tag}>`;
   }
 }

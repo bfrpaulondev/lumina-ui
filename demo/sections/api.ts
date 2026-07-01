@@ -1,14 +1,53 @@
 /**
  * API Reference — every component + every shared attribute.
+ * v0.3.0 — now lists all 100 components grouped by category.
  */
 import type { Route } from '../app';
-import { COMPONENTS } from '../data/components';
+import { COMPONENT_METAS, CATEGORIES } from '../data/components';
 import { el, sectionHead } from './_shared';
 
 export default async function apiSection(_route: Route): Promise<HTMLElement> {
   const root = el('div', { class: 'docs' });
+
+  const componentsByCat = CATEGORIES.map((cat) => {
+    const items = COMPONENT_METAS.filter((c) => c.category === cat.id);
+    return `
+      <section class="api__category">
+        <h2>${cat.icon} ${cat.label} <span class="api__cat-range">${cat.range}</span></h2>
+        ${items.map((c) => `
+          <article class="api__component" id="${c.tag}">
+            <h3><code>&lt;${c.tag}&gt;</code> <span class="api__tier api__tier--${c.tier}">${c.tier}</span></h3>
+            <p>${c.description}</p>
+            <div class="api__component-grid">
+              <div>
+                <strong>Variants</strong>
+                <p>${c.variants.map((v) => `<code>${v}</code>`).join(' ')}</p>
+              </div>
+              <div>
+                <strong>Events</strong>
+                <p>${(c.events ?? []).length > 0 ? c.events!.map((e) => `<code>${e}</code>`).join(' ') : '<em>(standard)</em>'}</p>
+              </div>
+              <div>
+                <strong>CSS parts</strong>
+                <p>${c.parts.map((p) => `<code>${p}</code>`).join(' ')}</p>
+              </div>
+              <div>
+                <strong>Slots</strong>
+                <p>${(c.slots ?? []).length > 0 ? c.slots!.map((s) => `<code>${s}</code>`).join(' ') : '<em>(none)</em>'}</p>
+              </div>
+              <div>
+                <strong>Props</strong>
+                <p>${(c.props ?? []).length > 0 ? c.props!.map((p) => `<code>${p.name}: ${p.type}</code>`).join(' ') : '<em>(only shared)</em>'}</p>
+              </div>
+            </div>
+          </article>
+        `).join('')}
+      </section>
+    `;
+  }).join('');
+
   root.innerHTML = `
-    ${sectionHead('⌘', 'API Reference', 'Toda a API pública da LuminaUI v0.1.0.').outerHTML}
+    ${sectionHead('⌘', 'API Reference', '100 componentes · 8 categorias · todos com variants, events, CSS parts, slots e props documentados.').outerHTML}
 
     <h2>Atributos compartilhados</h2>
     <p>Todos os componentes Lumina aceitam estes atributos (e suas propriedades camelCase equivalentes):</p>
@@ -17,21 +56,7 @@ export default async function apiSection(_route: Route): Promise<HTMLElement> {
     <h2>Eventos compartilhados</h2>
     ${eventsTable()}
 
-    <h2>Componentes</h2>
-    ${COMPONENTS.map((c) => `
-      <article class="api__component" id="${c.tag}">
-        <h3><code>&lt;${c.tag}&gt;</code></h3>
-        <p>${c.description}</p>
-        <p><strong>Atributos próprios:</strong></p>
-        ${componentSpecificAttrs(c.tag)}
-        <p><strong>Slots:</strong></p>
-        ${componentSlots(c.tag)}
-        <p><strong>CSS parts:</strong></p>
-        ${componentParts(c.tag)}
-        <p><strong>Eventos:</strong></p>
-        ${componentEvents(c.tag)}
-      </article>
-    `).join('')}
+    ${componentsByCat}
   `;
   return root;
 }
@@ -40,7 +65,7 @@ function sharedTable(): string {
   return `<table class="api__table">
     <thead><tr><th>Atributo</th><th>Propriedade</th><th>Tipo</th><th>Default</th></tr></thead>
     <tbody>
-      <tr><td><code>variant</code></td><td><code>variant</code></td><td><code>glass | morph | neural | void | aura | dimensional</code></td><td><code>glass</code></td></tr>
+      <tr><td><code>variant</code></td><td><code>variant</code></td><td><code>string</code> (varia por componente)</td><td><code>glass</code> ou primeiro da lista</td></tr>
       <tr><td><code>intensity</code></td><td><code>intensity</code></td><td><code>subtle | medium | intense | extreme</code></td><td><code>medium</code></td></tr>
       <tr><td><code>theme</code></td><td><code>theme</code></td><td><code>light | dark | auto | cosmic | void</code></td><td><code>auto</code></td></tr>
       <tr><td><code>animation-trigger</code></td><td><code>animationTrigger</code></td><td><code>hover | click | scroll | focus | proximity</code></td><td><code>hover</code></td></tr>
@@ -55,113 +80,18 @@ function eventsTable(): string {
   return `<table class="api__table">
     <thead><tr><th>Evento</th><th>detail</th><th>Disparado por</th></tr></thead>
     <tbody>
-      <tr><td><code>lumina-press</code></td><td>—</td><td>lumina-button</td></tr>
-      <tr><td><code>lumina-change</code></td><td><code>{ value: string }</code></td><td>lumina-input</td></tr>
-      <tr><td><code>lumina-submit</code></td><td><code>{ value: string }</code></td><td>lumina-input (Enter)</td></tr>
+      <tr><td><code>lumina-click</code></td><td>—</td><td>todos os componentes de botão</td></tr>
+      <tr><td><code>lumina-change</code></td><td>varia</td><td>inputs, toggles, selects</td></tr>
+      <tr><td><code>lumina-input</code></td><td><code>{ value: string }</code></td><td>inputs de texto</td></tr>
+      <tr><td><code>lumina-submit</code></td><td><code>{ value: string }</code></td><td>inputs (Enter)</td></tr>
       <tr><td><code>lumina-toggle</code></td><td><code>{ checked: boolean }</code></td><td>lumina-toggle</td></tr>
-      <tr><td><code>lumina-open</code></td><td>—</td><td>lumina-modal</td></tr>
-      <tr><td><code>lumina-close</code></td><td>—</td><td>lumina-modal</td></tr>
+      <tr><td><code>lumina-open / lumina-close</code></td><td>—</td><td>modais, drawers, dialogs</td></tr>
       <tr><td><code>lumina-nav-change</code></td><td><code>{ value: string }</code></td><td>lumina-navigation</td></tr>
+      <tr><td><code>lumina-show / lumina-hide</code></td><td>—</td><td>tooltips, popovers</td></tr>
+      <tr><td><code>lumina-dismiss</code></td><td>—</td><td>alerts, toasts, chips</td></tr>
+      <tr><td><code>lumina-morph</code></td><td>—</td><td>componentes morfáveis</td></tr>
+      <tr><td><code>lumina-progress-complete</code></td><td>—</td><td>lumina-progress</td></tr>
+      <tr><td><code>lumina-hover-start / lumina-hover-end</code></td><td>—</td><td>todos os componentes interativos</td></tr>
     </tbody>
   </table>`;
-}
-
-function componentSpecificAttrs(tag: string): string {
-  const map: Record<string, Array<[string, string, string]>> = {
-    'lumina-button': [
-      ['disabled', 'boolean', '—'],
-    ],
-    'lumina-input': [
-      ['type', 'string (text, email, password...)', 'text'],
-      ['placeholder', 'string', '—'],
-      ['value', 'string', '—'],
-      ['label', 'string', '—'],
-      ['name', 'string', '—'],
-      ['disabled', 'boolean', '—'],
-      ['required', 'boolean', '—'],
-      ['invalid', 'boolean', '—'],
-    ],
-    'lumina-toggle': [
-      ['checked', 'boolean', 'false'],
-      ['disabled', 'boolean', '—'],
-      ['label', 'string', '—'],
-    ],
-    'lumina-modal': [
-      ['open', 'boolean', 'false'],
-      ['closable', 'boolean', 'true'],
-    ],
-    'lumina-progress': [
-      ['value', 'number', '0'],
-      ['max', 'number', '100'],
-      ['indeterminate', 'boolean', 'false'],
-    ],
-    'lumina-badge': [
-      ['dot', 'boolean', 'false'],
-      ['pulse', 'boolean', 'false'],
-    ],
-    'lumina-tooltip': [
-      ['content', 'string', '—'],
-      ['side', 'top | bottom | left | right', 'top'],
-      ['delay', 'number (ms)', '200'],
-    ],
-    'lumina-nav-item': [
-      ['active', 'boolean', 'false'],
-      ['value', 'string', '—'],
-    ],
-  };
-  const attrs = map[tag] ?? [];
-  if (attrs.length === 0) return '<p><em>Sem atributos próprios.</em></p>';
-  return `<table class="api__table">
-    <thead><tr><th>Atributo</th><th>Tipo</th><th>Default</th></tr></thead>
-    <tbody>
-      ${attrs.map(([a, t, d]) => `<tr><td><code>${a}</code></td><td><code>${t}</code></td><td>${d}</td></tr>`).join('')}
-    </tbody>
-  </table>`;
-}
-
-function componentSlots(tag: string): string {
-  const map: Record<string, string[]> = {
-    'lumina-button': ['default'],
-    'lumina-card': ['default', 'title', 'subtitle', 'media', 'footer'],
-    'lumina-input': ['label'],
-    'lumina-toggle': ['default'],
-    'lumina-modal': ['default', 'title', 'footer'],
-    'lumina-navigation': ['default (lumina-nav-item children)'],
-    'lumina-progress': ['—'],
-    'lumina-badge': ['default'],
-    'lumina-tooltip': ['default (trigger)', 'content'],
-    'lumina-container': ['default'],
-  };
-  const slots = map[tag] ?? ['default'];
-  return `<p>${slots.map((s) => `<code>${s}</code>`).join(', ')}</p>`;
-}
-
-function componentParts(tag: string): string {
-  const map: Record<string, string[]> = {
-    'lumina-button': ['shell', 'bg', 'ring', 'aura', 'field', 'burst', 'sheen', 'content'],
-    'lumina-card': ['card', 'glow', 'field', 'glass', 'sheen', 'inner', 'body'],
-    'lumina-input': ['root', 'label', 'shell', 'bg', 'ring', 'bar', 'echo', 'input'],
-    'lumina-toggle': ['root', 'aura', 'track', 'glow', 'knob', 'burst', 'label'],
-    'lumina-modal': ['root', 'backdrop', 'portal', 'panel', 'glass', 'header', 'body', 'footer', 'close'],
-    'lumina-navigation': ['root', 'glow', 'bar', 'indicator'],
-    'lumina-progress': ['root', 'track', 'fill', 'shimmer', 'head', 'trail'],
-    'lumina-badge': ['root', 'dot', 'halo', 'content'],
-    'lumina-tooltip': ['root', 'bubble', 'glow', 'arrow', 'content'],
-    'lumina-container': ['root', 'glow', 'field', 'inner'],
-  };
-  const parts = map[tag] ?? [];
-  return `<p>${parts.map((p) => `<code>part="${p}"</code>`).join(' ')}</p>`;
-}
-
-function componentEvents(tag: string): string {
-  const map: Record<string, string[]> = {
-    'lumina-button': ['lumina-press'],
-    'lumina-input': ['lumina-change', 'lumina-submit'],
-    'lumina-toggle': ['lumina-toggle'],
-    'lumina-modal': ['lumina-open', 'lumina-close'],
-    'lumina-navigation': ['lumina-nav-change'],
-  };
-  const evts = map[tag] ?? [];
-  if (evts.length === 0) return '<p><em>Sem eventos próprios.</em></p>';
-  return `<p>${evts.map((e) => `<code>${e}</code>`).join(', ')}</p>`;
 }
