@@ -106,26 +106,133 @@ def gen_vanilla_snippet(spec):
     accent = spec.get('accent', '#7c5cff')
     v = variants[0] if variants else 'glass'
     events = spec.get('events', []) or []
+    props = spec.get('props', []) or []
+    slots = spec.get('slots', []) or ['default']
+    cat = spec.get('category', '')
+
+    # Build attribute string with shared + component-specific props
+    attrs = [f'variant="{v}"', f'intensity="intense"', f'accent-color="{accent}"', 'speed="0.5"']
+    for p in props:
+        pname = p['name']
+        ptype = p['type']
+        default = p.get('default', '')
+        # Skip if it would conflict with shared
+        if pname in ('variant', 'intensity', 'theme', 'speed', 'accent-color', 'depth'):
+            continue
+        # Provide a sensible example value
+        if 'boolean' in ptype:
+            if default and 'true' in str(default):
+                attrs.append(f'{pname}')
+            # else don't add (false is default)
+        elif 'number' in ptype:
+            val = str(default).strip('"').strip("'") if default else '0'
+            attrs.append(f'{pname}="{val}"')
+        elif 'JSON' in ptype or 'array' in ptype.lower() or 'string' in ptype and 'menu-items' in pname:
+            # Provide a JSON example for options/items
+            if pname == 'menu-items':
+                attrs.append(f'{pname}=\'[{{"label":"Editar","icon":"✎","value":"edit"}},{{"label":"Excluir","icon":"🗑","value":"delete"}}]\'')
+            elif pname == 'options':
+                attrs.append(f'{pname}=\'[{{"value":"a","label":"Opção A"}},{{"value":"b","label":"Opção B"}}]\'')
+            elif pname == 'marks':
+                attrs.append(f'{pname}=\'[{{"value":0,"label":"0"}},{{"value":50,"label":"Médio"}},{{"value":100,"label":"Máx"}}]\'')
+            elif pname == 'gestures':
+                attrs.append(f'{pname}="hold,swipe,double-tap"')
+            else:
+                if default:
+                    attrs.append(f'{pname}="{str(default).strip(chr(34)).strip(chr(39))}"')
+        else:
+            if default:
+                val = str(default).strip('"').strip("'")
+                attrs.append(f'{pname}="{val}"')
+
+    attr_str = '\n  '.join(attrs)
+
+    # Build content / slots
+    content = ''
+    if tag == 'lumina-icon-button':
+        content = '⚙'
+    elif tag == 'lumina-fab':
+        content = '+\n  <span slot="label">Nova tarefa</span>'
+    elif tag == 'lumina-split-button':
+        content = 'Salvar'
+    elif tag == 'lumina-toggle-button':
+        content = 'Modo escuro'
+    elif tag == 'lumina-button-group':
+        content = '  <button data-value="a">A</button>\n  <button data-value="b">B</button>\n  <button data-value="c">C</button>'
+    elif tag == 'lumina-command-button':
+        content = 'Buscar'
+    elif tag == 'lumina-ripple-button':
+        content = 'Clique com ripple'
+    elif tag == 'lumina-magnetic-button':
+        content = 'Aproxime o cursor'
+    elif tag == 'lumina-breath-button':
+        content = 'Respirando...'
+    elif tag == 'lumina-neural-button':
+        content = 'Neural'
+    elif tag == 'lumina-portal-button':
+        content = 'Entrar no portal'
+    elif tag == 'lumina-echo-button':
+        content = 'Eco'
+    elif tag == 'lumina-morph-button':
+        content = 'Morph'
+    elif tag == 'lumina-gesture-button':
+        content = 'Toque, segure ou arraste'
+    elif cat == 'cards':
+        content = '<h3 slot="title">Título</h3>\n  <p slot="subtitle">subtítulo</p>\n  <p>Conteúdo de exemplo.</p>'
+    elif cat == 'inputs':
+        # self-closing
+        pass
+    elif cat == 'feedback':
+        if tag == 'lumina-progress':
+            content = ''
+        elif tag == 'lumina-badge':
+            content = 'NEW'
+        elif tag == 'lumina-chip':
+            content = '<span slot="icon">⚛</span>\n  TypeScript'
+        elif tag == 'lumina-toast':
+            content = 'Salvo com sucesso!\n  <button slot="actions" data-action="undo">Desfazer</button>'
+        elif tag == 'lumina-alert':
+            content = '<span slot="title">Sucesso</span>\n  Operação concluída.'
+        elif tag == 'lumina-skeleton':
+            content = ''
+        else:
+            content = 'Conteúdo'
+    elif cat == 'overlays':
+        if tag in ('lumina-modal', 'lumina-dialog', 'lumina-drawer-modal', 'lumina-confirmation-dialog'):
+            content = '<span slot="title">Título</span>\n  <p>Conteúdo do modal.</p>\n  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>'
+        elif tag == 'lumina-drawer':
+            content = '<h2 slot="header">Filtros</h2>\n  <p>Conteúdo do drawer.</p>'
+        elif tag in ('lumina-tooltip', 'lumina-popover'):
+            content = 'Hover me'
+        else:
+            content = 'Conteúdo'
+    else:
+        content = 'Conteúdo de exemplo'
+
+    # Self-closing for inputs without content
+    is_self_closing = cat == 'inputs' or tag in ('lumina-progress', 'lumina-skeleton', 'lumina-spinner', 'lumina-loading', 'lumina-status-indicator', 'lumina-pulse-indicator', 'lumina-neural-loader')
+
+    if is_self_closing:
+        open_tag = f'<{tag}\n  {attr_str}\n></{tag}>'
+    else:
+        open_tag = f'<{tag}\n  {attr_str}\n>\n  {content}\n</{tag}>'
+
+    # Event listener
     event_listener = ''
     if events:
+        primary_event = events[0]
+        # Convert lumina-click to onLuminaClick for React-style, but keep native for vanilla
         event_listener = (
             "\n<script type=\"module\">\n"
             f"  const el = document.querySelector('{tag}');\n"
-            f"  el.addEventListener('{events[0]}', (e) => console.log(e));\n"
-            "</script>\n"
+            f"  el.addEventListener('{primary_event}', (e) => {{\n"
+            f"    console.log('{primary_event}', e.detail);\n"
+            "  });\n"
+            "</script>"
         )
-    return (
-        f"<!-- {name} -->\n"
-        f"<{tag}\n"
-        f"  variant=\"{v}\"\n"
-        f"  intensity=\"intense\"\n"
-        f"  accent-color=\"{accent}\"\n"
-        f"  speed=\"0.5\"\n"
-        f"  depth=\"medium\"\n"
-        ">\n"
-        "  Conteúdo de exemplo\n"
-        f"</{tag}>{event_listener}"
-    )
+
+    return f"<!-- {name} -->\n{open_tag}{event_listener}"
+
 
 def gen_react_snippet(spec):
     tag = spec['tag']
@@ -134,27 +241,79 @@ def gen_react_snippet(spec):
     accent = spec.get('accent', '#7c5cff')
     v = variants[0] if variants else 'glass'
     events = spec.get('events', []) or []
+    props = spec.get('props', []) or []
+    cat = spec.get('category', '')
+    class_name = name.replace('Lumina', '')
+
+    # Build attribute string
+    attrs = [f'variant="{v}"', f'intensity="intense"', f'accent-color="{accent}"', 'speed={0.5}']
+    for p in props:
+        pname = p['name']
+        ptype = p['type']
+        default = p.get('default', '')
+        if pname in ('variant', 'intensity', 'theme', 'speed', 'accent-color', 'depth'):
+            continue
+        if 'boolean' in ptype:
+            if default and 'true' in str(default):
+                attrs.append(f'{pname.replace("-","") if "-" not in pname else pname}')
+        elif 'number' in ptype:
+            val = str(default).strip('"').strip("'") if default else '0'
+            attrs.append(f'{pname}={{{val}}}')
+        elif 'JSON' in ptype or 'array' in ptype.lower():
+            if pname == 'menu-items':
+                attrs.append(f'menu-items=\'[{{"label":"Editar","value":"edit"}}]\'')
+            elif pname == 'options':
+                attrs.append(f'options={{[{{value:"a",label:"Opção A"}}]}}')
+            elif pname == 'marks':
+                attrs.append(f'marks={{[{{value:0,label:"0"}}]}}')
+            elif pname == 'gestures':
+                attrs.append(f'gestures="hold,swipe,double-tap"')
+        else:
+            if default:
+                val = str(default).strip('"').strip("'")
+                attrs.append(f'{pname}="{val}"')
+
+    attr_str = ' '.join(attrs)
+
+    # Content
+    content = 'Conteúdo'
+    if tag == 'lumina-icon-button':
+        content = '⚙'
+    elif tag == 'lumina-button-group':
+        content = '<button data-value="a">A</button><button data-value="b">B</button>'
+    elif cat == 'cards':
+        content = '<h3 slot="title">Título</h3><p>Conteúdo.</p>'
+    elif cat == 'inputs':
+        content = ''
+    elif cat == 'feedback':
+        if tag == 'lumina-progress':
+            content = ''
+        elif tag == 'lumina-chip':
+            content = 'TypeScript'
+
+    # Event handler
     event_handler = ''
     if events:
-        # Convert lumina-click -> onLuminaClick
-        parts = events[0].split('-')
+        primary = events[0]
+        parts = primary.split('-')
         camel = 'on' + ''.join(p.capitalize() for p in parts)
-        event_handler = f"\n      {camel}={{(e) => console.log(e)}}"
-    class_name = name.replace('Lumina', '')
+        event_handler = f'\n      {camel}={{(e) => console.log(e.detail)}}'
+
+    # Self-closing?
+    is_self_closing = cat == 'inputs' or tag in ('lumina-progress', 'lumina-skeleton', 'lumina-spinner', 'lumina-loading')
+
+    if is_self_closing:
+        jsx = f"    <{tag} {attr_str}{event_handler} />"
+    else:
+        jsx = f"    <{tag} {attr_str}{event_handler}>\n      {content}\n    </{tag}>"
+
     return (
-        "import 'lumina-ui';\n\n"
+        f"import 'lumina-ui';\n\n"
         f"export function {class_name}Example() {{\n"
-        "  return (\n"
-        f"    <{tag}\n"
-        f"      variant=\"{v}\"\n"
-        f"      intensity=\"intense\"\n"
-        f"      accent-color=\"{accent}\"\n"
-        f"      speed={{0.5}}{event_handler}\n"
-        "    >\n"
-        "      Conteúdo\n"
-        f"    </{tag}>\n"
-        "  );\n"
-        "}\n"
+        f"  return (\n"
+        f"{jsx}\n"
+        f"  );\n"
+        f"}}"
     )
 
 def main():

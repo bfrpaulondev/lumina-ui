@@ -1,148 +1,100 @@
 /**
- * LuminaNeuralButton — Rede neural visível por trás do botão.
+ * LuminaNeuralButton — Botão com rede neural animada (partículas conectadas
+ * por linhas) que reage ao hover e clique.
  *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: buttons
- *
- * Description: Botão com rede neural animada (partículas conectadas).
- *
- * Variants: `neural` | `intense` | `subtle`
- * Events:    lumina-click
- * CSS parts: button, label, network
- * Props:     (none beyond shared)
- * Slots:     (none)
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * Variants: neural | intense | subtle
+ * Props: particle-count
+ * Evento: lumina-click
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { ParticleField } from '../core/ParticleField';
+import { intensityToMultiplier, prefersReducedMotion } from '../core/utils';
 
 export class NeuralButton extends LuminaElement {
   static tagName = 'lumina-neural-button';
-
   static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
+    return [...LuminaElement.observedAttributes, 'particle-count'];
   }
+  private _particleCount = 20;
+  private field: ParticleField | null = null;
+  private fieldHost: HTMLElement | null = null;
 
-
+  get particleCount(): number { return this._particleCount; }
+  set particleCount(v: number) { this._particleCount = v; this.setAttribute('particle-count', String(v)); this.rebuildField(); }
 
   protected render(): string {
     return `
-      <button class="lmc" part="button" tabindex="0">
-        <span class="lmc__bg" aria-hidden="true"></span>
-        <span class="lmc__particles" part="particles" aria-hidden="true"></span>
-        <span class="lmc__label" part="label"><slot></slot></span>
+      <button class="lmnb" part="button" type="button">
+        <span class="lmnb__bg" aria-hidden="true"></span>
+        <span class="lmnb__field" part="particles" aria-hidden="true"></span>
+        <span class="lmnb__label"><slot></slot></span>
       </button>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: inline-block;
-        cursor: pointer;
-        outline: none;
-        border-radius: var(--lumina-radius-pill);
-        font-family: var(--lumina-font-sans);
-        font-weight: 600;
-        font-size: 14px;
-        color: var(--lumina-text);
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
+      :host { display: inline-block; cursor: pointer; outline: none; font-family: var(--lumina-font-sans); color: var(--lumina-text); }
+      .lmnb {
+        position: relative; display: inline-flex; align-items: center; justify-content: center;
+        height: 44px; padding: 0 22px; border: 0; background: transparent; color: inherit;
+        font: 600 14px var(--lumina-font-sans); cursor: pointer; border-radius: var(--lumina-radius-pill);
+        overflow: hidden; isolation: isolate;
+        transition: transform var(--lumina-speed) var(--lumina-ease-spring);
       }
-      :host([disabled]) { cursor: not-allowed; opacity: 0.45; filter: saturate(0.4); }
-      .lmc {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 44px;
-        padding: 0 22px;
-        border: 0;
-        background: transparent;
-        color: inherit;
-        font: inherit;
-        border-radius: inherit;
-        overflow: hidden;
-        cursor: pointer;
-        transition: transform var(--lumina-speed) var(--lumina-ease-spring),
-                    box-shadow var(--lumina-speed) var(--lumina-ease-out);
-        will-change: transform;
-        isolation: isolate;
-      }
-      .lmc:focus-visible { outline: 2px solid var(--lumina-accent); outline-offset: 4px; }
-      .lmc__bg {
-        position: absolute; inset: 0;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(14px) saturate(1.4);
-        -webkit-backdrop-filter: blur(14px) saturate(1.4);
-        border: 1px solid var(--lumina-border);
-        border-radius: inherit;
-        z-index: 0;
-      }
-      .lmc__glow {
-        position: absolute; inset: -20%;
-        border-radius: inherit;
-        pointer-events: none; z-index: 0;
-        opacity: 0;
-        background: radial-gradient(60% 60% at 50% 50%, rgb(var(--lumina-accent-rgb) / 0.45), transparent 70%);
-        filter: blur(20px);
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      .lmc__label { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
-      :host(:hover) .lmc { transform: translateY(-2px) scale(1.02); }
-      :host(:hover) .lmc__glow { opacity: calc(0.6 * var(--lumina-intensity)); }
-      :host(:active) .lmc { transform: translateY(0) scale(0.97); }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__glow { animation: none !important; transition: none !important; }
-      }
-`;
+      .lmnb__bg { position: absolute; inset: 0; border-radius: inherit; background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) - 0.1)); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgb(var(--lumina-accent-rgb) / 0.3); z-index: 0; }
+      .lmnb__field { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 1; opacity: 0.8; transition: opacity var(--lumina-speed) var(--lumina-ease-out); }
+      .lmnb__label { position: relative; z-index: 2; white-space: nowrap; text-shadow: 0 0 12px rgb(var(--lumina-accent-rgb) / 0.8); }
+      :host(:hover) .lmnb { transform: translateY(-2px) scale(1.02); }
+      :host(:hover) .lmnb__field { opacity: 1; }
+      :host(:hover) .lmnb__bg { border-color: rgb(var(--lumina-accent-rgb) / 0.6); }
+      :host(:active) .lmnb { transform: translateY(0) scale(0.97); }
+      :host(:focus-visible) { outline: 2px solid var(--lumina-accent); outline-offset: 4px; }
+      :host([variant="intense"]) .lmnb__field { opacity: 1; }
+      :host([variant="intense"]) .lmnb__label { text-shadow: 0 0 16px rgb(var(--lumina-accent-rgb) / 1); }
+      :host([variant="subtle"]) .lmnb__field { opacity: 0.5; }
+      @media (prefers-reduced-motion: reduce) { .lmnb { transition: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    const btn = this.$$('.lmc');
-    btn?.addEventListener('click', () => this.emit('lumina-click'));
-    btn?.addEventListener('focus', () => this.emit('lumina-focus'));
-    btn?.addEventListener('blur', () => this.emit('lumina-blur'));
-    btn?.addEventListener('pointerenter', () => this.emit('lumina-hover-start'));
-    btn?.addEventListener('pointerleave', () => this.emit('lumina-hover-end'));
+    this._particleCount = parseInt(this.getAttribute('particle-count') ?? '20', 10) || 20;
+    this.fieldHost = this.$$('.lmnb__field');
+    this.setAttribute('role', 'button');
+    this.setAttribute('tabindex', '0');
+    this.$$('.lmnb')?.addEventListener('click', this.onClick);
+    this.$$('.lmnb')?.addEventListener('keydown', this.onKeydown);
+    if (!prefersReducedMotion()) this.buildField();
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { this.field?.destroy(); this.field = null; }
+  protected onConfigChange(changed: Partial<LuminaElementAttributes>): void {
+    if (changed.intensity || changed['accent-color']) this.rebuildField();
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'particle-count') { this._particleCount = parseInt(value ?? '20', 10) || 20; this.rebuildField(); }
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  private rebuildField(): void {
+    this.field?.destroy();
+    this.field = null;
+    if (!prefersReducedMotion()) this.buildField();
   }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
+  private buildField(): void {
+    if (!this.fieldHost) return;
+    const rgb = (this.shadow.host as HTMLElement).style.getPropertyValue('--lumina-accent-rgb').trim() || '124 92 255';
+    const intensity = intensityToMultiplier(this.intensity);
+    this.field = new ParticleField(this.shadow.host as HTMLElement, {
+      count: Math.round(this._particleCount * intensity),
+      rgb,
+      sizeRange: [0.6, 1.8],
+      speedRange: [0.15, 0.5],
+      lifeRange: [100, 200],
+      connect: true,
+    });
+    this.field.mount(this.fieldHost);
   }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private onClick = (): void => { this.dispatchEvent(new CustomEvent('lumina-click', { bubbles: true, composed: true })); };
+  private onKeydown = (e: KeyboardEvent): void => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.onClick(); } };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-neural-button': NeuralButton;
-  }
-}
-
-if (!customElements.get(NeuralButton.tagName)) {
-  customElements.define(NeuralButton.tagName, NeuralButton);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-neural-button': NeuralButton } }
+if (!customElements.get(NeuralButton.tagName)) customElements.define(NeuralButton.tagName, NeuralButton);

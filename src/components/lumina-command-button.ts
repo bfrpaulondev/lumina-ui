@@ -1,156 +1,96 @@
 /**
- * LuminaCommandButton — Botão com hint de atalho de teclado.
+ * LuminaCommandButton — Botão estilo atalho (Cmd+K) com brilho rápido ao
+ * hover e suporte a shortcut de teclado.
  *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: buttons
- *
- * Description: Botão estilo atalho (Cmd+K) com brilho ao hover.
- *
- * Variants: `glass` | `neural` | `minimal`
- * Events:    lumina-click
- * CSS parts: button, label, shortcut, glow
- * Props:     `shortcut`
- * Slots:     (none)
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * Variants: glass | neural | minimal
+ * Eventos: lumina-click, lumina-shortcut
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
 
 export class CommandButton extends LuminaElement {
   static tagName = 'lumina-command-button';
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'shortcut']; }
+  private _shortcut = '';
 
-  static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes, "shortcut"];
-  }
-
-  get shortcut(): string {
-    return this.getAttribute('shortcut') ?? '';
-  }
-  set shortcut(v: string) {
-    this.setAttribute('shortcut', v);
-  }
+  get shortcut(): string { return this._shortcut; }
+  set shortcut(v: string) { this._shortcut = v; this.setAttribute('shortcut', v); this.renderShortcut(); }
 
   protected render(): string {
     return `
-      <button class="lmc" part="button" tabindex="0">
-        <span class="lmc__bg" aria-hidden="true"></span>
-        <span class="lmc__glow" part="glow" aria-hidden="true"></span>
-        <span class="lmc__label" part="label"><slot></slot></span>
+      <button class="lmcb" part="button" type="button">
+        <span class="lmcb__bg" aria-hidden="true"></span>
+        <span class="lmcb__sheen" aria-hidden="true"></span>
+        <span class="lmcb__label"><slot></slot></span>
+        <span class="lmcb__shortcut" part="shortcut"></span>
       </button>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: inline-block;
-        cursor: pointer;
-        outline: none;
-        border-radius: var(--lumina-radius-pill);
-        font-family: var(--lumina-font-sans);
-        font-weight: 600;
-        font-size: 14px;
-        color: var(--lumina-text);
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
+      :host { display: inline-block; cursor: pointer; outline: none; font-family: var(--lumina-font-sans); color: var(--lumina-text); }
+      .lmcb {
+        position: relative; display: inline-flex; align-items: center; gap: 12px;
+        height: 40px; padding: 0 14px; border: 0; background: transparent; color: inherit;
+        font: 500 13px var(--lumina-font-sans); cursor: pointer; border-radius: var(--lumina-radius-md);
+        overflow: hidden; isolation: isolate;
+        transition: transform var(--lumina-speed) var(--lumina-ease-spring);
       }
-      :host([disabled]) { cursor: not-allowed; opacity: 0.45; filter: saturate(0.4); }
-      .lmc {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 44px;
-        padding: 0 22px;
-        border: 0;
-        background: transparent;
-        color: inherit;
-        font: inherit;
-        border-radius: inherit;
-        overflow: hidden;
-        cursor: pointer;
-        transition: transform var(--lumina-speed) var(--lumina-ease-spring),
-                    box-shadow var(--lumina-speed) var(--lumina-ease-out);
-        will-change: transform;
-        isolation: isolate;
-      }
-      .lmc:focus-visible { outline: 2px solid var(--lumina-accent); outline-offset: 4px; }
-      .lmc__bg {
-        position: absolute; inset: 0;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(14px) saturate(1.4);
-        -webkit-backdrop-filter: blur(14px) saturate(1.4);
-        border: 1px solid var(--lumina-border);
-        border-radius: inherit;
-        z-index: 0;
-      }
-      .lmc__glow {
-        position: absolute; inset: -20%;
-        border-radius: inherit;
-        pointer-events: none; z-index: 0;
-        opacity: 0;
-        background: radial-gradient(60% 60% at 50% 50%, rgb(var(--lumina-accent-rgb) / 0.45), transparent 70%);
-        filter: blur(20px);
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      .lmc__label { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
-      :host(:hover) .lmc { transform: translateY(-2px) scale(1.02); }
-      :host(:hover) .lmc__glow { opacity: calc(0.6 * var(--lumina-intensity)); }
-      :host(:active) .lmc { transform: translateY(0) scale(0.97); }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__glow { animation: none !important; transition: none !important; }
-      }
-
-      :host([variant="minimal"]) .lmc__bg { background: transparent; backdrop-filter: none; border-color: transparent; }
-      :host([variant="minimal"]:hover) .lmc__bg { background: rgb(var(--lumina-accent-rgb) / 0.1); }
-`;
+      .lmcb__bg { position: absolute; inset: 0; border-radius: inherit; background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(12px) saturate(1.3); -webkit-backdrop-filter: blur(12px) saturate(1.3); border: 1px solid var(--lumina-border); z-index: 0; transition: background var(--lumina-speed) var(--lumina-ease-out), border-color var(--lumina-speed) var(--lumina-ease-out); }
+      .lmcb__sheen { position: absolute; top: 0; left: -120%; width: 60%; height: 100%; background: linear-gradient(100deg, transparent 0%, rgb(var(--lumina-accent-rgb) / 0.4) 50%, transparent 100%); transform: skewX(-18deg); pointer-events: none; z-index: 1; opacity: 0; }
+      .lmcb__label { position: relative; z-index: 2; white-space: nowrap; }
+      .lmcb__shortcut { position: relative; z-index: 2; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: rgb(var(--lumina-accent-rgb) / 0.15); color: var(--lumina-accent); border: 1px solid rgb(var(--lumina-accent-rgb) / 0.3); }
+      .lmcb__shortcut:empty { display: none; }
+      :host(:hover) .lmcb { transform: translateY(-1px); }
+      :host(:hover) .lmcb__bg { border-color: rgb(var(--lumina-accent-rgb) / 0.5); background: rgb(var(--lumina-accent-rgb) / 0.1); }
+      :host(:hover) .lmcb__sheen { opacity: 1; left: 120%; transition: left calc(var(--lumina-speed) * 1.5) var(--lumina-ease-in-out), opacity var(--lumina-speed) var(--lumina-ease-out); }
+      :host(:active) .lmcb { transform: translateY(0) scale(0.97); }
+      :host(:focus-visible) { outline: 2px solid var(--lumina-accent); outline-offset: 4px; }
+      :host([variant="minimal"]) .lmcb__bg { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; border-color: transparent; }
+      :host([variant="minimal"]:hover) .lmcb__bg { background: rgb(var(--lumina-accent-rgb) / 0.1); }
+      @media (prefers-reduced-motion: reduce) { .lmcb, .lmcb__sheen { transition: none !important; animation: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    const btn = this.$$('.lmc');
-    btn?.addEventListener('click', () => this.emit('lumina-click'));
-    btn?.addEventListener('focus', () => this.emit('lumina-focus'));
-    btn?.addEventListener('blur', () => this.emit('lumina-blur'));
-    btn?.addEventListener('pointerenter', () => this.emit('lumina-hover-start'));
-    btn?.addEventListener('pointerleave', () => this.emit('lumina-hover-end'));
+    this._shortcut = this.getAttribute('shortcut') ?? '';
+    this.renderShortcut();
+    this.setAttribute('role', 'button');
+    this.setAttribute('tabindex', '0');
+    this.$$('.lmcb')?.addEventListener('click', this.onClick);
+    this.$$('.lmcb')?.addEventListener('keydown', this.onKeydown);
+    if (this._shortcut) this.registerShortcut();
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { document.removeEventListener('keydown', this.globalKeydown); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'shortcut') { this._shortcut = value ?? ''; this.renderShortcut(); }
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  private renderShortcut(): void {
+    const el = this.$$('.lmcb__shortcut');
+    if (el) el.textContent = this._shortcut;
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
+  private onClick = (): void => { this.dispatchEvent(new CustomEvent('lumina-click', { bubbles: true, composed: true })); };
+  private onKeydown = (e: KeyboardEvent): void => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.onClick(); } };
+  private registerShortcut(): void {
+    document.addEventListener('keydown', this.globalKeydown);
   }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private globalKeydown = (e: KeyboardEvent): void => {
+    if (!this._shortcut) return;
+    // Parse simple shortcuts like "Cmd+K", "Ctrl+S", "Shift+P"
+    const parts = this._shortcut.toLowerCase().split('+').map((s) => s.trim());
+    const key = parts[parts.length - 1];
+    const wantsCmd = parts.includes('cmd') || parts.includes('meta') || parts.includes('⌘');
+    const wantsCtrl = parts.includes('ctrl') || parts.includes('control');
+    const wantsShift = parts.includes('shift');
+    const wantsAlt = parts.includes('alt') || parts.includes('option');
+    if (e.key.toLowerCase() === key && (!wantsCmd === !e.metaKey) && (!wantsCtrl === !e.ctrlKey) && (!wantsShift === !e.shiftKey) && (!wantsAlt === !e.altKey)) {
+      e.preventDefault();
+      this.dispatchEvent(new CustomEvent('lumina-shortcut', { bubbles: true, composed: true, detail: { shortcut: this._shortcut } }));
+      this.dispatchEvent(new CustomEvent('lumina-click', { bubbles: true, composed: true }));
+    }
+  };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-command-button': CommandButton;
-  }
-}
-
-if (!customElements.get(CommandButton.tagName)) {
-  customElements.define(CommandButton.tagName, CommandButton);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-command-button': CommandButton } }
+if (!customElements.get(CommandButton.tagName)) customElements.define(CommandButton.tagName, CommandButton);

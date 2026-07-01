@@ -1,154 +1,153 @@
 /**
- * LuminaGestureButton — Reconhece swipe, hold e double-tap.
+ * LuminaGestureButton — Botão que reconhece gestos simples (hold, swipe,
+ * double-tap) via Pointer Events com feedback visual diferente por gesto.
  *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: buttons
- *
- * Description: Botão que reconhece gestos simples (swipe, hold, double tap).
- *
- * Variants: `neural` | `aura` | `glass`
- * Events:    lumina-swipe
-   * lumina-hold
-   * lumina-double-tap
-   * lumina-click
- * CSS parts: button, label, gesture-hint
- * Props:     (none beyond shared)
- * Slots:     (none)
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * Variants: neural | aura | glass
+ * Props: gestures (lista CSV), hold-delay (ms)
+ * Eventos: lumina-gesture (detail: { type: 'hold'|'swipe'|'double-tap' }), lumina-click
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+
+type GestureType = 'hold' | 'swipe' | 'double-tap';
 
 export class GestureButton extends LuminaElement {
   static tagName = 'lumina-gesture-button';
-
   static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
+    return [...LuminaElement.observedAttributes, 'gestures', 'hold-delay'];
   }
+  private _gestures: GestureType[] = ['hold', 'swipe', 'double-tap'];
+  private _holdDelay = 500;
+  private pointerStartX = 0;
+  private pointerStartY = 0;
+  private pointerStartTime = 0;
+  private holdTimer: ReturnType<typeof setTimeout> | null = null;
+  private lastTapTime = 0;
+  private feedback: HTMLElement | null = null;
 
-
+  get gestures(): GestureType[] { return this._gestures; }
+  set gestures(v: GestureType[]) { this._gestures = v; this.setAttribute('gestures', v.join(',')); }
+  get holdDelay(): number { return this._holdDelay; }
+  set holdDelay(v: number) { this._holdDelay = v; this.setAttribute('hold-delay', String(v)); }
 
   protected render(): string {
     return `
-      <button class="lmc" part="button" tabindex="0">
-        <span class="lmc__bg" aria-hidden="true"></span>
-        <span class="lmc__label" part="label"><slot></slot></span>
+      <button class="lmgb" part="button" type="button">
+        <span class="lmgb__bg" aria-hidden="true"></span>
+        <span class="lmgb__feedback" part="feedback" aria-hidden="true"></span>
+        <span class="lmgb__label"><slot></slot></span>
       </button>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: inline-block;
-        cursor: pointer;
-        outline: none;
-        border-radius: var(--lumina-radius-pill);
-        font-family: var(--lumina-font-sans);
-        font-weight: 600;
-        font-size: 14px;
-        color: var(--lumina-text);
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
+      :host { display: inline-block; cursor: pointer; outline: none; font-family: var(--lumina-font-sans); color: var(--lumina-text); }
+      .lmgb {
+        position: relative; display: inline-flex; align-items: center; justify-content: center;
+        height: 44px; padding: 0 22px; border: 0; background: transparent; color: inherit;
+        font: 600 14px var(--lumina-font-sans); cursor: pointer; border-radius: var(--lumina-radius-pill);
+        overflow: hidden; isolation: isolate;
+        transition: transform var(--lumina-speed) var(--lumina-ease-spring);
+        touch-action: none;
       }
-      :host([disabled]) { cursor: not-allowed; opacity: 0.45; filter: saturate(0.4); }
-      .lmc {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 44px;
-        padding: 0 22px;
-        border: 0;
-        background: transparent;
-        color: inherit;
-        font: inherit;
-        border-radius: inherit;
-        overflow: hidden;
-        cursor: pointer;
-        transition: transform var(--lumina-speed) var(--lumina-ease-spring),
-                    box-shadow var(--lumina-speed) var(--lumina-ease-out);
-        will-change: transform;
-        isolation: isolate;
-      }
-      .lmc:focus-visible { outline: 2px solid var(--lumina-accent); outline-offset: 4px; }
-      .lmc__bg {
-        position: absolute; inset: 0;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(14px) saturate(1.4);
-        -webkit-backdrop-filter: blur(14px) saturate(1.4);
-        border: 1px solid var(--lumina-border);
-        border-radius: inherit;
-        z-index: 0;
-      }
-      .lmc__glow {
-        position: absolute; inset: -20%;
-        border-radius: inherit;
-        pointer-events: none; z-index: 0;
-        opacity: 0;
-        background: radial-gradient(60% 60% at 50% 50%, rgb(var(--lumina-accent-rgb) / 0.45), transparent 70%);
-        filter: blur(20px);
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
-      }
-      .lmc__label { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
-      :host(:hover) .lmc { transform: translateY(-2px) scale(1.02); }
-      :host(:hover) .lmc__glow { opacity: calc(0.6 * var(--lumina-intensity)); }
-      :host(:active) .lmc { transform: translateY(0) scale(0.97); }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__glow { animation: none !important; transition: none !important; }
-      }
-
-      :host([variant="aura"]) .lmc { animation: lmc-float 4s ease-in-out infinite; }
-      :host([variant="aura"]) .lmc__glow { opacity: calc(0.3 * var(--lumina-intensity)); }
-      @keyframes lmc-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
-`;
+      .lmgb__bg { position: absolute; inset: 0; border-radius: inherit; background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(14px) saturate(1.4); -webkit-backdrop-filter: blur(14px) saturate(1.4); border: 1px solid var(--lumina-border); z-index: 0; transition: background var(--lumina-speed) var(--lumina-ease-out); }
+      .lmgb__feedback { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 1; opacity: 0; transition: opacity var(--lumina-speed) var(--lumina-ease-out); }
+      .lmgb__label { position: relative; z-index: 2; white-space: nowrap; }
+      :host(:hover) .lmgb { transform: translateY(-2px) scale(1.02); }
+      :host(:hover) .lmgb__bg { background: rgb(var(--lumina-accent-rgb) / 0.1); }
+      :host(:active) .lmgb { transform: translateY(0) scale(0.97); }
+      :host(:focus-visible) { outline: 2px solid var(--lumina-accent); outline-offset: 4px; }
+      .lmgb__feedback[data-gesture="hold"] { background: radial-gradient(circle, rgb(var(--lumina-accent-rgb) / 0.5), transparent 70%); animation: lmgb-hold-feedback 0.4s var(--lumina-ease-out); }
+      .lmgb__feedback[data-gesture="swipe"] { background: linear-gradient(90deg, transparent, rgb(var(--lumina-accent-rgb) / 0.4), transparent); animation: lmgb-swipe-feedback 0.5s var(--lumina-ease-out); }
+      .lmgb__feedback[data-gesture="double-tap"] { background: radial-gradient(circle, rgb(var(--lumina-accent-rgb) / 0.6), transparent 60%); animation: lmgb-double-feedback 0.4s var(--lumina-ease-spring); }
+      @keyframes lmgb-hold-feedback { 0% { opacity: 0; transform: scale(0.8); } 50% { opacity: 1; } 100% { opacity: 0; transform: scale(1.2); } }
+      @keyframes lmgb-swipe-feedback { 0% { opacity: 0; transform: translateX(-100%); } 50% { opacity: 1; } 100% { opacity: 0; transform: translateX(100%); } }
+      @keyframes lmgb-double-feedback { 0% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; } 100% { opacity: 0; transform: scale(1.5); } }
+      @media (prefers-reduced-motion: reduce) { .lmgb, .lmgb__feedback { animation: none !important; transition: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    const btn = this.$$('.lmc');
-    btn?.addEventListener('click', () => this.emit('lumina-click'));
-    btn?.addEventListener('focus', () => this.emit('lumina-focus'));
-    btn?.addEventListener('blur', () => this.emit('lumina-blur'));
-    btn?.addEventListener('pointerenter', () => this.emit('lumina-hover-start'));
-    btn?.addEventListener('pointerleave', () => this.emit('lumina-hover-end'));
+    const gAttr = this.getAttribute('gestures');
+    if (gAttr) {
+      this._gestures = gAttr.split(',').map((s) => s.trim()) as GestureType[];
+    }
+    this._holdDelay = parseInt(this.getAttribute('hold-delay') ?? '500', 10) || 500;
+    this.feedback = this.$$('.lmgb__feedback');
+    this.setAttribute('role', 'button');
+    this.setAttribute('tabindex', '0');
+    const btn = this.$$('.lmgb');
+    btn?.addEventListener('pointerdown', this.onPointerDown);
+    btn?.addEventListener('pointerup', this.onPointerUp);
+    btn?.addEventListener('pointercancel', this.onPointerCancel);
+    btn?.addEventListener('pointermove', this.onPointerMove);
+    btn?.addEventListener('keydown', this.onKeydown);
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void { if (this.holdTimer) clearTimeout(this.holdTimer); }
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'gestures' && value) this._gestures = value.split(',').map((s) => s.trim()) as GestureType[];
+    else if (name === 'hold-delay') this._holdDelay = parseInt(value ?? '500', 10) || 500;
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
+  private onPointerDown = (e: PointerEvent): void => {
+    this.pointerStartX = e.clientX;
+    this.pointerStartY = e.clientY;
+    this.pointerStartTime = Date.now();
+    if (this._gestures.includes('hold')) {
+      this.holdTimer = setTimeout(() => {
+        this.emitGesture('hold');
+        this.holdTimer = null;
+      }, this._holdDelay);
+    }
+  };
+  private onPointerMove = (e: PointerEvent): void => {
+    if (!this.holdTimer) return;
+    const dx = Math.abs(e.clientX - this.pointerStartX);
+    const dy = Math.abs(e.clientY - this.pointerStartY);
+    if (dx > 10 || dy > 10) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+    }
+  };
+  private onPointerUp = (e: PointerEvent): void => {
+    if (this.holdTimer) {
+      clearTimeout(this.holdTimer);
+      this.holdTimer = null;
+      const dx = e.clientX - this.pointerStartX;
+      const dy = e.clientY - this.pointerStartY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const duration = Date.now() - this.pointerStartTime;
+      if (this._gestures.includes('swipe') && dist > 40 && duration < 500) {
+        this.emitGesture('swipe');
+        return;
+      }
+      // Check double-tap
+      const now = Date.now();
+      if (this._gestures.includes('double-tap') && now - this.lastTapTime < 300) {
+        this.emitGesture('double-tap');
+        this.lastTapTime = 0;
+        return;
+      }
+      this.lastTapTime = now;
+      // Single tap / click
+      this.dispatchEvent(new CustomEvent('lumina-click', { bubbles: true, composed: true }));
+    }
+  };
+  private onPointerCancel = (): void => { if (this.holdTimer) { clearTimeout(this.holdTimer); this.holdTimer = null; } };
+  private emitGesture(type: GestureType): void {
+    if (this.feedback) {
+      this.feedback.setAttribute('data-gesture', type);
+      setTimeout(() => this.feedback?.removeAttribute('data-gesture'), 500);
+    }
+    this.dispatchEvent(new CustomEvent('lumina-gesture', { bubbles: true, composed: true, detail: { type } }));
   }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private onKeydown = (e: KeyboardEvent): void => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      this.dispatchEvent(new CustomEvent('lumina-click', { bubbles: true, composed: true }));
+    }
+  };
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-gesture-button': GestureButton;
-  }
-}
-
-if (!customElements.get(GestureButton.tagName)) {
-  customElements.define(GestureButton.tagName, GestureButton);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-gesture-button': GestureButton } }
+if (!customElements.get(GestureButton.tagName)) customElements.define(GestureButton.tagName, GestureButton);

@@ -58,31 +58,25 @@ customElements.define(Button.tagName, Button);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-button>
 <script type="module">
   const el = document.querySelector('lumina-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ButtonExample() {
   return (
-    <lumina-button
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-button variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-button>
   );
-}
-`,
+}`,
   },
   'lumina-icon-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -91,10 +85,12 @@ export class IconButton extends LuminaElement {
   static tagName = 'lumina-icon-button';
 
   // Accepts variants: 'glass' | 'neural' | 'aura' | 'minimal'
-  // CSS parts:       button, icon, glow
-  // Events:          lumina-click
+  // CSS parts:       button, icon, glow, particles
+  // Events:          lumina-click, lumina-hover
   // Props:
-   * (only shared LuminaElement props)
+   * size: "sm" | "md" | "lg"
+   * shape: "circle" | "square"
+   * disabled: boolean
   // Slots:           default
 
   protected render(): string {
@@ -120,31 +116,27 @@ customElements.define(IconButton.tagName, IconButton);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
+  size="md"
+  shape="circle"
 >
-  Conteúdo de exemplo
+  ⚙
 </lumina-icon-button>
 <script type="module">
   const el = document.querySelector('lumina-icon-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function IconButtonExample() {
   return (
-    <lumina-icon-button
-      variant="glass"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
-      Conteúdo
+    <lumina-icon-button variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} size="md" shape="circle"
+      onLuminaClick={(e) => console.log(e.detail)}>
+      ⚙
     </lumina-icon-button>
   );
-}
-`,
+}`,
   },
   'lumina-fab': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -156,7 +148,8 @@ export class FloatingActionButton extends LuminaElement {
   // CSS parts:       button, icon, label, glow
   // Events:          lumina-click
   // Props:
-   * (only shared LuminaElement props)
+   * extended: boolean
+   * position: "bottom-right" | "bottom-left" | "top-right" | "top-left"
   // Slots:           default, label
 
   protected render(): string {
@@ -182,31 +175,27 @@ customElements.define(FloatingActionButton.tagName, FloatingActionButton);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  position="bottom-right"
 >
-  Conteúdo de exemplo
+  +
+  <span slot="label">Nova tarefa</span>
 </lumina-fab>
 <script type="module">
   const el = document.querySelector('lumina-fab');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function FloatingActionButtonExample() {
   return (
-    <lumina-fab
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-fab variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} position="bottom-right"
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-fab>
   );
-}
-`,
+}`,
   },
   'lumina-split-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -215,11 +204,12 @@ export class SplitButton extends LuminaElement {
   static tagName = 'lumina-split-button';
 
   // Accepts variants: 'glass' | 'morph' | 'neural'
-  // CSS parts:       primary, chevron, menu
-  // Events:          lumina-click, lumina-menu-toggle
+  // CSS parts:       button, trigger, menu, menu-item
+  // Events:          lumina-click, lumina-menu-open, lumina-menu-close
   // Props:
-   * (only shared LuminaElement props)
-  // Slots:           default, menu
+   * menu-items: string
+   * disabled: boolean
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-split-button.ts */
@@ -244,31 +234,26 @@ customElements.define(SplitButton.tagName, SplitButton);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  menu-items='[{"label":"Editar","icon":"✎","value":"edit"},{"label":"Excluir","icon":"🗑","value":"delete"}]'
 >
-  Conteúdo de exemplo
+  Salvar
 </lumina-split-button>
 <script type="module">
   const el = document.querySelector('lumina-split-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function SplitButtonExample() {
   return (
-    <lumina-split-button
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-split-button variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-split-button>
   );
-}
-`,
+}`,
   },
   'lumina-toggle-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -277,11 +262,13 @@ export class ToggleButton extends LuminaElement {
   static tagName = 'lumina-toggle-button';
 
   // Accepts variants: 'glass' | 'neural' | 'aura'
-  // CSS parts:       button, label, indicator
+  // CSS parts:       button, label, glow
   // Events:          lumina-change
   // Props:
    * pressed: boolean
-  // Slots:           (none)
+   * icon-on: string
+   * icon-off: string
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-toggle-button.ts */
@@ -306,31 +293,25 @@ customElements.define(ToggleButton.tagName, ToggleButton);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  Modo escuro
 </lumina-toggle-button>
 <script type="module">
   const el = document.querySelector('lumina-toggle-button');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ToggleButtonExample() {
   return (
-    <lumina-toggle-button
-      variant="glass"
-      intensity="intense"
-      accent-color="#ffd166"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
+    <lumina-toggle-button variant="glass" intensity="intense" accent-color="#ffd166" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-toggle-button>
   );
-}
-`,
+}`,
   },
   'lumina-button-group': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -339,10 +320,11 @@ export class ButtonGroup extends LuminaElement {
   static tagName = 'lumina-button-group';
 
   // Accepts variants: 'glass' | 'segmented' | 'neural'
-  // CSS parts:       group
-  // Events:          (inherits standard lumina-* events)
+  // CSS parts:       group, button
+  // Events:          lumina-change
   // Props:
-   * (only shared LuminaElement props)
+   * multiple: boolean
+   * value: string
   // Slots:           default
 
   protected render(): string {
@@ -368,25 +350,27 @@ customElements.define(ButtonGroup.tagName, ButtonGroup);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
-</lumina-button-group>`,
+    <button data-value="a">A</button>
+  <button data-value="b">B</button>
+  <button data-value="c">C</button>
+</lumina-button-group>
+<script type="module">
+  const el = document.querySelector('lumina-button-group');
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ButtonGroupExample() {
   return (
-    <lumina-button-group
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-button-group variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)}>
+      <button data-value="a">A</button><button data-value="b">B</button>
     </lumina-button-group>
   );
-}
-`,
+}`,
   },
   'lumina-command-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -395,11 +379,11 @@ export class CommandButton extends LuminaElement {
   static tagName = 'lumina-command-button';
 
   // Accepts variants: 'glass' | 'neural' | 'minimal'
-  // CSS parts:       button, label, shortcut, glow
-  // Events:          lumina-click
+  // CSS parts:       button, shortcut, glow
+  // Events:          lumina-click, lumina-shortcut
   // Props:
    * shortcut: string
-  // Slots:           (none)
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-command-button.ts */
@@ -424,31 +408,25 @@ customElements.define(CommandButton.tagName, CommandButton);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  Buscar
 </lumina-command-button>
 <script type="module">
   const el = document.querySelector('lumina-command-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function CommandButtonExample() {
   return (
-    <lumina-command-button
-      variant="glass"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-command-button variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-command-button>
   );
-}
-`,
+}`,
   },
   'lumina-ripple-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -457,11 +435,13 @@ export class RippleButton extends LuminaElement {
   static tagName = 'lumina-ripple-button';
 
   // Accepts variants: 'glass' | 'neural' | 'void'
-  // CSS parts:       button, ripple, label
+  // CSS parts:       button, ripple
   // Events:          lumina-click, lumina-ripple
   // Props:
-   * (only shared LuminaElement props)
-  // Slots:           (none)
+   * ripple-color: string
+   * ripple-duration: number
+   * multi: boolean
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-ripple-button.ts */
@@ -486,31 +466,28 @@ customElements.define(RippleButton.tagName, RippleButton);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  ripple-color="var(--lumina-accent)"
+  ripple-duration="600"
+  multi
 >
-  Conteúdo de exemplo
+  Clique com ripple
 </lumina-ripple-button>
 <script type="module">
   const el = document.querySelector('lumina-ripple-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function RippleButtonExample() {
   return (
-    <lumina-ripple-button
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-ripple-button variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} ripple-color="var(--lumina-accent)" ripple-duration={600} multi
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-ripple-button>
   );
-}
-`,
+}`,
   },
   'lumina-magnetic-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -519,11 +496,11 @@ export class MagneticButton extends LuminaElement {
   static tagName = 'lumina-magnetic-button';
 
   // Accepts variants: 'glass' | 'neural' | 'aura'
-  // CSS parts:       button, label, glow
-  // Events:          lumina-click
+  // CSS parts:       button, glow
+  // Events:          lumina-click, lumina-magnetic-start
   // Props:
-   * (only shared LuminaElement props)
-  // Slots:           (none)
+   * magnetic-strength: number
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-magnetic-button.ts */
@@ -548,31 +525,26 @@ customElements.define(MagneticButton.tagName, MagneticButton);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
+  magnetic-strength="0.4"
 >
-  Conteúdo de exemplo
+  Aproxime o cursor
 </lumina-magnetic-button>
 <script type="module">
   const el = document.querySelector('lumina-magnetic-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function MagneticButtonExample() {
   return (
-    <lumina-magnetic-button
-      variant="glass"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-magnetic-button variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5} magnetic-strength={0.4}
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-magnetic-button>
   );
-}
-`,
+}`,
   },
   'lumina-breath-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -581,11 +553,11 @@ export class BreathButton extends LuminaElement {
   static tagName = 'lumina-breath-button';
 
   // Accepts variants: 'glass' | 'aura' | 'subtle'
-  // CSS parts:       button, label, glow
+  // CSS parts:       button, glow
   // Events:          lumina-click
   // Props:
    * (only shared LuminaElement props)
-  // Slots:           (none)
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-breath-button.ts */
@@ -610,31 +582,25 @@ customElements.define(BreathButton.tagName, BreathButton);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  Respirando...
 </lumina-breath-button>
 <script type="module">
   const el = document.querySelector('lumina-breath-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function BreathButtonExample() {
   return (
-    <lumina-breath-button
-      variant="glass"
-      intensity="intense"
-      accent-color="#ffd166"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-breath-button variant="glass" intensity="intense" accent-color="#ffd166" speed={0.5}
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-breath-button>
   );
-}
-`,
+}`,
   },
   'lumina-neural-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -643,11 +609,11 @@ export class NeuralButton extends LuminaElement {
   static tagName = 'lumina-neural-button';
 
   // Accepts variants: 'neural' | 'intense' | 'subtle'
-  // CSS parts:       button, label, network
+  // CSS parts:       button, particles
   // Events:          lumina-click
   // Props:
-   * (only shared LuminaElement props)
-  // Slots:           (none)
+   * particle-count: number
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-neural-button.ts */
@@ -672,31 +638,26 @@ customElements.define(NeuralButton.tagName, NeuralButton);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
+  particle-count="20"
 >
-  Conteúdo de exemplo
+  Neural
 </lumina-neural-button>
 <script type="module">
   const el = document.querySelector('lumina-neural-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function NeuralButtonExample() {
   return (
-    <lumina-neural-button
-      variant="neural"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-neural-button variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} particle-count={20}
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-neural-button>
   );
-}
-`,
+}`,
   },
   'lumina-portal-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -705,11 +666,11 @@ export class PortalButton extends LuminaElement {
   static tagName = 'lumina-portal-button';
 
   // Accepts variants: 'void' | 'dimensional' | 'neural'
-  // CSS parts:       button, label, portal
+  // CSS parts:       button, portal, particles
   // Events:          lumina-click, lumina-portal-open
   // Props:
    * (only shared LuminaElement props)
-  // Slots:           (none)
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-portal-button.ts */
@@ -734,31 +695,25 @@ customElements.define(PortalButton.tagName, PortalButton);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  Entrar no portal
 </lumina-portal-button>
 <script type="module">
   const el = document.querySelector('lumina-portal-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function PortalButtonExample() {
   return (
-    <lumina-portal-button
-      variant="void"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-portal-button variant="void" intensity="intense" accent-color="#78f0ff" speed={0.5}
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-portal-button>
   );
-}
-`,
+}`,
   },
   'lumina-echo-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -767,11 +722,11 @@ export class EchoButton extends LuminaElement {
   static tagName = 'lumina-echo-button';
 
   // Accepts variants: 'glass' | 'aura' | 'neural'
-  // CSS parts:       button, label, echo
+  // CSS parts:       button, echo
   // Events:          lumina-click, lumina-echo
   // Props:
-   * (only shared LuminaElement props)
-  // Slots:           (none)
+   * echo-count: number
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-echo-button.ts */
@@ -796,31 +751,26 @@ customElements.define(EchoButton.tagName, EchoButton);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  echo-count="3"
 >
-  Conteúdo de exemplo
+  Eco
 </lumina-echo-button>
 <script type="module">
   const el = document.querySelector('lumina-echo-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function EchoButtonExample() {
   return (
-    <lumina-echo-button
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-echo-button variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} echo-count={3}
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-echo-button>
   );
-}
-`,
+}`,
   },
   'lumina-morph-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -829,11 +779,12 @@ export class MorphButton extends LuminaElement {
   static tagName = 'lumina-morph-button';
 
   // Accepts variants: 'morph' | 'glass' | 'dimensional'
-  // CSS parts:       button, label, shape
-  // Events:          lumina-click, lumina-morph
+  // CSS parts:       button, icon
+  // Events:          lumina-click, lumina-morph-start, lumina-morph-end
   // Props:
-   * (only shared LuminaElement props)
-  // Slots:           (none)
+   * from: string
+   * to: string
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-morph-button.ts */
@@ -858,31 +809,25 @@ customElements.define(MorphButton.tagName, MorphButton);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  Morph
 </lumina-morph-button>
 <script type="module">
   const el = document.querySelector('lumina-morph-button');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function MorphButtonExample() {
   return (
-    <lumina-morph-button
-      variant="morph"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-morph-button variant="morph" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-morph-button>
   );
-}
-`,
+}`,
   },
   'lumina-gesture-button': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -891,11 +836,12 @@ export class GestureButton extends LuminaElement {
   static tagName = 'lumina-gesture-button';
 
   // Accepts variants: 'neural' | 'aura' | 'glass'
-  // CSS parts:       button, label, gesture-hint
-  // Events:          lumina-swipe, lumina-hold, lumina-double-tap, lumina-click
+  // CSS parts:       button, feedback
+  // Events:          lumina-gesture, lumina-click
   // Props:
-   * (only shared LuminaElement props)
-  // Slots:           (none)
+   * gestures: string
+   * hold-delay: number
+  // Slots:           default
 
   protected render(): string {
     /* Full source: src/components/lumina-gesture-button.ts */
@@ -920,31 +866,27 @@ customElements.define(GestureButton.tagName, GestureButton);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
+  gestures="hold,swipe,double-tap"
+  hold-delay="500"
 >
-  Conteúdo de exemplo
+  Toque, segure ou arraste
 </lumina-gesture-button>
 <script type="module">
   const el = document.querySelector('lumina-gesture-button');
-  el.addEventListener('lumina-swipe', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-gesture', (e) => {
+    console.log('lumina-gesture', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function GestureButtonExample() {
   return (
-    <lumina-gesture-button
-      variant="neural"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaSwipe={(e) => console.log(e)}
-    >
+    <lumina-gesture-button variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} gestures="hold,swipe,double-tap" hold-delay={500}
+      onLuminaGesture={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-gesture-button>
   );
-}
-`,
+}`,
   },
   'lumina-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -982,31 +924,28 @@ customElements.define(Card.tagName, Card);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  interactive
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-card>
 <script type="module">
   const el = document.querySelector('lumina-card');
-  el.addEventListener('lumina-hover', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-hover', (e) => {
+    console.log('lumina-hover', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function CardExample() {
   return (
-    <lumina-card
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaHover={(e) => console.log(e)}
-    >
-      Conteúdo
+    <lumina-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} interactive
+      onLuminaHover={(e) => console.log(e.detail)}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-card>
   );
-}
-`,
+}`,
   },
   'lumina-glass-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1044,25 +983,20 @@ customElements.define(GlassCard.tagName, GlassCard);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-glass-card>`,
     react: `import 'lumina-ui';
 
 export function GlassCardExample() {
   return (
-    <lumina-glass-card
-      variant="light"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-glass-card variant="light" intensity="intense" accent-color="#7c5cff" speed={0.5}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-glass-card>
   );
-}
-`,
+}`,
   },
   'lumina-morph-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1100,31 +1034,27 @@ customElements.define(MorphCard.tagName, MorphCard);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-morph-card>
 <script type="module">
   const el = document.querySelector('lumina-morph-card');
-  el.addEventListener('lumina-morph', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-morph', (e) => {
+    console.log('lumina-morph', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function MorphCardExample() {
   return (
-    <lumina-morph-card
-      variant="subtle"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-      onLuminaMorph={(e) => console.log(e)}
-    >
-      Conteúdo
+    <lumina-morph-card variant="subtle" intensity="intense" accent-color="#78f0ff" speed={0.5}
+      onLuminaMorph={(e) => console.log(e.detail)}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-morph-card>
   );
-}
-`,
+}`,
   },
   'lumina-neural-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1162,25 +1092,20 @@ customElements.define(NeuralCard.tagName, NeuralCard);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-neural-card>`,
     react: `import 'lumina-ui';
 
 export function NeuralCardExample() {
   return (
-    <lumina-neural-card
-      variant="neural"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-neural-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-neural-card>
   );
-}
-`,
+}`,
   },
   'lumina-void-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1218,25 +1143,20 @@ customElements.define(VoidCard.tagName, VoidCard);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-void-card>`,
     react: `import 'lumina-ui';
 
 export function VoidCardExample() {
   return (
-    <lumina-void-card
-      variant="void"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-void-card variant="void" intensity="intense" accent-color="#78f0ff" speed={0.5}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-void-card>
   );
-}
-`,
+}`,
   },
   'lumina-dimensional-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1274,31 +1194,27 @@ customElements.define(DimensionalCard.tagName, DimensionalCard);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-dimensional-card>
 <script type="module">
   const el = document.querySelector('lumina-dimensional-card');
-  el.addEventListener('lumina-tilt-start', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-tilt-start', (e) => {
+    console.log('lumina-tilt-start', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function DimensionalCardExample() {
   return (
-    <lumina-dimensional-card
-      variant="medium"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaTiltStart={(e) => console.log(e)}
-    >
-      Conteúdo
+    <lumina-dimensional-card variant="medium" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaTiltStart={(e) => console.log(e.detail)}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-dimensional-card>
   );
-}
-`,
+}`,
   },
   'lumina-hover-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1336,31 +1252,27 @@ customElements.define(HoverCard.tagName, HoverCard);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-hover-card>
 <script type="module">
   const el = document.querySelector('lumina-hover-card');
-  el.addEventListener('lumina-expand', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-expand', (e) => {
+    console.log('lumina-expand', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function HoverCardExample() {
   return (
-    <lumina-hover-card
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaExpand={(e) => console.log(e)}
-    >
-      Conteúdo
+    <lumina-hover-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaExpand={(e) => console.log(e.detail)}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-hover-card>
   );
-}
-`,
+}`,
   },
   'lumina-context-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1398,25 +1310,20 @@ customElements.define(ContextCard.tagName, ContextCard);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-context-card>`,
     react: `import 'lumina-ui';
 
 export function ContextCardExample() {
   return (
-    <lumina-context-card
-      variant="adaptive"
-      intensity="intense"
-      accent-color="#ffd166"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-context-card variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-context-card>
   );
-}
-`,
+}`,
   },
   'lumina-breath-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1454,25 +1361,20 @@ customElements.define(BreathCard.tagName, BreathCard);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-breath-card>`,
     react: `import 'lumina-ui';
 
 export function BreathCardExample() {
   return (
-    <lumina-breath-card
-      variant="subtle"
-      intensity="intense"
-      accent-color="#ffd166"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-breath-card variant="subtle" intensity="intense" accent-color="#ffd166" speed={0.5}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-breath-card>
   );
-}
-`,
+}`,
   },
   'lumina-stack-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1510,31 +1412,27 @@ customElements.define(StackCard.tagName, StackCard);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-stack-card>
 <script type="module">
   const el = document.querySelector('lumina-stack-card');
-  el.addEventListener('lumina-swipe', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-swipe', (e) => {
+    console.log('lumina-swipe', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function StackCardExample() {
   return (
-    <lumina-stack-card
-      variant="glass"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaSwipe={(e) => console.log(e)}
-    >
-      Conteúdo
+    <lumina-stack-card variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaSwipe={(e) => console.log(e.detail)}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-stack-card>
   );
-}
-`,
+}`,
   },
   'lumina-reveal-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1572,31 +1470,27 @@ customElements.define(RevealCard.tagName, RevealCard);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-reveal-card>
 <script type="module">
   const el = document.querySelector('lumina-reveal-card');
-  el.addEventListener('lumina-reveal', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-reveal', (e) => {
+    console.log('lumina-reveal', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function RevealCardExample() {
   return (
-    <lumina-reveal-card
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaReveal={(e) => console.log(e)}
-    >
-      Conteúdo
+    <lumina-reveal-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaReveal={(e) => console.log(e.detail)}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-reveal-card>
   );
-}
-`,
+}`,
   },
   'lumina-parallax-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1634,25 +1528,20 @@ customElements.define(ParallaxCard.tagName, ParallaxCard);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-parallax-card>`,
     react: `import 'lumina-ui';
 
 export function ParallaxCardExample() {
   return (
-    <lumina-parallax-card
-      variant="medium"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-parallax-card variant="medium" intensity="intense" accent-color="#78f0ff" speed={0.5}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-parallax-card>
   );
-}
-`,
+}`,
   },
   'lumina-glow-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1690,31 +1579,27 @@ customElements.define(GlowCard.tagName, GlowCard);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-glow-card>
 <script type="module">
   const el = document.querySelector('lumina-glow-card');
-  el.addEventListener('lumina-glow-move', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-glow-move', (e) => {
+    console.log('lumina-glow-move', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function GlowCardExample() {
   return (
-    <lumina-glow-card
-      variant="aura"
-      intensity="intense"
-      accent-color="#ffd166"
-      speed={0.5}
-      onLuminaGlowMove={(e) => console.log(e)}
-    >
-      Conteúdo
+    <lumina-glow-card variant="aura" intensity="intense" accent-color="#ffd166" speed={0.5}
+      onLuminaGlowMove={(e) => console.log(e.detail)}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-glow-card>
   );
-}
-`,
+}`,
   },
   'lumina-particle-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1752,25 +1637,20 @@ customElements.define(ParticleCard.tagName, ParticleCard);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-particle-card>`,
     react: `import 'lumina-ui';
 
 export function ParticleCardExample() {
   return (
-    <lumina-particle-card
-      variant="neural"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-particle-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-particle-card>
   );
-}
-`,
+}`,
   },
   'lumina-liquid-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1808,25 +1688,20 @@ customElements.define(LiquidCard.tagName, LiquidCard);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-liquid-card>`,
     react: `import 'lumina-ui';
 
 export function LiquidCardExample() {
   return (
-    <lumina-liquid-card
-      variant="morph"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-liquid-card variant="morph" intensity="intense" accent-color="#78f0ff" speed={0.5}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-liquid-card>
   );
-}
-`,
+}`,
   },
   'lumina-holo-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1864,25 +1739,20 @@ customElements.define(HoloCard.tagName, HoloCard);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-holo-card>`,
     react: `import 'lumina-ui';
 
 export function HoloCardExample() {
   return (
-    <lumina-holo-card
-      variant="holo"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-holo-card variant="holo" intensity="intense" accent-color="#ff6ec7" speed={0.5}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-holo-card>
   );
-}
-`,
+}`,
   },
   'lumina-memory-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1920,25 +1790,20 @@ customElements.define(MemoryCard.tagName, MemoryCard);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-memory-card>`,
     react: `import 'lumina-ui';
 
 export function MemoryCardExample() {
   return (
-    <lumina-memory-card
-      variant="neural"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-    >
-      Conteúdo
+    <lumina-memory-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-memory-card>
   );
-}
-`,
+}`,
   },
   'lumina-echo-card': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -1976,31 +1841,27 @@ customElements.define(EchoCard.tagName, EchoCard);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <h3 slot="title">Título</h3>
+  <p slot="subtitle">subtítulo</p>
+  <p>Conteúdo de exemplo.</p>
 </lumina-echo-card>
 <script type="module">
   const el = document.querySelector('lumina-echo-card');
-  el.addEventListener('lumina-echo', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-echo', (e) => {
+    console.log('lumina-echo', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function EchoCardExample() {
   return (
-    <lumina-echo-card
-      variant="aura"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaEcho={(e) => console.log(e)}
-    >
-      Conteúdo
+    <lumina-echo-card variant="aura" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaEcho={(e) => console.log(e.detail)}>
+      <h3 slot="title">Título</h3><p>Conteúdo.</p>
     </lumina-echo-card>
   );
-}
-`,
+}`,
   },
   'lumina-input': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2041,31 +1902,21 @@ customElements.define(Input.tagName, Input);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-input>
+></lumina-input>
 <script type="module">
   const el = document.querySelector('lumina-input');
-  el.addEventListener('lumina-input', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-input', (e) => {
+    console.log('lumina-input', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function InputExample() {
   return (
-    <lumina-input
-      variant="glass"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaInput={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-input>
+    <lumina-input variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaInput={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-textarea': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2104,31 +1955,22 @@ customElements.define(Textarea.tagName, Textarea);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-textarea>
+  rows="4"
+></lumina-textarea>
 <script type="module">
   const el = document.querySelector('lumina-textarea');
-  el.addEventListener('lumina-input', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-input', (e) => {
+    console.log('lumina-input', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function TextareaExample() {
   return (
-    <lumina-textarea
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaInput={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-textarea>
+    <lumina-textarea variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} rows={4}
+      onLuminaInput={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-search-input': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2166,31 +2008,21 @@ customElements.define(SearchInput.tagName, SearchInput);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-search-input>
+></lumina-search-input>
 <script type="module">
   const el = document.querySelector('lumina-search-input');
-  el.addEventListener('lumina-search', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-search', (e) => {
+    console.log('lumina-search', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function SearchInputExample() {
   return (
-    <lumina-search-input
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaSearch={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-search-input>
+    <lumina-search-input variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaSearch={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-password-input': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2228,31 +2060,21 @@ customElements.define(PasswordInput.tagName, PasswordInput);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-password-input>
+></lumina-password-input>
 <script type="module">
   const el = document.querySelector('lumina-password-input');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function PasswordInputExample() {
   return (
-    <lumina-password-input
-      variant="glass"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-password-input>
+    <lumina-password-input variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-select': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2293,31 +2115,21 @@ customElements.define(Select.tagName, Select);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-select>
+></lumina-select>
 <script type="module">
   const el = document.querySelector('lumina-select');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function SelectExample() {
   return (
-    <lumina-select
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-select>
+    <lumina-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-multi-select': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2355,31 +2167,21 @@ customElements.define(MultiSelect.tagName, MultiSelect);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-multi-select>
+></lumina-multi-select>
 <script type="module">
   const el = document.querySelector('lumina-multi-select');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function MultiSelectExample() {
   return (
-    <lumina-multi-select
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-multi-select>
+    <lumina-multi-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-autocomplete': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2417,31 +2219,21 @@ customElements.define(Autocomplete.tagName, Autocomplete);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-autocomplete>
+></lumina-autocomplete>
 <script type="module">
   const el = document.querySelector('lumina-autocomplete');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function AutocompleteExample() {
   return (
-    <lumina-autocomplete
-      variant="neural"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-autocomplete>
+    <lumina-autocomplete variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-slider': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2483,31 +2275,25 @@ customElements.define(Slider.tagName, Slider);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-slider>
+  value="50"
+  min="0"
+  max="100"
+  step="1"
+></lumina-slider>
 <script type="module">
   const el = document.querySelector('lumina-slider');
-  el.addEventListener('lumina-input', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-input', (e) => {
+    console.log('lumina-input', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function SliderExample() {
   return (
-    <lumina-slider
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaInput={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-slider>
+    <lumina-slider variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} value={50} min={0} max={100} step={1}
+      onLuminaInput={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-range-slider': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2545,31 +2331,21 @@ customElements.define(RangeSlider.tagName, RangeSlider);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-range-slider>
+></lumina-range-slider>
 <script type="module">
   const el = document.querySelector('lumina-range-slider');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function RangeSliderExample() {
   return (
-    <lumina-range-slider
-      variant="glass"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-range-slider>
+    <lumina-range-slider variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-switch': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2607,31 +2383,21 @@ customElements.define(Switch.tagName, Switch);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-switch>
+></lumina-switch>
 <script type="module">
   const el = document.querySelector('lumina-switch');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function SwitchExample() {
   return (
-    <lumina-switch
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-switch>
+    <lumina-switch variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-checkbox': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2669,31 +2435,21 @@ customElements.define(Checkbox.tagName, Checkbox);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-checkbox>
+></lumina-checkbox>
 <script type="module">
   const el = document.querySelector('lumina-checkbox');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function CheckboxExample() {
   return (
-    <lumina-checkbox
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-checkbox>
+    <lumina-checkbox variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-radio-group': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2731,31 +2487,21 @@ customElements.define(RadioGroup.tagName, RadioGroup);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-radio-group>
+></lumina-radio-group>
 <script type="module">
   const el = document.querySelector('lumina-radio-group');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function RadioGroupExample() {
   return (
-    <lumina-radio-group
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-radio-group>
+    <lumina-radio-group variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-file-upload': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2793,31 +2539,21 @@ customElements.define(FileUpload.tagName, FileUpload);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-file-upload>
+></lumina-file-upload>
 <script type="module">
   const el = document.querySelector('lumina-file-upload');
-  el.addEventListener('lumina-file-select', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-file-select', (e) => {
+    console.log('lumina-file-select', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function FileUploadExample() {
   return (
-    <lumina-file-upload
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaFileSelect={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-file-upload>
+    <lumina-file-upload variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaFileSelect={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-color-picker': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2855,31 +2591,21 @@ customElements.define(ColorPicker.tagName, ColorPicker);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-color-picker>
+></lumina-color-picker>
 <script type="module">
   const el = document.querySelector('lumina-color-picker');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ColorPickerExample() {
   return (
-    <lumina-color-picker
-      variant="glass"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-color-picker>
+    <lumina-color-picker variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-date-picker': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2917,31 +2643,21 @@ customElements.define(DatePicker.tagName, DatePicker);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-date-picker>
+></lumina-date-picker>
 <script type="module">
   const el = document.querySelector('lumina-date-picker');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function DatePickerExample() {
   return (
-    <lumina-date-picker
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-date-picker>
+    <lumina-date-picker variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-time-picker': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -2979,31 +2695,21 @@ customElements.define(TimePicker.tagName, TimePicker);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-time-picker>
+></lumina-time-picker>
 <script type="module">
   const el = document.querySelector('lumina-time-picker');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function TimePickerExample() {
   return (
-    <lumina-time-picker
-      variant="glass"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-time-picker>
+    <lumina-time-picker variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-signature-pad': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3041,31 +2747,21 @@ customElements.define(SignaturePad.tagName, SignaturePad);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-signature-pad>
+></lumina-signature-pad>
 <script type="module">
   const el = document.querySelector('lumina-signature-pad');
-  el.addEventListener('lumina-sign', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-sign', (e) => {
+    console.log('lumina-sign', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function SignaturePadExample() {
   return (
-    <lumina-signature-pad
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaSign={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-signature-pad>
+    <lumina-signature-pad variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaSign={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-voice-input': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3103,31 +2799,21 @@ customElements.define(VoiceInput.tagName, VoiceInput);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-voice-input>
+></lumina-voice-input>
 <script type="module">
   const el = document.querySelector('lumina-voice-input');
-  el.addEventListener('lumina-voice-start', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-voice-start', (e) => {
+    console.log('lumina-voice-start', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function VoiceInputExample() {
   return (
-    <lumina-voice-input
-      variant="neural"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaVoiceStart={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-voice-input>
+    <lumina-voice-input variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaVoiceStart={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-neural-input': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3165,31 +2851,21 @@ customElements.define(NeuralInput.tagName, NeuralInput);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-neural-input>
+></lumina-neural-input>
 <script type="module">
   const el = document.querySelector('lumina-neural-input');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function NeuralInputExample() {
   return (
-    <lumina-neural-input
-      variant="neural"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-neural-input>
+    <lumina-neural-input variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-context-input': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3227,31 +2903,21 @@ customElements.define(ContextInput.tagName, ContextInput);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-context-input>
+></lumina-context-input>
 <script type="module">
   const el = document.querySelector('lumina-context-input');
-  el.addEventListener('lumina-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-change', (e) => {
+    console.log('lumina-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ContextInputExample() {
   return (
-    <lumina-context-input
-      variant="adaptive"
-      intensity="intense"
-      accent-color="#ffd166"
-      speed={0.5}
-      onLuminaChange={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-context-input>
+    <lumina-context-input variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5}
+      onLuminaChange={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-navigation': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3289,31 +2955,25 @@ customElements.define(Navigation.tagName, Navigation);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-navigation>
 <script type="module">
   const el = document.querySelector('lumina-navigation');
-  el.addEventListener('lumina-nav-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-nav-change', (e) => {
+    console.log('lumina-nav-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function NavigationExample() {
   return (
-    <lumina-navigation
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaNavChange={(e) => console.log(e)}
-    >
+    <lumina-navigation variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaNavChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-navigation>
   );
-}
-`,
+}`,
   },
   'lumina-tabs': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3353,31 +3013,26 @@ customElements.define(Tabs.tagName, Tabs);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  orientation="horizontal"
 >
   Conteúdo de exemplo
 </lumina-tabs>
 <script type="module">
   const el = document.querySelector('lumina-tabs');
-  el.addEventListener('lumina-tab-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-tab-change', (e) => {
+    console.log('lumina-tab-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function TabsExample() {
   return (
-    <lumina-tabs
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaTabChange={(e) => console.log(e)}
-    >
+    <lumina-tabs variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} orientation="horizontal"
+      onLuminaTabChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-tabs>
   );
-}
-`,
+}`,
   },
   'lumina-breadcrumbs': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3415,31 +3070,25 @@ customElements.define(Breadcrumbs.tagName, Breadcrumbs);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-breadcrumbs>
 <script type="module">
   const el = document.querySelector('lumina-breadcrumbs');
-  el.addEventListener('lumina-navigate', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-navigate', (e) => {
+    console.log('lumina-navigate', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function BreadcrumbsExample() {
   return (
-    <lumina-breadcrumbs
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaNavigate={(e) => console.log(e)}
-    >
+    <lumina-breadcrumbs variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaNavigate={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-breadcrumbs>
   );
-}
-`,
+}`,
   },
   'lumina-pagination': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3478,31 +3127,27 @@ customElements.define(Pagination.tagName, Pagination);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  page="0"
+  total="0"
 >
   Conteúdo de exemplo
 </lumina-pagination>
 <script type="module">
   const el = document.querySelector('lumina-pagination');
-  el.addEventListener('lumina-page-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-page-change', (e) => {
+    console.log('lumina-page-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function PaginationExample() {
   return (
-    <lumina-pagination
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaPageChange={(e) => console.log(e)}
-    >
+    <lumina-pagination variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} page={0} total={0}
+      onLuminaPageChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-pagination>
   );
-}
-`,
+}`,
   },
   'lumina-sidebar': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3540,31 +3185,25 @@ customElements.define(Sidebar.tagName, Sidebar);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-sidebar>
 <script type="module">
   const el = document.querySelector('lumina-sidebar');
-  el.addEventListener('lumina-toggle', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-toggle', (e) => {
+    console.log('lumina-toggle', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function SidebarExample() {
   return (
-    <lumina-sidebar
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaToggle={(e) => console.log(e)}
-    >
+    <lumina-sidebar variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaToggle={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-sidebar>
   );
-}
-`,
+}`,
   },
   'lumina-drawer': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3604,31 +3243,27 @@ customElements.define(Drawer.tagName, Drawer);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
+  placement="left"
+  size="md"
 >
   Conteúdo de exemplo
 </lumina-drawer>
 <script type="module">
   const el = document.querySelector('lumina-drawer');
-  el.addEventListener('lumina-open', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-open', (e) => {
+    console.log('lumina-open', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function DrawerExample() {
   return (
-    <lumina-drawer
-      variant="glass"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-      onLuminaOpen={(e) => console.log(e)}
-    >
+    <lumina-drawer variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} placement="left" size="md"
+      onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-drawer>
   );
-}
-`,
+}`,
   },
   'lumina-mega-menu': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3666,31 +3301,25 @@ customElements.define(MegaMenu.tagName, MegaMenu);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-mega-menu>
 <script type="module">
   const el = document.querySelector('lumina-mega-menu');
-  el.addEventListener('lumina-navigate', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-navigate', (e) => {
+    console.log('lumina-navigate', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function MegaMenuExample() {
   return (
-    <lumina-mega-menu
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaNavigate={(e) => console.log(e)}
-    >
+    <lumina-mega-menu variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaNavigate={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-mega-menu>
   );
-}
-`,
+}`,
   },
   'lumina-command-palette': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3728,31 +3357,25 @@ customElements.define(CommandPalette.tagName, CommandPalette);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-command-palette>
 <script type="module">
   const el = document.querySelector('lumina-command-palette');
-  el.addEventListener('lumina-execute', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-execute', (e) => {
+    console.log('lumina-execute', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function CommandPaletteExample() {
   return (
-    <lumina-command-palette
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaExecute={(e) => console.log(e)}
-    >
+    <lumina-command-palette variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaExecute={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-command-palette>
   );
-}
-`,
+}`,
   },
   'lumina-floating-nav': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3790,31 +3413,25 @@ customElements.define(FloatingNav.tagName, FloatingNav);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-floating-nav>
 <script type="module">
   const el = document.querySelector('lumina-floating-nav');
-  el.addEventListener('lumina-show', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-show', (e) => {
+    console.log('lumina-show', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function FloatingNavExample() {
   return (
-    <lumina-floating-nav
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaShow={(e) => console.log(e)}
-    >
+    <lumina-floating-nav variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaShow={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-floating-nav>
   );
-}
-`,
+}`,
   },
   'lumina-step-indicator': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3853,31 +3470,27 @@ customElements.define(StepIndicator.tagName, StepIndicator);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  current="0"
+  total="0"
 >
   Conteúdo de exemplo
 </lumina-step-indicator>
 <script type="module">
   const el = document.querySelector('lumina-step-indicator');
-  el.addEventListener('lumina-step-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-step-change', (e) => {
+    console.log('lumina-step-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function StepIndicatorExample() {
   return (
-    <lumina-step-indicator
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaStepChange={(e) => console.log(e)}
-    >
+    <lumina-step-indicator variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} current={0} total={0}
+      onLuminaStepChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-step-indicator>
   );
-}
-`,
+}`,
   },
   'lumina-progress-nav': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3915,31 +3528,25 @@ customElements.define(ProgressNav.tagName, ProgressNav);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-progress-nav>
 <script type="module">
   const el = document.querySelector('lumina-progress-nav');
-  el.addEventListener('lumina-navigate', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-navigate', (e) => {
+    console.log('lumina-navigate', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ProgressNavExample() {
   return (
-    <lumina-progress-nav
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaNavigate={(e) => console.log(e)}
-    >
+    <lumina-progress-nav variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaNavigate={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-progress-nav>
   );
-}
-`,
+}`,
   },
   'lumina-orbital-nav': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -3977,31 +3584,25 @@ customElements.define(OrbitalNav.tagName, OrbitalNav);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-orbital-nav>
 <script type="module">
   const el = document.querySelector('lumina-orbital-nav');
-  el.addEventListener('lumina-navigate', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-navigate', (e) => {
+    console.log('lumina-navigate', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function OrbitalNavExample() {
   return (
-    <lumina-orbital-nav
-      variant="dimensional"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaNavigate={(e) => console.log(e)}
-    >
+    <lumina-orbital-nav variant="dimensional" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaNavigate={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-orbital-nav>
   );
-}
-`,
+}`,
   },
   'lumina-alert': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4040,31 +3641,28 @@ customElements.define(Alert.tagName, Alert);
   intensity="intense"
   accent-color="#22c55e"
   speed="0.5"
-  depth="medium"
+  dismissible
+  auto-dismiss="0"
 >
-  Conteúdo de exemplo
+  <span slot="title">Sucesso</span>
+  Operação concluída.
 </lumina-alert>
 <script type="module">
   const el = document.querySelector('lumina-alert');
-  el.addEventListener('lumina-close', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-close', (e) => {
+    console.log('lumina-close', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function AlertExample() {
   return (
-    <lumina-alert
-      variant="glass"
-      intensity="intense"
-      accent-color="#22c55e"
-      speed={0.5}
-      onLuminaClose={(e) => console.log(e)}
-    >
+    <lumina-alert variant="glass" intensity="intense" accent-color="#22c55e" speed={0.5} dismissible auto-dismiss={0}
+      onLuminaClose={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-alert>
   );
-}
-`,
+}`,
   },
   'lumina-toast': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4103,31 +3701,28 @@ customElements.define(Toast.tagName, Toast);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  duration="4000"
+  position="top-right"
 >
-  Conteúdo de exemplo
+  Salvo com sucesso!
+  <button slot="actions" data-action="undo">Desfazer</button>
 </lumina-toast>
 <script type="module">
   const el = document.querySelector('lumina-toast');
-  el.addEventListener('lumina-dismiss', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-dismiss', (e) => {
+    console.log('lumina-dismiss', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ToastExample() {
   return (
-    <lumina-toast
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaDismiss={(e) => console.log(e)}
-    >
+    <lumina-toast variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} duration={4000} position="top-right"
+      onLuminaDismiss={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-toast>
   );
-}
-`,
+}`,
   },
   'lumina-progress': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4167,31 +3762,23 @@ customElements.define(Progress.tagName, Progress);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-progress>
+  value="0"
+  max="100"
+></lumina-progress>
 <script type="module">
   const el = document.querySelector('lumina-progress');
-  el.addEventListener('lumina-progress-complete', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-progress-complete', (e) => {
+    console.log('lumina-progress-complete', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ProgressExample() {
   return (
-    <lumina-progress
-      variant="glass"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-      onLuminaProgressComplete={(e) => console.log(e)}
-    >
-      Conteúdo
-    </lumina-progress>
+    <lumina-progress variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} value={0} max={100}
+      onLuminaProgressComplete={(e) => console.log(e.detail)} />
   );
-}
-`,
+}`,
   },
   'lumina-skeleton': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4231,25 +3818,15 @@ customElements.define(Skeleton.tagName, Skeleton);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-skeleton>`,
+  shape="text"
+></lumina-skeleton>`,
     react: `import 'lumina-ui';
 
 export function SkeletonExample() {
   return (
-    <lumina-skeleton
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-    >
-      Conteúdo
-    </lumina-skeleton>
+    <lumina-skeleton variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} shape="text" />
   );
-}
-`,
+}`,
   },
   'lumina-badge': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4289,31 +3866,25 @@ customElements.define(Badge.tagName, Badge);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  NEW
 </lumina-badge>
 <script type="module">
   const el = document.querySelector('lumina-badge');
-  el.addEventListener('lumina-remove', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-remove', (e) => {
+    console.log('lumina-remove', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function BadgeExample() {
   return (
-    <lumina-badge
-      variant="glass"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaRemove={(e) => console.log(e)}
-    >
+    <lumina-badge variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaRemove={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-badge>
   );
-}
-`,
+}`,
   },
   'lumina-chip': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4353,31 +3924,27 @@ customElements.define(Chip.tagName, Chip);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  removable
 >
-  Conteúdo de exemplo
+  <span slot="icon">⚛</span>
+  TypeScript
 </lumina-chip>
 <script type="module">
   const el = document.querySelector('lumina-chip');
-  el.addEventListener('lumina-remove', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-remove', (e) => {
+    console.log('lumina-remove', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ChipExample() {
   return (
-    <lumina-chip
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaRemove={(e) => console.log(e)}
-    >
-      Conteúdo
+    <lumina-chip variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} removable
+      onLuminaRemove={(e) => console.log(e.detail)}>
+      TypeScript
     </lumina-chip>
   );
-}
-`,
+}`,
   },
   'lumina-loading': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4417,25 +3984,15 @@ customElements.define(Loading.tagName, Loading);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-loading>`,
+  size="64"
+></lumina-loading>`,
     react: `import 'lumina-ui';
 
 export function LoadingExample() {
   return (
-    <lumina-loading
-      variant="neural"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-    >
-      Conteúdo
-    </lumina-loading>
+    <lumina-loading variant="neural" intensity="intense" accent-color="#7c5cff" speed={0.5} size={64} />
   );
-}
-`,
+}`,
   },
   'lumina-spinner': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4473,25 +4030,15 @@ customElements.define(Spinner.tagName, Spinner);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-spinner>`,
+  size="40"
+></lumina-spinner>`,
     react: `import 'lumina-ui';
 
 export function SpinnerExample() {
   return (
-    <lumina-spinner
-      variant="neural"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-    >
-      Conteúdo
-    </lumina-spinner>
+    <lumina-spinner variant="neural" intensity="intense" accent-color="#7c5cff" speed={0.5} size={40} />
   );
-}
-`,
+}`,
   },
   'lumina-status-indicator': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4529,25 +4076,16 @@ customElements.define(StatusIndicator.tagName, StatusIndicator);
   intensity="intense"
   accent-color="#22c55e"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-status-indicator>`,
+></lumina-status-indicator>`,
     react: `import 'lumina-ui';
 
 export function StatusIndicatorExample() {
   return (
-    <lumina-status-indicator
-      variant="online"
-      intensity="intense"
-      accent-color="#22c55e"
-      speed={0.5}
-    >
+    <lumina-status-indicator variant="online" intensity="intense" accent-color="#22c55e" speed={0.5}>
       Conteúdo
     </lumina-status-indicator>
   );
-}
-`,
+}`,
   },
   'lumina-notification-badge': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4585,31 +4123,26 @@ customElements.define(NotificationBadge.tagName, NotificationBadge);
   intensity="intense"
   accent-color="#ff5577"
   speed="0.5"
-  depth="medium"
+  count="0"
 >
-  Conteúdo de exemplo
+  Conteúdo
 </lumina-notification-badge>
 <script type="module">
   const el = document.querySelector('lumina-notification-badge');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function NotificationBadgeExample() {
   return (
-    <lumina-notification-badge
-      variant="glass"
-      intensity="intense"
-      accent-color="#ff5577"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-notification-badge variant="glass" intensity="intense" accent-color="#ff5577" speed={0.5} count={0}
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-notification-badge>
   );
-}
-`,
+}`,
   },
   'lumina-pulse-indicator': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4647,25 +4180,16 @@ customElements.define(PulseIndicator.tagName, PulseIndicator);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-pulse-indicator>`,
+></lumina-pulse-indicator>`,
     react: `import 'lumina-ui';
 
 export function PulseIndicatorExample() {
   return (
-    <lumina-pulse-indicator
-      variant="aura"
-      intensity="intense"
-      accent-color="#ffd166"
-      speed={0.5}
-    >
+    <lumina-pulse-indicator variant="aura" intensity="intense" accent-color="#ffd166" speed={0.5}>
       Conteúdo
     </lumina-pulse-indicator>
   );
-}
-`,
+}`,
   },
   'lumina-neural-loader': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4703,25 +4227,16 @@ customElements.define(NeuralLoader.tagName, NeuralLoader);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
->
-  Conteúdo de exemplo
-</lumina-neural-loader>`,
+></lumina-neural-loader>`,
     react: `import 'lumina-ui';
 
 export function NeuralLoaderExample() {
   return (
-    <lumina-neural-loader
-      variant="neural"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-    >
+    <lumina-neural-loader variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}>
       Conteúdo
     </lumina-neural-loader>
   );
-}
-`,
+}`,
   },
   'lumina-modal': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4760,31 +4275,28 @@ customElements.define(Modal.tagName, Modal);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  close-on-backdrop
 >
-  Conteúdo de exemplo
+  <span slot="title">Título</span>
+  <p>Conteúdo do modal.</p>
+  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
 </lumina-modal>
 <script type="module">
   const el = document.querySelector('lumina-modal');
-  el.addEventListener('lumina-open', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-open', (e) => {
+    console.log('lumina-open', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ModalExample() {
   return (
-    <lumina-modal
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaOpen={(e) => console.log(e)}
-    >
+    <lumina-modal variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} close-on-backdrop
+      onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-modal>
   );
-}
-`,
+}`,
   },
   'lumina-drawer-modal': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4823,31 +4335,28 @@ customElements.define(DrawerModal.tagName, DrawerModal);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  side="right"
 >
-  Conteúdo de exemplo
+  <span slot="title">Título</span>
+  <p>Conteúdo do modal.</p>
+  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
 </lumina-drawer-modal>
 <script type="module">
   const el = document.querySelector('lumina-drawer-modal');
-  el.addEventListener('lumina-open', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-open', (e) => {
+    console.log('lumina-open', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function DrawerModalExample() {
   return (
-    <lumina-drawer-modal
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaOpen={(e) => console.log(e)}
-    >
+    <lumina-drawer-modal variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} side="right"
+      onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-drawer-modal>
   );
-}
-`,
+}`,
   },
   'lumina-dialog': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4885,31 +4394,27 @@ customElements.define(Dialog.tagName, Dialog);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <span slot="title">Título</span>
+  <p>Conteúdo do modal.</p>
+  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
 </lumina-dialog>
 <script type="module">
   const el = document.querySelector('lumina-dialog');
-  el.addEventListener('lumina-open', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-open', (e) => {
+    console.log('lumina-open', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function DialogExample() {
   return (
-    <lumina-dialog
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaOpen={(e) => console.log(e)}
-    >
+    <lumina-dialog variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-dialog>
   );
-}
-`,
+}`,
   },
   'lumina-popover': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -4947,31 +4452,26 @@ customElements.define(Popover.tagName, Popover);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  placement="top"
 >
-  Conteúdo de exemplo
+  Hover me
 </lumina-popover>
 <script type="module">
   const el = document.querySelector('lumina-popover');
-  el.addEventListener('lumina-show', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-show', (e) => {
+    console.log('lumina-show', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function PopoverExample() {
   return (
-    <lumina-popover
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaShow={(e) => console.log(e)}
-    >
+    <lumina-popover variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} placement="top"
+      onLuminaShow={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-popover>
   );
-}
-`,
+}`,
   },
   'lumina-tooltip': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5011,31 +4511,27 @@ customElements.define(Tooltip.tagName, Tooltip);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  side="top"
+  delay="200"
 >
-  Conteúdo de exemplo
+  Hover me
 </lumina-tooltip>
 <script type="module">
   const el = document.querySelector('lumina-tooltip');
-  el.addEventListener('lumina-show', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-show', (e) => {
+    console.log('lumina-show', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function TooltipExample() {
   return (
-    <lumina-tooltip
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaShow={(e) => console.log(e)}
-    >
+    <lumina-tooltip variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} side="top" delay={200}
+      onLuminaShow={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-tooltip>
   );
-}
-`,
+}`,
   },
   'lumina-context-menu': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5073,31 +4569,25 @@ customElements.define(ContextMenu.tagName, ContextMenu);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  Conteúdo
 </lumina-context-menu>
 <script type="module">
   const el = document.querySelector('lumina-context-menu');
-  el.addEventListener('lumina-show', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-show', (e) => {
+    console.log('lumina-show', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ContextMenuExample() {
   return (
-    <lumina-context-menu
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaShow={(e) => console.log(e)}
-    >
+    <lumina-context-menu variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaShow={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-context-menu>
   );
-}
-`,
+}`,
   },
   'lumina-lightbox': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5135,31 +4625,25 @@ customElements.define(Lightbox.tagName, Lightbox);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  Conteúdo
 </lumina-lightbox>
 <script type="module">
   const el = document.querySelector('lumina-lightbox');
-  el.addEventListener('lumina-open', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-open', (e) => {
+    console.log('lumina-open', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function LightboxExample() {
   return (
-    <lumina-lightbox
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaOpen={(e) => console.log(e)}
-    >
+    <lumina-lightbox variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-lightbox>
   );
-}
-`,
+}`,
   },
   'lumina-image-zoom': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5198,31 +4682,26 @@ customElements.define(ImageZoom.tagName, ImageZoom);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  zoom="1"
 >
-  Conteúdo de exemplo
+  Conteúdo
 </lumina-image-zoom>
 <script type="module">
   const el = document.querySelector('lumina-image-zoom');
-  el.addEventListener('lumina-zoom-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-zoom-change', (e) => {
+    console.log('lumina-zoom-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ImageZoomExample() {
   return (
-    <lumina-image-zoom
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaZoomChange={(e) => console.log(e)}
-    >
+    <lumina-image-zoom variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} zoom={1}
+      onLuminaZoomChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-image-zoom>
   );
-}
-`,
+}`,
   },
   'lumina-fullscreen-overlay': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5260,31 +4739,25 @@ customElements.define(FullscreenOverlay.tagName, FullscreenOverlay);
   intensity="intense"
   accent-color="#78f0ff"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  Conteúdo
 </lumina-fullscreen-overlay>
 <script type="module">
   const el = document.querySelector('lumina-fullscreen-overlay');
-  el.addEventListener('lumina-open', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-open', (e) => {
+    console.log('lumina-open', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function FullscreenOverlayExample() {
   return (
-    <lumina-fullscreen-overlay
-      variant="void"
-      intensity="intense"
-      accent-color="#78f0ff"
-      speed={0.5}
-      onLuminaOpen={(e) => console.log(e)}
-    >
+    <lumina-fullscreen-overlay variant="void" intensity="intense" accent-color="#78f0ff" speed={0.5}
+      onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-fullscreen-overlay>
   );
-}
-`,
+}`,
   },
   'lumina-confirmation-dialog': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5324,31 +4797,27 @@ customElements.define(ConfirmationDialog.tagName, ConfirmationDialog);
   intensity="intense"
   accent-color="#ff5577"
   speed="0.5"
-  depth="medium"
 >
-  Conteúdo de exemplo
+  <span slot="title">Título</span>
+  <p>Conteúdo do modal.</p>
+  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
 </lumina-confirmation-dialog>
 <script type="module">
   const el = document.querySelector('lumina-confirmation-dialog');
-  el.addEventListener('lumina-confirm', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-confirm', (e) => {
+    console.log('lumina-confirm', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ConfirmationDialogExample() {
   return (
-    <lumina-confirmation-dialog
-      variant="glass"
-      intensity="intense"
-      accent-color="#ff5577"
-      speed={0.5}
-      onLuminaConfirm={(e) => console.log(e)}
-    >
+    <lumina-confirmation-dialog variant="glass" intensity="intense" accent-color="#ff5577" speed={0.5}
+      onLuminaConfirm={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-confirmation-dialog>
   );
-}
-`,
+}`,
   },
   'lumina-table': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5386,31 +4855,25 @@ customElements.define(Table.tagName, Table);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-table>
 <script type="module">
   const el = document.querySelector('lumina-table');
-  el.addEventListener('lumina-sort', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-sort', (e) => {
+    console.log('lumina-sort', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function TableExample() {
   return (
-    <lumina-table
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaSort={(e) => console.log(e)}
-    >
+    <lumina-table variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaSort={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-table>
   );
-}
-`,
+}`,
   },
   'lumina-data-grid': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5448,31 +4911,25 @@ customElements.define(DataGrid.tagName, DataGrid);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-data-grid>
 <script type="module">
   const el = document.querySelector('lumina-data-grid');
-  el.addEventListener('lumina-select', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-select', (e) => {
+    console.log('lumina-select', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function DataGridExample() {
   return (
-    <lumina-data-grid
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaSelect={(e) => console.log(e)}
-    >
+    <lumina-data-grid variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaSelect={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-data-grid>
   );
-}
-`,
+}`,
   },
   'lumina-list': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5510,31 +4967,25 @@ customElements.define(List.tagName, List);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-list>
 <script type="module">
   const el = document.querySelector('lumina-list');
-  el.addEventListener('lumina-select', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-select', (e) => {
+    console.log('lumina-select', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ListExample() {
   return (
-    <lumina-list
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaSelect={(e) => console.log(e)}
-    >
+    <lumina-list variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaSelect={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-list>
   );
-}
-`,
+}`,
   },
   'lumina-grid': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5572,7 +5023,6 @@ customElements.define(Grid.tagName, Grid);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-grid>`,
@@ -5580,17 +5030,11 @@ customElements.define(Grid.tagName, Grid);
 
 export function GridExample() {
   return (
-    <lumina-grid
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-    >
+    <lumina-grid variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}>
       Conteúdo
     </lumina-grid>
   );
-}
-`,
+}`,
   },
   'lumina-avatar': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5632,31 +5076,26 @@ customElements.define(Avatar.tagName, Avatar);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  size="md"
 >
   Conteúdo de exemplo
 </lumina-avatar>
 <script type="module">
   const el = document.querySelector('lumina-avatar');
-  el.addEventListener('lumina-click', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-click', (e) => {
+    console.log('lumina-click', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function AvatarExample() {
   return (
-    <lumina-avatar
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaClick={(e) => console.log(e)}
-    >
+    <lumina-avatar variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} size="md"
+      onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-avatar>
   );
-}
-`,
+}`,
   },
   'lumina-avatar-group': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5694,7 +5133,7 @@ customElements.define(AvatarGroup.tagName, AvatarGroup);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
+  max="5"
 >
   Conteúdo de exemplo
 </lumina-avatar-group>`,
@@ -5702,17 +5141,11 @@ customElements.define(AvatarGroup.tagName, AvatarGroup);
 
 export function AvatarGroupExample() {
   return (
-    <lumina-avatar-group
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-    >
+    <lumina-avatar-group variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max={5}>
       Conteúdo
     </lumina-avatar-group>
   );
-}
-`,
+}`,
   },
   'lumina-timeline': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5750,31 +5183,25 @@ customElements.define(Timeline.tagName, Timeline);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-timeline>
 <script type="module">
   const el = document.querySelector('lumina-timeline');
-  el.addEventListener('lumina-select', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-select', (e) => {
+    console.log('lumina-select', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function TimelineExample() {
   return (
-    <lumina-timeline
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaSelect={(e) => console.log(e)}
-    >
+    <lumina-timeline variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaSelect={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-timeline>
   );
-}
-`,
+}`,
   },
   'lumina-tree-view': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5812,31 +5239,25 @@ customElements.define(TreeView.tagName, TreeView);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-tree-view>
 <script type="module">
   const el = document.querySelector('lumina-tree-view');
-  el.addEventListener('lumina-expand', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-expand', (e) => {
+    console.log('lumina-expand', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function TreeViewExample() {
   return (
-    <lumina-tree-view
-      variant="glass"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaExpand={(e) => console.log(e)}
-    >
+    <lumina-tree-view variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaExpand={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-tree-view>
   );
-}
-`,
+}`,
   },
   'lumina-morph-lab': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5874,31 +5295,25 @@ customElements.define(MorphLab.tagName, MorphLab);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-morph-lab>
 <script type="module">
   const el = document.querySelector('lumina-morph-lab');
-  el.addEventListener('lumina-morph', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-morph', (e) => {
+    console.log('lumina-morph', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function MorphLabExample() {
   return (
-    <lumina-morph-lab
-      variant="glass"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaMorph={(e) => console.log(e)}
-    >
+    <lumina-morph-lab variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+      onLuminaMorph={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-morph-lab>
   );
-}
-`,
+}`,
   },
   'lumina-particle-system': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5937,31 +5352,27 @@ customElements.define(ParticleSystem.tagName, ParticleSystem);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-  depth="medium"
+  count="60"
+  mode="plain"
 >
   Conteúdo de exemplo
 </lumina-particle-system>
 <script type="module">
   const el = document.querySelector('lumina-particle-system');
-  el.addEventListener('lumina-particle-burst', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-particle-burst', (e) => {
+    console.log('lumina-particle-burst', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ParticleSystemExample() {
   return (
-    <lumina-particle-system
-      variant="neural"
-      intensity="intense"
-      accent-color="#ff6ec7"
-      speed={0.5}
-      onLuminaParticleBurst={(e) => console.log(e)}
-    >
+    <lumina-particle-system variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} count={60} mode="plain"
+      onLuminaParticleBurst={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-particle-system>
   );
-}
-`,
+}`,
   },
   'lumina-depth-controller': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -5999,31 +5410,25 @@ customElements.define(DepthController.tagName, DepthController);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-depth-controller>
 <script type="module">
   const el = document.querySelector('lumina-depth-controller');
-  el.addEventListener('lumina-depth-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-depth-change', (e) => {
+    console.log('lumina-depth-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function DepthControllerExample() {
   return (
-    <lumina-depth-controller
-      variant="flat"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaDepthChange={(e) => console.log(e)}
-    >
+    <lumina-depth-controller variant="flat" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaDepthChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-depth-controller>
   );
-}
-`,
+}`,
   },
   'lumina-context-aware': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -6061,31 +5466,25 @@ customElements.define(ContextAware.tagName, ContextAware);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-context-aware>
 <script type="module">
   const el = document.querySelector('lumina-context-aware');
-  el.addEventListener('lumina-context-change', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-context-change', (e) => {
+    console.log('lumina-context-change', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function ContextAwareExample() {
   return (
-    <lumina-context-aware
-      variant="adaptive"
-      intensity="intense"
-      accent-color="#ffd166"
-      speed={0.5}
-      onLuminaContextChange={(e) => console.log(e)}
-    >
+    <lumina-context-aware variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5}
+      onLuminaContextChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-context-aware>
   );
-}
-`,
+}`,
   },
   'lumina-echo-system': {
     component: `import { LuminaElement } from '../core/LuminaElement';
@@ -6123,31 +5522,25 @@ customElements.define(EchoSystem.tagName, EchoSystem);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-  depth="medium"
 >
   Conteúdo de exemplo
 </lumina-echo-system>
 <script type="module">
   const el = document.querySelector('lumina-echo-system');
-  el.addEventListener('lumina-echo', (e) => console.log(e));
-</script>
-`,
+  el.addEventListener('lumina-echo', (e) => {
+    console.log('lumina-echo', e.detail);
+  });
+</script>`,
     react: `import 'lumina-ui';
 
 export function EchoSystemExample() {
   return (
-    <lumina-echo-system
-      variant="aura"
-      intensity="intense"
-      accent-color="#7c5cff"
-      speed={0.5}
-      onLuminaEcho={(e) => console.log(e)}
-    >
+    <lumina-echo-system variant="aura" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaEcho={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-echo-system>
   );
-}
-`,
+}`,
   },
 };
 

@@ -151,9 +151,57 @@ function buildPreviewHTML(meta: ComponentMeta, state: { variant: string; intensi
   const tag = meta.tag;
   const attrs = `variant="${state.variant}" intensity="${state.intensity}" accent-color="${state.accent}"`;
   const cat = meta.category;
+
+  // Special previews for each button type
+  if (cat === 'buttons') {
+    switch (tag) {
+      case 'lumina-button':
+        return `<${tag} ${attrs} speed="0.45">Click me</${tag}>`;
+      case 'lumina-icon-button':
+        return `<${tag} ${attrs} size="lg">⚙</${tag}>`;
+      case 'lumina-fab':
+        return `<div style="position:relative; width:100%; min-height:200px;">
+          <${tag} ${attrs} extended position="bottom-right">
+            +
+            <span slot="label">Nova tarefa</span>
+          </${tag}>
+        </div>`;
+      case 'lumina-split-button':
+        return `<${tag} ${attrs}
+          menu-items='[{"label":"Editar","icon":"✎","value":"edit"},{"label":"Duplicar","icon":"⧉","value":"dup"},{"label":"Excluir","icon":"✕","value":"del"}]'
+        >Salvar</${tag}>`;
+      case 'lumina-toggle-button':
+        return `<${tag} ${attrs} pressed>Modo escuro</${tag}>`;
+      case 'lumina-button-group':
+        return `<${tag} ${attrs} variant="segmented" value="b">
+          <button data-value="a">A</button>
+          <button data-value="b">B</button>
+          <button data-value="c">C</button>
+        </${tag}>`;
+      case 'lumina-command-button':
+        return `<${tag} ${attrs} shortcut="⌘K">Buscar comandos</${tag}>`;
+      case 'lumina-ripple-button':
+        return `<${tag} ${attrs} ripple-duration="800">Clique para ripple</${tag}>`;
+      case 'lumina-magnetic-button':
+        return `<${tag} ${attrs} magnetic-strength="0.5">Aproxime o cursor</${tag}>`;
+      case 'lumina-breath-button':
+        return `<${tag} ${attrs}>Respirando...</${tag}>`;
+      case 'lumina-neural-button':
+        return `<${tag} ${attrs} particle-count="25">Neural</${tag}>`;
+      case 'lumina-portal-button':
+        return `<${tag} ${attrs}>Entrar no portal</${tag}>`;
+      case 'lumina-echo-button':
+        return `<${tag} ${attrs} echo-count="3">Eco</${tag}>`;
+      case 'lumina-morph-button':
+        return `<${tag} ${attrs} from="pill" to="hexagon">Morph</${tag}>`;
+      case 'lumina-gesture-button':
+        return `<${tag} ${attrs} gestures="hold,swipe,double-tap">Toque • segure • arraste</${tag}>`;
+      default:
+        return `<${tag} ${attrs}>Click</${tag}>`;
+    }
+  }
+
   switch (cat) {
-    case 'buttons':
-      return `<${tag} ${attrs} speed="0.45">Click me</${tag}>`;
     case 'cards':
       return `<${tag} ${attrs}>
         <h3 slot="title">${meta.name.replace('Lumina', '')}</h3>
@@ -164,20 +212,33 @@ function buildPreviewHTML(meta: ComponentMeta, state: { variant: string; intensi
       if (tag === 'lumina-textarea' || tag === 'lumina-signature-pad' || tag === 'lumina-file-upload') {
         return `<${tag} ${attrs} placeholder="Digite algo..."></${tag}>`;
       }
+      if (tag === 'lumina-select') {
+        return `<${tag} ${attrs} searchable placeholder="Escolha..." options='[{"value":"br","label":"Brasil","icon":"🇧🇷"},{"value":"us","label":"EUA","icon":"🇺🇸"},{"value":"pt","label":"Portugal","icon":"🇵🇹"}]'></${tag}>`;
+      }
+      if (tag === 'lumina-slider') {
+        return `<${tag} ${attrs} min="0" max="100" value="50" step="5" marks='[{"value":0,"label":"0"},{"value":50,"label":"Médio"},{"value":100,"label":"Máx"}]'></${tag}>`;
+      }
       return `<${tag} ${attrs} placeholder="Digite algo..."></${tag}>`;
     case 'navigation':
-      if (tag === 'lumina-tabs' || tag === 'lumina-breadcrumbs' || tag === 'lumina-pagination' || tag === 'lumina-step-indicator') {
-        return `<${tag} ${attrs}>
-          <span>Item A</span><span>Item B</span><span>Item C</span>
+      if (tag === 'lumina-tabs') {
+        return `<${tag} ${attrs} active-tab="t2">
+          <lumina-tab id="t1" label="Geral" icon="⚙">Conteúdo da aba Geral</lumina-tab>
+          <lumina-tab id="t2" label="Conta" icon="👤" badge="3">Conteúdo da aba Conta</lumina-tab>
+          <lumina-tab id="t3" label="Ajuda" icon="?">Conteúdo da aba Ajuda</lumina-tab>
         </${tag}>`;
+      }
+      if (tag === 'lumina-tabs') {
+        return `<${tag} ${attrs}><span>Item A</span><span>Item B</span><span>Item C</span></${tag}>`;
       }
       return `<${tag} ${attrs}><span>Item 1</span><span>Item 2</span></${tag}>`;
     case 'feedback':
       if (tag === 'lumina-progress') return `<${tag} ${attrs} value="62"></${tag}>`;
       if (tag === 'lumina-skeleton') return `<${tag} ${attrs} shape="rectangle" width="200px" height="60px"></${tag}>`;
-      if (tag === 'lumina-loading' || tag === 'lumina-spinner' || tag === 'lumina-neural-loader') {
-        return `<${tag} ${attrs} size="64"></${tag}>`;
-      }
+      if (tag === 'lumina-loading') return `<${tag} ${attrs} size="64" text="Carregando..."></${tag}>`;
+      if (tag === 'lumina-spinner') return `<${tag} ${attrs} size="40"></${tag}>`;
+      if (tag === 'lumina-alert') return `<${tag} ${attrs} dismissible auto-dismiss="0"><span slot="title">Sucesso</span>Operação concluída com sucesso.</${tag}>`;
+      if (tag === 'lumina-toast') return `<${tag} ${attrs} duration="6000" position="top-right">Salvo com sucesso!<button slot="actions" data-action="undo">Desfazer</button></${tag}>`;
+      if (tag === 'lumina-chip') return `<${tag} ${attrs} selectable removable><span slot="icon">⚛</span>TypeScript</${tag}>`;
       if (tag === 'lumina-status-indicator' || tag === 'lumina-pulse-indicator') {
         return `<${tag} ${attrs}>Online</${tag}>`;
       }
@@ -194,6 +255,15 @@ function buildPreviewHTML(meta: ComponentMeta, state: { variant: string; intensi
           </${tag}>
         </div>`;
       }
+      if (tag === 'lumina-drawer') {
+        return `<div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
+          <lumina-button ${attrs} id="preview-open-drawer">Abrir drawer</lumina-button>
+          <${tag} ${attrs}>
+            <h2 slot="header">Filtros</h2>
+            <p>Conteúdo do drawer.</p>
+          </${tag}>
+        </div>`;
+      }
       if (tag === 'lumina-tooltip' || tag === 'lumina-popover') {
         return `<${tag} ${attrs} content="Hint contextual">
           <lumina-button ${attrs}>Hover me</lumina-button>
@@ -201,7 +271,7 @@ function buildPreviewHTML(meta: ComponentMeta, state: { variant: string; intensi
       }
       return `<${tag} ${attrs}>Trigger</${tag}>`;
     case 'data':
-      if (tag === 'lumina-avatar') return `<${tag} ${attrs} name="John Doe" size="64"></${tag}>`;
+      if (tag === 'lumina-avatar') return `<${tag} ${attrs} name="John Doe" status="online" size="lg"></${tag}>`;
       if (tag === 'lumina-avatar-group') return `<${tag} ${attrs} max="3">
         <lumina-avatar name="A"></lumina-avatar>
         <lumina-avatar name="B"></lumina-avatar>

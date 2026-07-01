@@ -1,154 +1,108 @@
 /**
- * LuminaFloatingActionButton — FAB flutuante com entrada animada.
+ * LuminaFAB — Floating Action Button com entrada scale+fade, elevação ao
+ * hover e modo extended (expande para mostrar texto).
  *
- * Auto-generated stub from demo/data/manifest.ts.
- * Category: buttons
- *
- * Description: FAB com animação de entrada e micro-interações.
- *
- * Variants: `glass` | `neural` | `aura` | `extended`
- * Events:    lumina-click
- * CSS parts: button, icon, label, glow
- * Props:     (none beyond shared)
- * Slots:     `default`, `label`
- *
- * This stub extends LuminaElement and accepts the shared
- * variant / intensity / theme / accent-color / speed / depth API.
- * Replace with a richer hand-written implementation as needed.
+ * Variants: glass | neural | aura | extended
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { coerceAttr } from '../core/utils';
 
-export class FloatingActionButton extends LuminaElement {
+const POSITIONS = ['bottom-right','bottom-left','top-right','top-left'] as const;
+type Position = (typeof POSITIONS)[number];
+
+export class Fab extends LuminaElement {
   static tagName = 'lumina-fab';
-
   static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes];
+    return [...LuminaElement.observedAttributes, 'extended', 'position'];
   }
+  private _extended = false;
+  private _position: Position = 'bottom-right';
 
-
+  get extended(): boolean { return this._extended; }
+  set extended(v: boolean) { this._extended = v; if (v) this.setAttribute('extended',''); else this.removeAttribute('extended'); }
+  get position(): Position { return this._position; }
+  set position(v: Position) { this._position = v; this.setAttribute('position', v); this.applyPosition(); }
 
   protected render(): string {
     return `
-      <button class="lmc" part="button" tabindex="0">
-        <span class="lmc__bg" aria-hidden="true"></span>
-        <span class="lmc__glow" part="glow" aria-hidden="true"></span>
-        <span class="lmc__label" part="label"><slot></slot></span>
+      <button class="lmfb" part="button" type="button">
+        <span class="lmfb__bg" aria-hidden="true"></span>
+        <span class="lmfb__glow" part="glow" aria-hidden="true"></span>
+        <span class="lmfb__icon" part="icon"><slot></slot></span>
+        <span class="lmfb__label" part="label"><slot name="label"></slot></span>
       </button>
     `;
   }
-
   protected styles(): string {
     return `
-      :host {
-        display: inline-block;
-        cursor: pointer;
-        outline: none;
-        border-radius: var(--lumina-radius-pill);
-        font-family: var(--lumina-font-sans);
-        font-weight: 600;
-        font-size: 14px;
-        color: var(--lumina-text);
-        user-select: none;
-        -webkit-tap-highlight-color: transparent;
-      }
-      :host([disabled]) { cursor: not-allowed; opacity: 0.45; filter: saturate(0.4); }
-      .lmc {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        height: 44px;
-        padding: 0 22px;
-        border: 0;
-        background: transparent;
-        color: inherit;
-        font: inherit;
-        border-radius: inherit;
-        overflow: hidden;
-        cursor: pointer;
+      :host { position: fixed; z-index: 900; font-family: var(--lumina-font-sans); color: var(--lumina-text); }
+      .lmfb {
+        position: relative; display: inline-flex; align-items: center; gap: 0;
+        height: 56px; min-width: 56px; padding: 0; border: 0; background: transparent;
+        color: inherit; cursor: pointer; border-radius: var(--lumina-radius-pill);
+        overflow: hidden; isolation: isolate;
         transition: transform var(--lumina-speed) var(--lumina-ease-spring),
-                    box-shadow var(--lumina-speed) var(--lumina-ease-out);
+                    box-shadow var(--lumina-speed) var(--lumina-ease-out),
+                    min-width var(--lumina-speed) var(--lumina-ease-spring);
+        animation: lmfb-enter calc(var(--lumina-speed) * 2) var(--lumina-ease-spring);
         will-change: transform;
-        isolation: isolate;
       }
-      .lmc:focus-visible { outline: 2px solid var(--lumina-accent); outline-offset: 4px; }
-      .lmc__bg {
-        position: absolute; inset: 0;
-        background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha));
-        backdrop-filter: blur(14px) saturate(1.4);
-        -webkit-backdrop-filter: blur(14px) saturate(1.4);
-        border: 1px solid var(--lumina-border);
-        border-radius: inherit;
+      @keyframes lmfb-enter { from { opacity: 0; transform: scale(0) rotate(-90deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
+      .lmfb__bg {
+        position: absolute; inset: 0; border-radius: inherit;
+        background: linear-gradient(135deg, rgb(var(--lumina-accent-rgb) / 0.9), rgb(var(--lumina-accent-rgb) / 0.6));
+        backdrop-filter: blur(14px) saturate(1.5);
+        -webkit-backdrop-filter: blur(14px) saturate(1.5);
+        box-shadow: 0 8px 24px -4px rgb(var(--lumina-accent-rgb) / 0.5), inset 0 1px 0 rgb(255 255 255 / 0.3);
         z-index: 0;
       }
-      .lmc__glow {
-        position: absolute; inset: -20%;
-        border-radius: inherit;
-        pointer-events: none; z-index: 0;
-        opacity: 0;
-        background: radial-gradient(60% 60% at 50% 50%, rgb(var(--lumina-accent-rgb) / 0.45), transparent 70%);
-        filter: blur(20px);
-        transition: opacity var(--lumina-speed) var(--lumina-ease-out);
+      .lmfb__glow {
+        position: absolute; inset: -25%; border-radius: inherit; pointer-events: none; z-index: 0;
+        opacity: 0; background: radial-gradient(circle, rgb(var(--lumina-accent-rgb) / 0.5), transparent 65%);
+        filter: blur(20px); transition: opacity var(--lumina-speed) var(--lumina-ease-out);
       }
-      .lmc__label { position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
-      :host(:hover) .lmc { transform: translateY(-2px) scale(1.02); }
-      :host(:hover) .lmc__glow { opacity: calc(0.6 * var(--lumina-intensity)); }
-      :host(:active) .lmc { transform: translateY(0) scale(0.97); }
-      @media (prefers-reduced-motion: reduce) {
-        .lmc, .lmc__glow { animation: none !important; transition: none !important; }
+      .lmfb__icon {
+        position: relative; z-index: 1; font-size: 22px; width: 56px; height: 56px;
+        display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
       }
-
-      :host([variant="aura"]) .lmc { animation: lmc-float 4s ease-in-out infinite; }
-      :host([variant="aura"]) .lmc__glow { opacity: calc(0.3 * var(--lumina-intensity)); }
-      @keyframes lmc-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
-
-      :host([variant="extended"]) .lmc { padding: 0 22px; height: 56px; border-radius: var(--lumina-radius-pill); }
-`;
+      .lmfb__label {
+        position: relative; z-index: 1; font-size: 14px; font-weight: 600; white-space: nowrap;
+        max-width: 0; opacity: 0; overflow: hidden; transition: max-width var(--lumina-speed) var(--lumina-ease-spring), opacity var(--lumina-speed) var(--lumina-ease-out), padding var(--lumina-speed) var(--lumina-ease-spring);
+        padding-right: 0;
+      }
+      :host([extended]) .lmfb__label { max-width: 200px; opacity: 1; padding-right: 20px; }
+      :host([extended]) .lmfb { min-width: auto; }
+      :host(:hover) .lmfb { transform: translateY(-4px) scale(1.04); box-shadow: 0 14px 36px -6px rgb(var(--lumina-accent-rgb) / 0.6); }
+      :host(:hover) .lmfb__glow { opacity: calc(0.7 * var(--lumina-intensity)); }
+      :host(:active) .lmfb { transform: translateY(-2px) scale(0.98); }
+      :host(:focus-visible) { outline: 2px solid var(--lumina-accent); outline-offset: 4px; }
+      :host([position="bottom-right"]) { bottom: 24px; right: 24px; }
+      :host([position="bottom-left"])  { bottom: 24px; left: 24px; }
+      :host([position="top-right"])    { top: 24px; right: 24px; }
+      :host([position="top-left"])     { top: 24px; left: 24px; }
+      :host([variant="aura"]) .lmfb { animation: lmfb-enter calc(var(--lumina-speed) * 2) var(--lumina-ease-spring), lmfb-float 4s ease-in-out infinite calc(var(--lumina-speed) * 2); }
+      @keyframes lmfb-float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+      @media (prefers-reduced-motion: reduce) { .lmfb { animation: none !important; transition: none !important; } }
+    `;
   }
-
   protected mounted(): void {
-    const btn = this.$$('.lmc');
-    btn?.addEventListener('click', () => this.emit('lumina-click'));
-    btn?.addEventListener('focus', () => this.emit('lumina-focus'));
-    btn?.addEventListener('blur', () => this.emit('lumina-blur'));
-    btn?.addEventListener('pointerenter', () => this.emit('lumina-hover-start'));
-    btn?.addEventListener('pointerleave', () => this.emit('lumina-hover-end'));
+    this._extended = this.hasAttribute('extended');
+    this._position = coerceAttr(this.getAttribute('position'), POSITIONS, 'bottom-right');
+    this.applyPosition();
+    this.setAttribute('role', 'button');
+    this.setAttribute('tabindex', '0');
+    this.$$('.lmfb')?.addEventListener('click', () => this.dispatchEvent(new CustomEvent('lumina-click', { bubbles: true, composed: true })));
   }
-
-  protected unmounted(): void {
-    // Listeners auto-cleaned by the host element removal.
+  protected unmounted(): void {}
+  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'extended') this._extended = value !== null;
+    else if (name === 'position') { this._position = coerceAttr(value, POSITIONS, 'bottom-right'); this.applyPosition(); }
   }
-
-  protected onConfigChange(_changed: any): void {
-    // Variants are CSS-driven; nothing to rebind here.
-  }
-
-  /** Dispatch a CustomEvent with composed bubbling. */
-  private emit(name: string, detail?: unknown): void {
-    this.dispatchEvent(new CustomEvent(name, { bubbles: true, composed: true, detail }));
-  }
-
-  /** For overlay-style components: open/close helpers. */
-  public open(): void {
-    this.setAttribute('open', '');
-    this.setAttribute('data-open', '');
-    this.emit('lumina-open');
-  }
-  public close(): void {
-    this.removeAttribute('open');
-    this.removeAttribute('data-open');
-    this.emit('lumina-close');
-  }
+  private applyPosition(): void { this.setAttribute('position', this._position); }
 }
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'lumina-fab': FloatingActionButton;
-  }
-}
-
-if (!customElements.get(FloatingActionButton.tagName)) {
-  customElements.define(FloatingActionButton.tagName, FloatingActionButton);
-}
+declare global { interface HTMLElementTagNameMap { 'lumina-fab': Fab } }
+if (!customElements.get(Fab.tagName)) customElements.define(Fab.tagName, Fab);
