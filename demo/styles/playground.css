@@ -743,7 +743,7 @@ body {
 
 .playground__info {
   margin-top: 20px;
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -989,7 +989,7 @@ body {
   align-items: flex-end;
 }
 .morph-lab__hint {
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(120, 240, 255, 0.05);
   border: 1px solid rgba(120, 240, 255, 0.15);
@@ -1061,7 +1061,7 @@ body {
 }
 .particle-physics__swatch:hover { transform: scale(1.15); }
 .particle-physics__hint {
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(120, 240, 255, 0.05);
   border: 1px solid rgba(120, 240, 255, 0.15);
@@ -1122,7 +1122,7 @@ body {
   cursor: pointer;
 }
 .depth-explorer__hint {
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(120, 240, 255, 0.05);
   border: 1px solid rgba(120, 240, 255, 0.15);
@@ -1165,7 +1165,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.3);
 }
@@ -1185,7 +1185,7 @@ body {
   padding: 20px;
 }
 .context-demo__hint {
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(120, 240, 255, 0.05);
   border: 1px solid rgba(120, 240, 255, 0.15);
@@ -1220,7 +1220,7 @@ body {
   margin-bottom: 20px;
 }
 .perf-bench__stat {
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.06);
@@ -1262,7 +1262,7 @@ body {
   justify-content: center;
 }
 .perf-bench__hint {
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(120, 240, 255, 0.05);
   border: 1px solid rgba(120, 240, 255, 0.15);
@@ -1338,7 +1338,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  padding: 16px;
+  padding: 12px;
   border-radius: 10px;
   background: rgba(0, 0, 0, 0.3);
   align-items: center;
@@ -1365,7 +1365,7 @@ body {
   border-radius: 4px;
 }
 .a11y__hint {
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(120, 240, 255, 0.05);
   border: 1px solid rgba(120, 240, 255, 0.15);
@@ -1910,7 +1910,7 @@ kbd {
 }
 .playground__gallery-row {
   margin-bottom: 16px;
-  padding: 16px;
+  padding: 12px;
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.025);
   border: 1px solid rgba(255, 255, 255, 0.06);
