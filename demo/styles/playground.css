@@ -730,8 +730,7 @@ body {
 .playground__preview-inner > * { width: 100%; max-width: 100%; }
 .playground__preview-inner > * { width: 100%; max-width: 100%; }
 .playground__code {
-  height: 500px;
-  height: 100%;
+  height: 500px !important;
   min-height: 0;
   overflow: hidden;
   display: flex;
