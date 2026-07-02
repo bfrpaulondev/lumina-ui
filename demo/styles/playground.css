@@ -1596,3 +1596,255 @@ kbd {
   .section-head__sub, p { color: #333 !important; }
   .gradient-text { -webkit-text-fill-color: #000 !important; color: #000 !important; }
 }
+
+/* ===== Variants Explorer — Comparator ===== */
+.variant-comparator {
+  margin-bottom: 48px;
+  padding: 28px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.variant-comparator__title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+}
+.variant-comparator__desc {
+  margin: 0 0 20px;
+  font-size: 14px;
+  color: rgba(245, 245, 255, 0.6);
+  line-height: 1.5;
+}
+.variant-comparator__intensity-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.variant-comparator__intensity-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(245, 245, 255, 0.5);
+  margin-right: 8px;
+}
+.variant-comparator__intensity-btn {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(245, 245, 255, 0.6);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font: 600 12px 'JetBrains Mono', monospace;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.variant-comparator__intensity-btn:hover {
+  background: rgba(124, 92, 255, 0.15);
+  color: #fff;
+}
+.variant-comparator__intensity-btn.is-active {
+  background: rgba(124, 92, 255, 0.3);
+  border-color: rgba(124, 92, 255, 0.6);
+  color: #fff;
+  box-shadow: 0 0 12px rgba(124, 92, 255, 0.3);
+}
+.variant-comparator__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.variant-comparator__cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 24px 16px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: border-color 0.3s;
+}
+.variant-comparator__cell:hover {
+  border-color: rgba(124, 92, 255, 0.2);
+}
+.variant-comparator__cell-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(245, 245, 255, 0.7);
+  text-transform: lowercase;
+}
+.variant-comparator__cell-demo {
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.variant-comparator__cell-link {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--lumina-accent, #7c5cff);
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+.variant-comparator__cell-link:hover {
+  opacity: 0.7;
+}
+@media (max-width: 800px) {
+  .variant-comparator__grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 480px) {
+  .variant-comparator__grid { grid-template-columns: 1fr !important; }
+}
+
+/* ===== Intensity Explainer ===== */
+.intensity-explainer {
+  margin-bottom: 48px;
+  padding: 28px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.intensity-explainer__title {
+  margin: 0 0 8px;
+  font-size: 22px;
+  font-weight: 700;
+}
+.intensity-explainer__title code {
+  font-family: 'JetBrains Mono', monospace;
+  color: #78f0ff;
+  background: rgba(120, 240, 255, 0.08);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 18px;
+}
+.intensity-explainer__intro {
+  margin: 0 0 24px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(245, 245, 255, 0.7);
+}
+.intensity-explainer__intro code {
+  font-family: 'JetBrains Mono', monospace;
+  color: #78f0ff;
+  background: rgba(120, 240, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 13px;
+}
+.intensity-explainer__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.intensity-explainer__card {
+  padding: 20px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  transition: all 0.3s;
+}
+.intensity-explainer__card.is-active {
+  border-color: rgba(124, 92, 255, 0.4);
+  box-shadow: 0 0 20px rgba(124, 92, 255, 0.15);
+}
+.intensity-explainer__card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.intensity-explainer__card-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+.intensity-explainer__card-mult {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: #7c5cff;
+  background: rgba(124, 92, 255, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+.intensity-explainer__card-desc {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: rgba(245, 245, 255, 0.6);
+  line-height: 1.4;
+}
+.intensity-explainer__card-effect {
+  margin: 0 0 16px;
+  font-size: 12px;
+  color: rgba(245, 245, 255, 0.5);
+  line-height: 1.5;
+}
+.intensity-explainer__card-demo {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0;
+}
+.intensity-explainer__tech {
+  padding: 20px;
+  border-radius: 12px;
+  background: rgba(120, 240, 255, 0.05);
+  border: 1px solid rgba(120, 240, 255, 0.15);
+}
+.intensity-explainer__tech h3 {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 700;
+}
+.intensity-explainer__tech p {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: rgba(245, 245, 255, 0.7);
+}
+.intensity-explainer__tech ul {
+  margin: 8px 0 12px;
+  padding-left: 20px;
+  font-size: 13px;
+  line-height: 1.7;
+  color: rgba(245, 245, 255, 0.7);
+}
+.intensity-explainer__tech code {
+  font-family: 'JetBrains Mono', monospace;
+  color: #78f0ff;
+  background: rgba(120, 240, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+.intensity-explainer__tech strong { color: #fff; }
+@media (max-width: 900px) {
+  .intensity-explainer__grid { grid-template-columns: repeat(2, 1fr) !important; }
+}
+@media (max-width: 480px) {
+  .intensity-explainer__grid { grid-template-columns: 1fr !important; }
+}
+
+/* ===== Variants Explorer section title ===== */
+.variants-explorer__section-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 20px;
+}
+
+/* ===== Playground link in variant detail ===== */
+.variant-detail__playground-link {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--lumina-accent, #7c5cff);
+  text-decoration: none;
+  margin-left: 12px;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+.variant-detail__playground-link:hover { opacity: 0.7; }

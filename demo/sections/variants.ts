@@ -1,6 +1,10 @@
 /**
  * Variants Explorer — deep technical breakdown of each variant.
- * v0.3.0 — uses local SHARED_VARIANTS (was previously in data/components.ts).
+ * v0.3.0 — redesigned with:
+ *   - Visual comparator (all 6 variants side-by-side)
+ *   - Interactive intensity selector (subtle/medium/intense/extreme)
+ *   - Links to playground with variant pre-selected
+ *   - Intensity explanation section
  */
 import type { Route } from '../app';
 import { el, sectionHead } from './_shared';
@@ -17,9 +21,9 @@ interface VariantInfo {
 const SHARED_VARIANTS: VariantInfo[] = [
   {
     name: 'glass',
-    visualDesc: 'Frosted glass with subtle blur, saturation boost and rim light.',
+    visualDesc: 'Vidro fosco com blur sutil, saturação reforçada e brilho de borda.',
     technicalDesc:
-      'Uses backdrop-filter: blur(14px) saturate(1.4) on a translucent surface, with inset highlight to simulate glass edge. Conic gradient ring reveals on hover.',
+      'Usa backdrop-filter: blur(14px) saturate(1.4) em uma superfície translúcida, com highlight inset para simular borda de vidro. Anel cônico aparece no hover.',
     recommended: { intensity: 'medium', depth: 'medium', accent: '#7c5cff' },
     useCases: [
       'Botões em landing pages premium',
@@ -35,9 +39,9 @@ const SHARED_VARIANTS: VariantInfo[] = [
   },
   {
     name: 'morph',
-    visualDesc: 'Shape-shifting polygon that morphs between pill and squircle on hover.',
+    visualDesc: 'Polígono que morfa entre pill e squircle no hover.',
     technicalDesc:
-      'Animates clip-path polygon() points with cubic-bezier(0.34, 1.56, 0.64, 1) spring easing. The element stays in normal flow; only the visual shape transforms.',
+      'Anima clip-path polygon() com cubic-bezier(0.34, 1.56, 0.64, 1) spring easing. O elemento fica no fluxo normal; só a forma visual se transforma.',
     recommended: { intensity: 'intense', depth: 'flat', accent: '#78f0ff' },
     useCases: [
       'Botões de call-to-action únicos',
@@ -53,9 +57,9 @@ const SHARED_VARIANTS: VariantInfo[] = [
   },
   {
     name: 'neural',
-    visualDesc: 'Translucent surface with a living network of connected particles.',
+    visualDesc: 'Superfície translúcida com rede viva de partículas conectadas.',
     technicalDesc:
-      'A canvas particle field runs behind the surface. Each particle drifts; pairs within 90px get a connecting line whose opacity scales with inverse distance. rAF-driven, HiDPI.',
+      'Um canvas com campo de partículas roda atrás da superfície. Cada partícula deriva; pares a menos de 90px recebem uma linha conectora cuja opacidade escala com a distância inversa. rAF-driven, HiDPI.',
     recommended: { intensity: 'intense', depth: 'medium', accent: '#ff6ec7' },
     useCases: [
       'Hero sections de produtos tech/IA',
@@ -71,9 +75,9 @@ const SHARED_VARIANTS: VariantInfo[] = [
   },
   {
     name: 'void',
-    visualDesc: 'Deep black surface with starfield and chromatic aberration glow.',
+    visualDesc: 'Superfície preta profunda com starfield e glow de aberração cromática.',
     technicalDesc:
-      'Background canvas renders wrap-around star points. Text gets text-shadow split into red and cyan channels (chromatic aberration). Border uses translucent accent at 0.2 alpha.',
+      'Background canvas renderiza pontos de estrela com wrap-around. Texto recebe text-shadow split em vermelho e ciano (aberração cromática). Borda usa accent translúcido a 0.2 alpha.',
     recommended: { intensity: 'extreme', depth: 'deep', accent: '#78f0ff' },
     useCases: [
       'Modos escuros premium / "pro tools"',
@@ -89,9 +93,9 @@ const SHARED_VARIANTS: VariantInfo[] = [
   },
   {
     name: 'aura',
-    visualDesc: 'Floating element with a soft radial aura that breathes around it.',
+    visualDesc: 'Elemento flutuante com aura radial suave que respira ao redor.',
     technicalDesc:
-      'A radial-gradient pseudo-element blurred 20px sits behind the surface. The host animates with a 4s translateY keyframe. On hover the aura intensifies by --lumina-intensity.',
+      'Um pseudo-elemento radial-gradient com blur 20px fica atrás da superfície. O host anima com keyframe translateY 4s. No hover a aura intensifica conforme --lumina-intensity.',
     recommended: { intensity: 'intense', depth: 'medium', accent: '#ffd166' },
     useCases: [
       'Hero CTAs que precisam "respirar"',
@@ -107,9 +111,9 @@ const SHARED_VARIANTS: VariantInfo[] = [
   },
   {
     name: 'dimensional',
-    visualDesc: '3D extruded element with parallax sheen and depth shadow.',
+    visualDesc: 'Elemento 3D extrudado com sheen de parallax e sombra de profundidade.',
     technicalDesc:
-      'Uses CSS transform-style: preserve-3d, perspective(800px) and rotateX/Y driven by pointer position. The bg carries a translateZ depth shadow using --lumina-depth. Sheen gradient on hover.',
+      'Usa CSS transform-style: preserve-3d, perspective(800px) e rotateX/Y controlados por pointer. O bg carrega translateZ depth shadow usando --lumina-depth. Sheen gradient no hover.',
     recommended: { intensity: 'intense', depth: 'deep', accent: '#7c5cff' },
     useCases: [
       'Cards de produto premium',
@@ -125,19 +129,121 @@ const SHARED_VARIANTS: VariantInfo[] = [
   },
 ];
 
+const INTENSITY_LEVELS = ['subtle', 'medium', 'intense', 'extreme'] as const;
+const INTENSITY_MULTIPLIERS: Record<string, number> = {
+  subtle: 0.4,
+  medium: 0.7,
+  intense: 1.0,
+  extreme: 1.6,
+};
+
+const INTENSITY_DESCRIPTIONS: Record<string, { title: string; desc: string; effect: string }> = {
+  subtle: {
+    title: 'Subtle (0.4x)',
+    desc: 'Efeitos visuais reduzidos a 40% da intensidade padrão.',
+    effect: 'Glow quase imperceptível, partículas raras, animações discretas. Ideal para interfaces profissionais onde o foco é conteúdo, não efeito.',
+  },
+  medium: {
+    title: 'Medium (0.7x)',
+    desc: 'Equilíbrio entre estética e discrição.',
+    effect: 'Glow visível mas contido, partículas moderadas, animações presentes mas não distractivas. Bom para uso geral em dashboards e apps.',
+  },
+  intense: {
+    title: 'Intense (1.0x)',
+    desc: 'Intensidade padrão — efeitos completos.',
+    effect: 'Glow forte, partículas abundantes, animações impactantes. Ideal para landing pages, showcases e demos onde o visual é o foco.',
+  },
+  extreme: {
+    title: 'Extreme (1.6x)',
+    desc: 'Efeitos exagerados a 160% — máximo impacto.',
+    effect: 'Glow muito intenso, partículas em quantidade máxima, animações dramáticas. Use com moderação — pode ser distractativo em uso diário.',
+  },
+};
+
 export default async function variantsSection(_route: Route): Promise<HTMLElement> {
   const root = el('div', { class: 'variants-explorer' });
 
   root.innerHTML = `
-    ${sectionHead('02', 'Variants Explorer', 'Cada variante é uma combinação única de técnicas visuais. Veja a descrição técnica, parâmetros recomendados, casos de uso e dicas de CSS.').outerHTML}
+    ${sectionHead('02', 'Variants Explorer', 'Compare as 6 variantes lado a lado, ajuste a intensidade em tempo real e veja descrições técnicas detalhadas.').outerHTML}
 
+    <!-- ===== VISUAL COMPARATOR ===== -->
+    <section class="variant-comparator" data-comparator>
+      <h2 class="variant-comparator__title">Comparador Visual</h2>
+      <p class="variant-comparator__desc">O mesmo componente em todas as 6 variantes. Mude a intensidade para ver como cada nível afeta o visual.</p>
+
+      <div class="variant-comparator__intensity-bar">
+        <span class="variant-comparator__intensity-label">Intensity:</span>
+        ${INTENSITY_LEVELS.map((level) => `
+          <button class="variant-comparator__intensity-btn ${level === 'intense' ? 'is-active' : ''}" data-intensity="${level}">
+            ${level}
+          </button>
+        `).join('')}
+      </div>
+
+      <div class="variant-comparator__grid" data-comparator-grid>
+        ${SHARED_VARIANTS.map((v) => `
+          <div class="variant-comparator__cell">
+            <div class="variant-comparator__cell-label">${v.name}</div>
+            <div class="variant-comparator__cell-demo">
+              <lumina-button variant="${v.name}" intensity="intense" accent-color="${v.recommended.accent ?? '#7c5cff'}" depth="${v.recommended.depth ?? 'medium'}" speed="0.45" theme="dark">${v.name}</lumina-button>
+            </div>
+            <a class="variant-comparator__cell-link" href="#/playground/lumina-button">Abrir no playground →</a>
+          </div>
+        `).join('')}
+      </div>
+    </section>
+
+    <!-- ===== INTENSITY EXPLAINER ===== -->
+    <section class="intensity-explainer" data-intensity-explainer>
+      <h2 class="intensity-explainer__title">O que é <code>intensity</code>?</h2>
+      <p class="intensity-explainer__intro">
+        O atributo <code>intensity</code> controla a intensidade de TODOS os efeitos visuais do componente — glow, partículas, animações, blur.
+        É um multiplicador global que escala de <strong>0.4x</strong> (subtle) a <strong>1.6x</strong> (extreme).
+        Internamente, ele seta a variável CSS <code>--lumina-intensity</code> que é usada em cálculos de opacidade, quantidade de partículas e força de glow.
+      </p>
+
+      <div class="intensity-explainer__grid">
+        ${INTENSITY_LEVELS.map((level) => {
+          const info = INTENSITY_DESCRIPTIONS[level];
+          return `
+            <div class="intensity-explainer__card ${level === 'intense' ? 'is-active' : ''}" data-intensity-card="${level}">
+              <div class="intensity-explainer__card-header">
+                <span class="intensity-explainer__card-name">${info.title}</span>
+                <span class="intensity-explainer__card-mult">${INTENSITY_MULTIPLIERS[level]}x</span>
+              </div>
+              <p class="intensity-explainer__card-desc">${info.desc}</p>
+              <p class="intensity-explainer__card-effect">${info.effect}</p>
+              <div class="intensity-explainer__card-demo">
+                <lumina-button variant="aura" intensity="${level}" accent-color="#ffd166" speed="0.5" theme="dark">${level}</lumina-button>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <div class="intensity-explainer__tech">
+        <h3>Como funciona tecnicamente</h3>
+        <p>O <code>intensity</code> é convertido para um número via <code>INTENSITY_MULTIPLIERS</code> e setado como <code>--lumina-intensity</code> no host. Componentes usam essa variável em:</p>
+        <ul>
+          <li><strong>Quantidade de partículas:</strong> <code>count = baseCount × --lumina-intensity</code></li>
+          <li><strong>Opacidade de glow:</strong> <code>opacity = baseOpacity × --lumina-intensity</code></li>
+          <li><strong>Força de blur:</strong> <code>blur = baseBlur × --lumina-intensity</code></li>
+          <li><strong>Escala de animação:</strong> <code>scale = baseScale × --lumina-intensity</code></li>
+        </ul>
+        <p>Isso significa que mudar <code>intensity</code> afeta todos os efeitos de forma consistente e proporcional.</p>
+      </div>
+    </section>
+
+    <!-- ===== DETAILED VARIANT CARDS ===== -->
+    <h2 class="variants-explorer__section-title">Detalhes por variante</h2>
     <div class="variants-explorer__list">
       ${SHARED_VARIANTS.map((v) => `
         <article class="variant-detail" id="variant-${v.name}">
           <header class="variant-detail__head">
             <div class="variant-detail__name">${v.name}</div>
             <div class="variant-detail__demo">
-              <lumina-button variant="${v.name}" intensity="${v.recommended.intensity ?? 'intense'}" accent-color="${v.recommended.accent ?? '#7c5cff'}" depth="${v.recommended.depth ?? 'medium'}" speed="0.45">${v.name}</lumina-button>
+              <lumina-button variant="${v.name}" intensity="${v.recommended.intensity ?? 'intense'}" accent-color="${v.recommended.accent ?? '#7c5cff'}" depth="${v.recommended.depth ?? 'medium'}" speed="0.45" theme="dark">${v.name}</lumina-button>
+              <a class="variant-detail__playground-link" href="#/playground/lumina-button">→ Playground</a>
             </div>
           </header>
 
@@ -175,6 +281,26 @@ export default async function variantsSection(_route: Route): Promise<HTMLElemen
       `).join('')}
     </div>
   `;
+
+  // ===== Wire up intensity selector in comparator =====
+  const comparatorGrid = root.querySelector('[data-comparator-grid]');
+  const intensityBtns = root.querySelectorAll('[data-intensity]');
+
+  intensityBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const level = (btn as HTMLElement).dataset.intensity!;
+      // Update active button
+      intensityBtns.forEach((b) => b.classList.toggle('is-active', b === btn));
+      // Update all buttons in comparator
+      comparatorGrid?.querySelectorAll('lumina-button').forEach((lb) => {
+        (lb as HTMLElement).setAttribute('intensity', level);
+      });
+      // Update intensity explainer cards
+      root.querySelectorAll('[data-intensity-card]').forEach((card) => {
+        card.classList.toggle('is-active', (card as HTMLElement).dataset.intensityCard === level);
+      });
+    });
+  });
 
   return root;
 }
