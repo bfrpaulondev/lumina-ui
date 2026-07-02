@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LuminaUI — Teste Externo dos 15 Botões</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body { background: #06060c; color: #f5f5ff; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; padding: 40px 24px; }
+      h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+      h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; color: #7c5cff; }
+      p { color: rgba(245,245,255,0.6); margin-bottom: 24px; font-size: 15px; line-height: 1.6; }
+      .btn-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 16px; }
+      .btn-row { margin-bottom: 32px; padding: 24px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
+      .btn-row h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+      .btn-row .desc { font-size: 13px; color: rgba(245,245,255,0.5); margin-bottom: 16px; }
+      .event-log { margin-top: 16px; padding: 12px 16px; border-radius: 8px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.06); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4ade80; max-height: 120px; overflow-y: auto; white-space: pre-wrap; }
+      .event-log:empty::before { content: '← Clique nos botões acima para ver os eventos aqui'; color: rgba(245,245,255,0.3); font-style: italic; }
+      .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-left: 8px; }
+      .badge-glass { background: rgba(124,92,255,0.2); color: #b4a5ff; }
+      .badge-morph { background: rgba(120,240,255,0.2); color: #78f0ff; }
+      .badge-neural { background: rgba(255,110,199,0.2); color: #ff6ec7; }
+      .badge-void { background: rgba(120,240,255,0.15); color: #78f0ff; }
+      .badge-aura { background: rgba(255,209,102,0.2); color: #ffd166; }
+      .badge-dimensional { background: rgba(124,92,255,0.2); color: #b4a5ff; }
+    </style>
+  </head>
+  <body>
+    <h1>🧪 Teste Externo — 15 Botões LuminaUI</h1>
+    <p>Esta página usa APENAS o código copiado do playground. Importa a lib via ESM CDN (esm.sh). Todos os eventos são logados no painel abaixo de cada botão.</p>
+
+    <script type="module">
+      import 'https://esm.sh/lumina-ui@latest';
+      
+      await Promise.all([
+        customElements.whenDefined('lumina-button'),
+        customElements.whenDefined('lumina-icon-button'),
+        customElements.whenDefined('lumina-fab'),
+        customElements.whenDefined('lumina-split-button'),
+        customElements.whenDefined('lumina-toggle-button'),
+        customElements.whenDefined('lumina-button-group'),
+        customElements.whenDefined('lumina-command-button'),
+        customElements.whenDefined('lumina-ripple-button'),
+        customElements.whenDefined('lumina-magnetic-button'),
+        customElements.whenDefined('lumina-breath-button'),
+        customElements.whenDefined('lumina-neural-button'),
+        customElements.whenDefined('lumina-portal-button'),
+        customElements.whenDefined('lumina-echo-button'),
+        customElements.whenDefined('lumina-morph-button'),
+        customElements.whenDefined('lumina-gesture-button'),
+      ]);
+
+      function logEvent(elementId, eventName, detail) {
+        const log = document.getElementById(elementId);
+        if (!log) return;
+        const time = new Date().toLocaleTimeString();
+        const detailStr = detail ? ' | detail: ' + JSON.stringify(detail) : '';
+        log.textContent = `[${time}] ${eventName}${detailStr}\n` + log.textContent;
+      }
+
+      function attachAll(selector, logId) {
+        const el = document.querySelector(selector);
+        if (!el) return;
+        const events = ['lumina-click','lumina-press','lumina-hover-start','lumina-hover-end','lumina-focus','lumina-blur','lumina-change','lumina-morph-start','lumina-morph-end','lumina-ripple','lumina-magnetic-start','lumina-portal-open','lumina-echo','lumina-shortcut','lumina-gesture','lumina-menu-open','lumina-menu-close','lumina-menu-select'];
+        events.forEach(evt => el.addEventListener(evt, (e) => logEvent(logId, evt, e.detail)));
+      }
+
+      attachAll('#btn1','log1'); attachAll('#btn2','log2'); attachAll('#btn3','log3');
+      attachAll('#btn4','log4'); attachAll('#btn5','log5'); attachAll('#btn7','log7');
+      attachAll('#btn8','log8'); attachAll('#btn9','log9'); attachAll('#btn10','log10');
+      attachAll('#btn11','log11'); attachAll('#btn12','log12'); attachAll('#btn13','log13');
+      attachAll('#btn14','log14'); attachAll('#btn15','log15');
+
+      // Button group
+      document.querySelector('#btn6')?.addEventListener('lumina-change', (e) => logEvent('log6','lumina-change',e.detail));
+
+      // Split button alert
+      document.querySelector('#btn4')?.addEventListener('lumina-menu-select', (e) => alert('Selecionou: ' + e.detail.label));
+
+      console.log('✅ Todos os 15 botões LuminaUI carregados!');
+    </script>
+
+    <div class="btn-row">
+      <h3>1. LuminaButton <span class="badge badge-glass">6 variantes</span></h3>
+      <p class="desc">Botão principal com 6 variantes. Clique para ver lumina-press + burst de partículas.</p>
+      <div class="btn-grid">
+        <lumina-button id="btn1" variant="glass" intensity="intense" accent-color="#7c5cff" speed="0.45" theme="dark">Glass</lumina-button>
+        <lumina-button variant="morph" intensity="intense" accent-color="#78f0ff" speed="0.45" theme="dark">Morph</lumina-button>
+        <lumina-button variant="neural" intensity="intense" accent-color="#ff6ec7" speed="0.5" theme="dark">Neural</lumina-button>
+        <lumina-button variant="void" intensity="extreme" accent-color="#78f0ff" speed="0.4" theme="dark">Void</lumina-button>
+        <lumina-button variant="aura" intensity="intense" accent-color="#ffd166" speed="0.5" theme="dark">Aura</lumina-button>
+        <lumina-button variant="dimensional" intensity="intense" accent-color="#7c5cff" depth="deep" speed="0.45" theme="dark">Dimensional</lumina-button>
+      </div>
+      <div class="event-log" id="log1"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>2. LuminaIconButton <span class="badge badge-glass">4 variantes</span></h3>
+      <p class="desc">Botão de ícone com glow circular e partículas. Tamanhos sm/md/lg.</p>
+      <div class="btn-grid">
+        <lumina-icon-button id="btn2" variant="glass" size="sm" intensity="intense" accent-color="#78f0ff" theme="dark">⚙</lumina-icon-button>
+        <lumina-icon-button variant="neural" size="md" intensity="intense" accent-color="#ff6ec7" theme="dark">★</lumina-icon-button>
+        <lumina-icon-button variant="aura" size="lg" intensity="intense" accent-color="#ffd166" theme="dark">♥</lumina-icon-button>
+        <lumina-icon-button variant="minimal" size="md" intensity="medium" accent-color="#7c5cff" theme="dark">☰</lumina-icon-button>
+      </div>
+      <div class="event-log" id="log2"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>3. LuminaFAB <span class="badge badge-glass">4 variantes</span></h3>
+      <p class="desc">Floating Action Button. O extended mostra texto. Posicionamento fixo no canto.</p>
+      <div class="btn-grid">
+        <lumina-fab variant="glass" accent-color="#7c5cff" theme="dark">+</lumina-fab>
+        <lumina-fab variant="neural" accent-color="#ff6ec7" theme="dark">★</lumina-fab>
+        <lumina-fab variant="aura" accent-color="#ffd166" theme="dark">♥</lumina-fab>
+      </div>
+      <lumina-fab id="btn3" variant="extended" accent-color="#7c5cff" theme="dark" style="position:fixed;bottom:24px;right:24px;">+<span slot="label">Nova tarefa</span></lumina-fab>
+      <div class="event-log" id="log3"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>4. LuminaSplitButton <span class="badge badge-glass">3 variantes</span></h3>
+      <p class="desc">Ação principal + menu dropdown. Clique na seta para abrir o menu.</p>
+      <div class="btn-grid">
+        <lumina-split-button id="btn4" variant="glass" intensity="intense" accent-color="#7c5cff" theme="dark" menu-items='[{"label":"Editar","icon":"✎","value":"edit"},{"label":"Duplicar","icon":"⧉","value":"dup"},{"label":"Excluir","icon":"✕","value":"del"}]'>Salvar</lumina-split-button>
+      </div>
+      <div class="event-log" id="log4"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>5. LuminaToggleButton <span class="badge badge-glass">3 variantes</span></h3>
+      <p class="desc">Botão que alterna pressed/released. Clique para ver o glow mudar + partículas.</p>
+      <div class="btn-grid">
+        <lumina-toggle-button id="btn5" variant="glass" intensity="intense" accent-color="#ffd166" theme="dark">Modo escuro</lumina-toggle-button>
+        <lumina-toggle-button variant="neural" intensity="intense" accent-color="#ff6ec7" pressed theme="dark">Neural ON</lumina-toggle-button>
+        <lumina-toggle-button variant="aura" intensity="intense" accent-color="#7c5cff" theme="dark">Aura</lumina-toggle-button>
+      </div>
+      <div class="event-log" id="log5"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>6. LuminaButtonGroup <span class="badge badge-glass">3 variantes</span></h3>
+      <p class="desc">Grupo de botões conectados. Clique para selecionar.</p>
+      <div class="btn-grid">
+        <lumina-button-group id="btn6" variant="segmented" value="b" theme="dark" accent-color="#7c5cff" intensity="intense">
+          <button data-value="a">A</button>
+          <button data-value="b">B</button>
+          <button data-value="c">C</button>
+        </lumina-button-group>
+      </div>
+      <div class="event-log" id="log6"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>7. LuminaCommandButton <span class="badge badge-glass">3 variantes</span></h3>
+      <p class="desc">Botão com atalho de teclado. Tente pressionar Cmd+K (ou Ctrl+K)!</p>
+      <div class="btn-grid">
+        <lumina-command-button id="btn7" variant="glass" intensity="intense" accent-color="#78f0ff" shortcut="⌘K" theme="dark">Buscar comandos</lumina-command-button>
+        <lumina-command-button variant="neural" intensity="intense" accent-color="#ff6ec7" shortcut="Ctrl+S" theme="dark">Salvar</lumina-command-button>
+      </div>
+      <div class="event-log" id="log7"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>8. LuminaRippleButton <span class="badge badge-glass">3 variantes</span></h3>
+      <p class="desc">Ripple expansivo no ponto exato do clique.</p>
+      <div class="btn-grid">
+        <lumina-ripple-button id="btn8" variant="glass" intensity="intense" accent-color="#7c5cff" ripple-duration="800" theme="dark">Clique aqui</lumina-ripple-button>
+        <lumina-ripple-button variant="neural" intensity="intense" accent-color="#ff6ec7" theme="dark">Neural ripple</lumina-ripple-button>
+      </div>
+      <div class="event-log" id="log8"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>9. LuminaMagneticButton <span class="badge badge-glass">3 variantes</span></h3>
+      <p class="desc">Atrai o cursor! Aproxime o mouse para sentir o efeito magnético.</p>
+      <div class="btn-grid">
+        <lumina-magnetic-button id="btn9" variant="glass" intensity="intense" accent-color="#ff6ec7" magnetic-strength="0.5" theme="dark">Aproxime o cursor</lumina-magnetic-button>
+      </div>
+      <div class="event-log" id="log9"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>10. LuminaBreathButton <span class="badge badge-aura">3 variantes</span></h3>
+      <p class="desc">Respira em loop contínuo. Passe o cursor para pausar.</p>
+      <div class="btn-grid">
+        <lumina-breath-button id="btn10" variant="aura" intensity="intense" accent-color="#ffd166" theme="dark">Respirando...</lumina-breath-button>
+        <lumina-breath-button variant="subtle" intensity="medium" accent-color="#7c5cff" theme="dark">Subtle breath</lumina-breath-button>
+      </div>
+      <div class="event-log" id="log10"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>11. LuminaNeuralButton <span class="badge badge-neural">3 variantes</span></h3>
+      <p class="desc">Rede neural visível por trás do botão. Partículas conectadas por linhas.</p>
+      <div class="btn-grid">
+        <lumina-neural-button id="btn11" variant="neural" intensity="intense" accent-color="#ff6ec7" particle-count="25" theme="dark">Neural</lumina-neural-button>
+        <lumina-neural-button variant="intense" intensity="extreme" accent-color="#7c5cff" particle-count="30" theme="dark">Intense</lumina-neural-button>
+      </div>
+      <div class="event-log" id="log11"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>12. LuminaPortalButton <span class="badge badge-void">3 variantes</span></h3>
+      <p class="desc">Efeito de portal dimensional ao clicar — swirl + partículas sugadas.</p>
+      <div class="btn-grid">
+        <lumina-portal-button id="btn12" variant="void" intensity="extreme" accent-color="#78f0ff" theme="dark">Entrar no portal</lumina-portal-button>
+        <lumina-portal-button variant="dimensional" intensity="intense" accent-color="#7c5cff" theme="dark">Dimensional portal</lumina-portal-button>
+      </div>
+      <div class="event-log" id="log12"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>13. LuminaEchoButton <span class="badge badge-glass">3 variantes</span></h3>
+      <p class="desc">Ondas concêntricas se expandem a partir do clique.</p>
+      <div class="btn-grid">
+        <lumina-echo-button id="btn13" variant="glass" intensity="intense" accent-color="#7c5cff" echo-count="3" theme="dark">Eco</lumina-echo-button>
+        <lumina-echo-button variant="aura" intensity="intense" accent-color="#ffd166" echo-count="5" theme="dark">Aura echo</lumina-echo-button>
+      </div>
+      <div class="event-log" id="log13"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>14. LuminaMorphButton <span class="badge badge-morph">3 variantes</span></h3>
+      <p class="desc">Morphs de forma no hover. Passe o cursor para ver o clip-path mudar!</p>
+      <div class="btn-grid">
+        <lumina-morph-button id="btn14" variant="morph" intensity="intense" accent-color="#7c5cff" from="pill" to="hexagon" theme="dark">Morph</lumina-morph-button>
+        <lumina-morph-button variant="glass" intensity="intense" accent-color="#78f0ff" from="squircle" to="star" theme="dark">Star morph</lumina-morph-button>
+      </div>
+      <div class="event-log" id="log14"></div>
+    </div>
+
+    <div class="btn-row">
+      <h3>15. LuminaGestureButton <span class="badge badge-neural">3 variantes</span></h3>
+      <p class="desc">Reconhece gestos: hold (segure 0.5s), swipe (arraste), double-tap (2x rápido).</p>
+      <div class="btn-grid">
+        <lumina-gesture-button id="btn15" variant="neural" intensity="intense" accent-color="#ff6ec7" gestures="hold,swipe,double-tap" theme="dark">Toque • segure • arraste</lumina-gesture-button>
+      </div>
+      <div class="event-log" id="log15"></div>
+    </div>
+
+    <p style="text-align:center; margin-top:48px; color:rgba(245,245,255,0.3); font-size:13px;">
+      Esta página usa <code style="color:#78f0ff;">import 'https://esm.sh/lumina-ui@latest'</code> — sem build, sem npm, sem React. Apenas HTML + JS puro.
+    </p>
+  </body>
+</html>
