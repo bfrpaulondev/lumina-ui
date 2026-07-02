@@ -1,11 +1,14 @@
 /**
- * LuminaUI — CodeViewer with Monaco (v2 — robust layout, no white flash).
+ * LuminaUI — CodeViewer with Monaco (v3 — Light DOM, no shadow root).
  *
- * Improvements:
- *  - Dark placeholder that matches the editor background (no white flash).
- *  - ResizeObserver to call editor.layout() when container resizes.
- *  - Exposes `editor` so parent can call layout() after route changes.
- *  - Stricter container styling (no flex bleed-through).
+ * Critical fix: Monaco injects its CSS into document <head>, but those rules
+ * don't pierce Shadow DOM. The internal <textarea class="inputarea"> ended up
+ * with user-agent defaults (white bg, gray border, position:static) — showing
+ * as a thin white horizontal bar across the editor area.
+ *
+ * Solution: render the CodeViewer in Light DOM so Monaco's CSS works.
+ * We still isolate our own styles by namespacing every class with
+ * `.lumina-cv__*` and scoping via the host selector.
  */
 
 import { loadMonaco } from '../monaco';
@@ -19,9 +22,12 @@ const styles = `
   background: #0b0b14;
   border-radius: 12px;
   overflow: hidden;
-  /* No border on host — parent .playground__code already has one */
 }
-.code-viewer__head {
+
+/* All LuminaUI-controlled UI is prefixed with .lumina-cv__ so we don't
+   leak styles to/from the host page. Monaco's own classes (.monaco-*)
+   are managed by Monaco's own CSS. */
+.lumina-cv__head {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -30,8 +36,10 @@ const styles = `
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   height: 38px;
   box-sizing: border-box;
+  position: relative;
+  z-index: 2;
 }
-.code-viewer__tab {
+.lumina-cv__tab {
   appearance: none;
   border: 0;
   background: transparent;
@@ -43,13 +51,13 @@ const styles = `
   letter-spacing: 0.02em;
   transition: background 0.2s, color 0.2s;
 }
-.code-viewer__tab:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
-.code-viewer__tab[data-active="true"] {
+.lumina-cv__tab:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+.lumina-cv__tab[data-active="true"] {
   background: rgba(124, 92, 255, 0.18);
   color: #fff;
 }
-.code-viewer__spacer { flex: 1; }
-.code-viewer__action {
+.lumina-cv__spacer { flex: 1; }
+.lumina-cv__action {
   appearance: none;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
@@ -62,14 +70,15 @@ const styles = `
   text-transform: uppercase;
   transition: background 0.2s, color 0.2s;
 }
-.code-viewer__action:hover { background: rgba(124, 92, 255, 0.2); color: #fff; }
-.code-viewer__action[data-copied] {
+.lumina-cv__action:hover { background: rgba(124, 92, 255, 0.2); color: #fff; }
+.lumina-cv__action[data-copied] {
   background: rgba(34, 197, 94, 0.2);
   border-color: rgba(34, 197, 94, 0.4);
   color: #4ade80;
 }
+
 /* Container is the editor mount point — explicit dark bg, no white flash */
-.code-viewer__container {
+.lumina-cv__container {
   position: absolute;
   top: 38px;
   left: 0;
@@ -78,7 +87,7 @@ const styles = `
   background: #0b0b14;
   overflow: hidden;
 }
-.code-viewer__loading {
+.lumina-cv__loading {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,6 +97,26 @@ const styles = `
   font: 500 13px 'JetBrains Mono', monospace;
   font-style: italic;
   background: #0b0b14;
+}
+
+/* === Monaco fix — force the internal textarea to be transparent ===
+   This overrides Monaco's defaults that may not apply if Monaco's CSS
+   didn't load fully, or if user-agent defaults bleed through. */
+.lumina-cv__container .monaco-editor .inputarea {
+  background: transparent !important;
+  color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  position: absolute !important;
+  opacity: 0 !important;
+  overflow: hidden !important;
+  resize: none !important;
+}
+/* Make sure the editor background stays dark even if Monaco's CSS lags */
+.lumina-cv__container .monaco-editor,
+.lumina-cv__container .monaco-editor-background,
+.lumina-cv__container .monaco-editor .margin {
+  background-color: #0b0b14 !important;
 }
 `;
 
@@ -101,20 +130,18 @@ export interface CodeViewerTab {
 export class CodeViewer extends HTMLElement {
   static tagName = 'lumina-code-viewer';
 
-  private shadow: ShadowRoot;
   private editor: any = null;
   private tabs: CodeViewerTab[] = [];
   private activeTabId = '';
   private onChangeCb: ((code: string, tabId: string) => void) | null = null;
   private resizeObserver: ResizeObserver | null = null;
   private containerEl: HTMLElement | null = null;
+  private styleSheetEl: HTMLStyleElement | null = null;
 
   constructor() {
     super();
-    this.shadow = this.attachShadow({ mode: 'open' });
-    const sheet = new CSSStyleSheet();
-    sheet.replaceSync(styles);
-    this.shadow.adoptedStyleSheets = [sheet];
+    // NO shadow root — use light DOM so Monaco's CSS (injected into <head>)
+    // can style its own internals.
   }
 
   /** Expose editor so parent can call .layout() if needed. */
@@ -143,7 +170,10 @@ export class CodeViewer extends HTMLElement {
   relayout(): void {
     if (this.editor && this.containerEl) {
       try {
-        this.editor.layout({ width: this.containerEl.clientWidth, height: this.containerEl.clientHeight });
+        this.editor.layout({
+          width: this.containerEl.clientWidth,
+          height: this.containerEl.clientHeight,
+        });
       } catch {
         /* noop */
       }
@@ -151,30 +181,39 @@ export class CodeViewer extends HTMLElement {
   }
 
   private renderShell(): void {
+    // Inject our styles into document head (once)
+    if (!document.getElementById('lumina-cv-styles')) {
+      const style = document.createElement('style');
+      style.id = 'lumina-cv-styles';
+      style.textContent = styles;
+      document.head.appendChild(style);
+      this.styleSheetEl = style;
+    }
+
     const tabsHtml = this.tabs
       .map(
         (t) =>
-          `<button class="code-viewer__tab" data-tab="${t.id}" data-active="${t.id === this.activeTabId}">${t.label}</button>`,
+          `<button class="lumina-cv__tab" data-tab="${t.id}" data-active="${t.id === this.activeTabId}">${t.label}</button>`,
       )
       .join('');
-    this.shadow.innerHTML = `
-      <div class="code-viewer__head">
+    this.innerHTML = `
+      <div class="lumina-cv__head">
         ${tabsHtml}
-        <div class="code-viewer__spacer"></div>
-        <button class="code-viewer__action" data-action="copy">Copiar</button>
-        <button class="code-viewer__action" data-action="reset">Reset</button>
+        <div class="lumina-cv__spacer"></div>
+        <button class="lumina-cv__action" data-action="copy">Copiar</button>
+        <button class="lumina-cv__action" data-action="reset">Reset</button>
       </div>
-      <div class="code-viewer__container">
-        <div class="code-viewer__loading">Carregando editor…</div>
+      <div class="lumina-cv__container">
+        <div class="lumina-cv__loading">Carregando editor…</div>
       </div>
     `;
-    this.shadow.querySelectorAll('.code-viewer__tab').forEach((btn) => {
+    this.querySelectorAll('.lumina-cv__tab').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const id = (e.currentTarget as HTMLElement).dataset.tab!;
         this.switchTab(id);
       });
     });
-    this.shadow.querySelector('[data-action="copy"]')?.addEventListener('click', (e) => {
+    this.querySelector('[data-action="copy"]')?.addEventListener('click', (e) => {
       const btn = e.currentTarget as HTMLButtonElement;
       const code = this.getCode();
       const onDone = () => {
@@ -196,7 +235,7 @@ export class CodeViewer extends HTMLElement {
         onDone();
       }
     });
-    this.shadow.querySelector('[data-action="reset"]')?.addEventListener('click', () => {
+    this.querySelector('[data-action="reset"]')?.addEventListener('click', () => {
       const tab = this.tabs.find((t) => t.id === this.activeTabId);
       if (tab && this.editor) this.editor.setValue(tab.code);
     });
@@ -216,7 +255,7 @@ export class CodeViewer extends HTMLElement {
   }
 
   private async initEditor(): Promise<void> {
-    const container = this.shadow.querySelector('.code-viewer__container') as HTMLElement;
+    const container = this.querySelector('.lumina-cv__container') as HTMLElement;
     if (!container) return;
     this.containerEl = container;
     const monaco = await loadMonaco();
@@ -253,7 +292,7 @@ export class CodeViewer extends HTMLElement {
       return;
     }
 
-    // Define custom theme BEFORE creating the editor (prevents white flash from vs-dark default)
+    // Define custom theme BEFORE creating the editor (prevents white flash)
     monaco.editor.defineTheme('lumina-dark', {
       base: 'vs-dark',
       inherit: true,
@@ -273,7 +312,7 @@ export class CodeViewer extends HTMLElement {
       value: tab.code,
       language: tab.language,
       theme: 'lumina-dark',
-      automaticLayout: false, // we use ResizeObserver instead (more reliable)
+      automaticLayout: false,
       fontSize: 12.5,
       fontFamily: "'JetBrains Mono', ui-monospace, monospace",
       fontLigatures: true,
@@ -291,7 +330,7 @@ export class CodeViewer extends HTMLElement {
       if (this.onChangeCb) this.onChangeCb(this.getCode(), this.activeTabId);
     });
 
-    // Reliable layout via ResizeObserver — fires when container size changes
+    // Reliable layout via ResizeObserver
     if (typeof ResizeObserver !== 'undefined') {
       this.resizeObserver = new ResizeObserver(() => {
         if (this.editor && this.containerEl) {
@@ -306,20 +345,19 @@ export class CodeViewer extends HTMLElement {
       this.resizeObserver.observe(container);
     }
 
-    // Initial layout (after a microtask to ensure DOM is settled)
+    // Initial layout
     requestAnimationFrame(() => this.relayout());
   }
 
   private switchTab(id: string): void {
     if (id === this.activeTabId || !this.editor) return;
     this.activeTabId = id;
-    this.shadow.querySelectorAll('.code-viewer__tab').forEach((btn) => {
-      (btn as HTMLElement).dataset.active = String(btn === this.shadow.querySelector(`[data-tab="${id}"]`));
+    this.querySelectorAll('.lumina-cv__tab').forEach((btn) => {
+      (btn as HTMLElement).dataset.active = String(btn === this.querySelector(`[data-tab="${id}"]`));
     });
     const tab = this.tabs.find((t) => t.id === id);
     if (tab) {
       this.editor.setValue(tab.code);
-      // Update language by creating a new model
       try {
         const monacoNs = (window as any).monaco;
         if (monacoNs) {
@@ -340,6 +378,7 @@ export class CodeViewer extends HTMLElement {
       try { this.editor.dispose(); } catch { /* noop */ }
       this.editor = null;
     }
+    // Don't remove the global <style> — other CodeViewers may still be using it.
   }
 }
 
