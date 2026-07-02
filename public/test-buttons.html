@@ -3,42 +3,54 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>LuminaUI — Teste Externo dos 15 Botões</title>
+    <title>LuminaUI — Button Power Lab</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
     <style>
       * { box-sizing: border-box; margin: 0; padding: 0; }
-      body { background: #06060c; color: #f5f5ff; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; padding: 40px 24px; }
+      body { background: #06060c; color: #f5f5ff; font-family: 'Inter', system-ui, sans-serif; min-height: 100vh; padding: 40px 24px 80px; }
       h1 { font-size: 32px; font-weight: 800; margin-bottom: 8px; }
-      h2 { font-size: 20px; font-weight: 700; margin: 40px 0 16px; color: #7c5cff; }
-      p { color: rgba(245,245,255,0.6); margin-bottom: 24px; font-size: 15px; line-height: 1.6; }
-      .btn-grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 16px; }
-      .btn-row { margin-bottom: 32px; padding: 24px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
-      .btn-row h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-      .btn-row .desc { font-size: 13px; color: rgba(245,245,255,0.5); margin-bottom: 16px; }
-      .event-log { margin-top: 16px; padding: 12px 16px; border-radius: 8px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.06); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4ade80; max-height: 120px; overflow-y: auto; white-space: pre-wrap; }
-      .event-log:empty::before { content: '← Clique nos botões acima para ver os eventos aqui'; color: rgba(245,245,255,0.3); font-style: italic; }
-      .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-left: 8px; }
-      .badge-glass { background: rgba(124,92,255,0.2); color: #b4a5ff; }
-      .badge-morph { background: rgba(120,240,255,0.2); color: #78f0ff; }
-      .badge-neural { background: rgba(255,110,199,0.2); color: #ff6ec7; }
-      .badge-void { background: rgba(120,240,255,0.15); color: #78f0ff; }
-      .badge-aura { background: rgba(255,209,102,0.2); color: #ffd166; }
-      .badge-dimensional { background: rgba(124,92,255,0.2); color: #b4a5ff; }
+      h2 { font-size: 22px; font-weight: 700; margin: 48px 0 8px; color: #7c5cff; }
+      p { color: rgba(245,245,255,0.6); margin-bottom: 20px; font-size: 15px; line-height: 1.6; }
+      .grid { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; margin-bottom: 8px; }
+      .section { margin-bottom: 32px; padding: 24px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); }
+      .section h3 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+      .section .desc { font-size: 13px; color: rgba(245,245,255,0.5); margin-bottom: 16px; }
+      .code-tabs { display: flex; gap: 4px; margin-top: 16px; margin-bottom: 0; }
+      .code-tab { appearance: none; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: rgba(245,245,255,0.5); padding: 6px 14px; border-radius: 8px 8px 0 0; cursor: pointer; font: 600 12px 'Inter',sans-serif; transition: all 0.2s; }
+      .code-tab.is-active { background: rgba(124,92,255,0.15); border-color: rgba(124,92,255,0.3); color: #fff; }
+      .code-block { background: #0b0b14; border: 1px solid rgba(255,255,255,0.08); border-radius: 0 8px 8px 8px; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 12.5px; line-height: 1.55; color: #e8e8f5; overflow-x: auto; white-space: pre; position: relative; }
+      .code-block hidden { display: none; }
+      .copy-btn { position: absolute; top: 8px; right: 8px; appearance: none; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.06); color: rgba(245,245,255,0.7); padding: 4px 10px; border-radius: 6px; cursor: pointer; font: 600 11px 'Inter',sans-serif; transition: all 0.2s; }
+      .copy-btn:hover { background: rgba(124,92,255,0.2); color: #fff; }
+      .copy-btn.copied { background: rgba(34,197,94,0.2); border-color: rgba(34,197,94,0.4); color: #4ade80; }
+      .console { margin-top: 16px; padding: 16px; border-radius: 8px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #4ade80; max-height: 180px; overflow-y: auto; white-space: pre-wrap; }
+      .console:empty::before { content: '💡 Clique, dê duplo clique, ou use os botões acima. Os eventos aparecem aqui em tempo real.'; color: rgba(245,245,255,0.3); font-style: italic; }
+      .console .ts { color: rgba(245,245,255,0.4); }
+      .console .evt { color: #7c5cff; font-weight: 700; }
+      .console .det { color: #78f0ff; }
+      .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; margin-left: 8px; background: rgba(124,92,255,0.2); color: #b4a5ff; }
+      .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+      .control { display: flex; flex-direction: column; gap: 4px; }
+      .control label { font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: rgba(245,245,255,0.5); }
+      .control select, .control input[type="color"] { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #fff; padding: 6px 10px; font: 500 13px 'Inter',sans-serif; }
+      .control select { height: 34px; }
+      .control input[type="color"] { width: 50px; height: 34px; padding: 2px; cursor: pointer; }
+      .live-demo { display: flex; justify-content: center; align-items: center; min-height: 80px; padding: 24px; border-radius: 12px; background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.06); margin-bottom: 16px; }
     </style>
   </head>
   <body>
-    <h1>🧪 Teste Externo — 15 Botões LuminaUI</h1>
-    <p>Esta página usa APENAS o código copiado do playground. Importa a lib via ESM CDN (esm.sh). Todos os eventos são logados no painel abaixo de cada botão.</p>
+    <h1>🧪 Button Power Lab</h1>
+    <p>O poder puro de HTML, CSS e JavaScript. Cada botão abaixo é um Web Component real — sem React, sem Vue, sem framework. Copie o código e cole no seu projeto.</p>
+
+    <script type="module" src="./lumina-ui.js"></script>
 
     <script type="module">
-      import './lumina-ui.js';
-      
+      // Wait for all button components to be defined
       await Promise.all([
         customElements.whenDefined('lumina-button'),
         customElements.whenDefined('lumina-icon-button'),
-        customElements.whenDefined('lumina-fab'),
         customElements.whenDefined('lumina-split-button'),
         customElements.whenDefined('lumina-toggle-button'),
         customElements.whenDefined('lumina-button-group'),
@@ -53,197 +65,744 @@
         customElements.whenDefined('lumina-gesture-button'),
       ]);
 
-      function logEvent(elementId, eventName, detail) {
-        const log = document.getElementById(elementId);
-        if (!log) return;
+      // ===== Global Console =====
+      function logToConsole(consoleId, eventName, detail) {
+        const c = document.getElementById(consoleId);
+        if (!c) return;
         const time = new Date().toLocaleTimeString();
-        const detailStr = detail ? ' | detail: ' + JSON.stringify(detail) : '';
-        log.textContent = `[${time}] ${eventName}${detailStr}\n` + log.textContent;
+        const detailStr = detail ? ` <span class="det">detail: ${JSON.stringify(detail)}</span>` : '';
+        c.innerHTML += `<span class="ts">[${time}]</span> <span class="evt">${eventName}</span>${detailStr}\n`;
+        c.scrollTop = c.scrollHeight;
       }
 
-      function attachAll(selector, logId) {
+      function attachAllEvents(selector, consoleId) {
         const el = document.querySelector(selector);
         if (!el) return;
-        const events = ['lumina-click','lumina-press','lumina-hover-start','lumina-hover-end','lumina-focus','lumina-blur','lumina-change','lumina-morph-start','lumina-morph-end','lumina-ripple','lumina-magnetic-start','lumina-portal-open','lumina-echo','lumina-shortcut','lumina-gesture','lumina-menu-open','lumina-menu-close','lumina-menu-select'];
-        events.forEach(evt => el.addEventListener(evt, (e) => logEvent(logId, evt, e.detail)));
+        const events = [
+          'lumina-click', 'lumina-press', 'lumina-hover-start', 'lumina-hover-end',
+          'lumina-focus', 'lumina-blur', 'lumina-change', 'lumina-ripple',
+          'lumina-magnetic-start', 'lumina-portal-open', 'lumina-echo',
+          'lumina-shortcut', 'lumina-gesture', 'lumina-menu-open', 'lumina-menu-close',
+          'lumina-menu-select', 'lumina-morph-start', 'lumina-morph-end',
+        ];
+        events.forEach(evt => {
+          el.addEventListener(evt, (e) => logToConsole(consoleId, evt, e.detail));
+        });
+
+        // Also listen for native DOM events
+        ['click', 'dblclick', 'contextmenu', 'keydown'].forEach(nativeEvt => {
+          el.addEventListener(nativeEvt, (e) => {
+            if (nativeEvt === 'click') {
+              logToConsole(consoleId, 'native:click', null);
+            } else if (nativeEvt === 'dblclick') {
+              logToConsole(consoleId, 'native:dblclick', null);
+              alert('DoubleClick detectado! Você pode usar ondblclick para ações especiais.');
+            }
+          });
+        });
       }
 
-      attachAll('#btn1','log1'); attachAll('#btn2','log2'); attachAll('#btn3','log3');
-      attachAll('#btn4','log4'); attachAll('#btn5','log5'); attachAll('#btn7','log7');
-      attachAll('#btn8','log8'); attachAll('#btn9','log9'); attachAll('#btn10','log10');
-      attachAll('#btn11','log11'); attachAll('#btn12','log12'); attachAll('#btn13','log13');
-      attachAll('#btn14','log14'); attachAll('#btn15','log15');
+      // ===== Copy to clipboard =====
+      window.copyCode = function(btn, codeId) {
+        const code = document.getElementById(codeId)?.textContent || '';
+        navigator.clipboard.writeText(code).then(() => {
+          btn.classList.add('copied');
+          btn.textContent = '✓ Copiado!';
+          setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copiar'; }, 1500);
+        }).catch(() => {
+          const ta = document.createElement('textarea');
+          ta.value = code;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+          btn.classList.add('copied');
+          btn.textContent = '✓ Copiado!';
+          setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copiar'; }, 1500);
+        });
+      };
+
+      // ===== Tab switching =====
+      window.switchTab = function(tabBtn, sectionId) {
+        const section = document.getElementById(sectionId);
+        if (!section) return;
+        section.querySelectorAll('.code-tab').forEach(t => t.classList.remove('is-active'));
+        section.querySelectorAll('.code-block').forEach(b => b.style.display = 'none');
+        tabBtn.classList.add('is-active');
+        const target = tabBtn.dataset.target;
+        const block = section.querySelector(`#${target}`);
+        if (block) block.style.display = 'block';
+      };
+
+      // ===== Live Demo Controls =====
+      window.updateLiveDemo = function() {
+        const variant = document.getElementById('live-variant')?.value || 'glass';
+        const intensity = document.getElementById('live-intensity')?.value || 'intense';
+        const accent = document.getElementById('live-accent')?.value || '#7c5cff';
+        const label = document.getElementById('live-label')?.value || 'Click me';
+        const disabled = document.getElementById('live-disabled')?.checked;
+        const depth = document.getElementById('live-depth')?.value || 'medium';
+        
+        const btn = document.getElementById('live-btn');
+        if (!btn) return;
+        btn.setAttribute('variant', variant);
+        btn.setAttribute('intensity', intensity);
+        btn.setAttribute('accent-color', accent);
+        btn.setAttribute('depth', depth);
+        if (disabled) btn.setAttribute('disabled', '');
+        else btn.removeAttribute('disabled');
+        btn.textContent = label;
+
+        // Update code preview
+        const htmlCode = `<!-- HTML -->
+<lumina-button
+  variant="${variant}"
+  intensity="${intensity}"
+  accent-color="${accent}"
+  depth="${depth}"
+  speed="0.5"
+  ${disabled ? 'disabled' : ''}
+>
+  ${label}
+</lumina-button>
+
+<script type="module">
+  const btn = document.querySelector('lumina-button');
+  
+  // Click event
+  btn.addEventListener('lumina-press', (e) => {
+    console.log('Button pressed!', e);
+  });
+  
+  // Hover events
+  btn.addEventListener('lumina-hover-start', () => console.log('Hover started'));
+  btn.addEventListener('lumina-hover-end', () => console.log('Hover ended'));
+  
+  // Focus/Blur
+  btn.addEventListener('lumina-focus', () => console.log('Focused'));
+  btn.addEventListener('lumina-blur', () => console.log('Blurred'));
+  
+  // Native double-click
+  btn.addEventListener('dblclick', () => {
+    console.log('Double-clicked!');
+  });
+<\/script>`;
+        
+        const reactCode = `import 'lumina-ui';
+
+export function MyButton() {
+  return (
+    <lumina-button
+      variant="${variant}"
+      intensity="${intensity}"
+      accent-color="${accent}"
+      depth="${depth}"
+      ${disabled ? 'disabled' : ''}
+      onLuminaPress={(e) => console.log('Pressed!', e)}
+      onLuminaHoverStart={() => console.log('Hover started')}
+      onDblClick={() => console.log('Double-clicked!')}
+    >
+      ${label}
+    </lumina-button>
+  );
+}`;
+
+        const htmlEl = document.getElementById('live-code-html');
+        const reactEl = document.getElementById('live-code-react');
+        if (htmlEl) htmlEl.textContent = htmlCode;
+        if (reactEl) reactEl.textContent = reactCode;
+      };
+
+      // Attach events to all demo buttons
+      attachAllEvents('#demo-basic', 'console-basic');
+      attachAllEvents('#demo-variants', 'console-variants');
+      attachAllEvents('#demo-disabled', 'console-disabled');
+      attachAllEvents('#demo-icon', 'console-icon');
+      attachAllEvents('#demo-danger', 'console-danger');
+      attachAllEvents('#demo-block', 'console-block');
+      attachAllEvents('#demo-ghost', 'console-ghost');
+      attachAllEvents('#demo-loading', 'console-loading');
+      attachAllEvents('#demo-gradient', 'console-gradient');
+      attachAllEvents('#demo-ripple', 'console-ripple');
+      attachAllEvents('#demo-portal', 'console-portal');
+      attachAllEvents('#demo-gesture', 'console-gesture');
+      attachAllEvents('#live-btn', 'console-live');
+
+      // Split button
+      const split = document.querySelector('#demo-split');
+      split?.addEventListener('lumina-click', () => logToConsole('console-split', 'lumina-click (ação principal)'));
+      split?.addEventListener('lumina-menu-open', () => logToConsole('console-split', 'lumina-menu-open'));
+      split?.addEventListener('lumina-menu-close', () => logToConsole('console-split', 'lumina-menu-close'));
+      split?.addEventListener('lumina-menu-select', (e) => {
+        logToConsole('console-split', 'lumina-menu-select', e.detail);
+        alert('Selecionou: ' + e.detail.label);
+      });
+
+      // Toggle button
+      const toggle = document.querySelector('#demo-toggle');
+      toggle?.addEventListener('lumina-change', (e) => logToConsole('console-toggle', 'lumina-change', e.detail));
 
       // Button group
-      document.querySelector('#btn6')?.addEventListener('lumina-change', (e) => logEvent('log6','lumina-change',e.detail));
+      const group = document.querySelector('#demo-group');
+      group?.addEventListener('lumina-change', (e) => logToConsole('console-group', 'lumina-change', e.detail));
 
-      // Split button alert
-      document.querySelector('#btn4')?.addEventListener('lumina-menu-select', (e) => alert('Selecionou: ' + e.detail.label));
+      // Command button
+      const cmd = document.querySelector('#demo-command');
+      cmd?.addEventListener('lumina-click', () => logToConsole('console-command', 'lumina-click'));
+      cmd?.addEventListener('lumina-shortcut', (e) => {
+        logToConsole('console-command', 'lumina-shortcut', e.detail);
+        alert('Atalho pressionado: ' + e.detail.shortcut);
+      });
 
-      console.log('✅ Todos os 15 botões LuminaUI carregados!');
+      console.log('✅ Button Power Lab loaded — all components ready!');
     </script>
 
-    <div class="btn-row">
-      <h3>1. LuminaButton <span class="badge badge-glass">6 variantes</span></h3>
-      <p class="desc">Botão principal com 6 variantes. Clique para ver lumina-press + burst de partículas.</p>
-      <div class="btn-grid">
-        <lumina-button id="btn1" variant="glass" intensity="intense" accent-color="#7c5cff" speed="0.45" theme="dark">Glass</lumina-button>
+    <!-- ===== LIVE DEMO PLAYGROUND ===== -->
+    <div class="section" id="section-live">
+      <h3>🎮 Playground Interativo <span class="badge">Configure tudo</span></h3>
+      <p class="desc">Mude as propriedades e veja o botão + código atualizando em tempo real. Clique no botão para ver os eventos no console.</p>
+      
+      <div class="controls">
+        <div class="control">
+          <label>variant</label>
+          <select id="live-variant" onchange="updateLiveDemo()">
+            <option value="glass">glass</option>
+            <option value="morph">morph</option>
+            <option value="neural">neural</option>
+            <option value="void">void</option>
+            <option value="aura">aura</option>
+            <option value="dimensional">dimensional</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>intensity</label>
+          <select id="live-intensity" onchange="updateLiveDemo()">
+            <option value="subtle">subtle</option>
+            <option value="medium">medium</option>
+            <option value="intense" selected>intense</option>
+            <option value="extreme">extreme</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>depth</label>
+          <select id="live-depth" onchange="updateLiveDemo()">
+            <option value="flat">flat</option>
+            <option value="medium" selected>medium</option>
+            <option value="deep">deep</option>
+            <option value="extrude">extrude</option>
+          </select>
+        </div>
+        <div class="control">
+          <label>accent-color</label>
+          <input type="color" id="live-accent" value="#7c5cff" onchange="updateLiveDemo()" />
+        </div>
+        <div class="control">
+          <label>label</label>
+          <input type="text" id="live-label" value="Click me" oninput="updateLiveDemo()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:8px;color:#fff;padding:6px 10px;font:500 13px Inter,sans-serif;width:120px;" />
+        </div>
+        <div class="control">
+          <label>disabled</label>
+          <input type="checkbox" id="live-disabled" onchange="updateLiveDemo()" style="width:20px;height:20px;accent-color:#7c5cff;" />
+        </div>
+      </div>
+
+      <div class="live-demo">
+        <lumina-button id="live-btn" variant="glass" intensity="intense" accent-color="#7c5cff" depth="medium" speed="0.5" theme="dark">Click me</lumina-button>
+      </div>
+
+      <div class="console" id="console-live"></div>
+
+      <div class="code-tabs">
+        <button class="code-tab is-active" data-target="live-code-html" onclick="switchTab(this, 'section-live')">Vanilla HTML</button>
+        <button class="code-tab" data-target="live-code-react" onclick="switchTab(this, 'section-live')">React</button>
+      </div>
+      <div class="code-block" id="live-code-html"><button class="copy-btn" onclick="copyCode(this, 'live-code-html')">Copiar</button><!-- Código gerado dinamicamente --></div>
+      <div class="code-block" id="live-code-react" style="display:none;"><button class="copy-btn" onclick="copyCode(this, 'live-code-react')">Copiar</button><!-- Código gerado dinamicamente --></div>
+    </div>
+
+    <!-- ===== BASIC BUTTON ===== -->
+    <div class="section" id="section-basic">
+      <h3>1. Botão Básico <span class="badge">Syntactic sugar</span></h3>
+      <p class="desc">O botão mais simples. Suporta click, dblclick, focus, blur nativamente.</p>
+      <div class="grid">
+        <lumina-button id="demo-basic" variant="glass" intensity="intense" accent-color="#7c5cff" speed="0.5" theme="dark">Click me</lumina-button>
+      </div>
+      <div class="console" id="console-basic"></div>
+      <div class="code-tabs">
+        <button class="code-tab is-active" data-target="basic-html" onclick="switchTab(this, 'section-basic')">Vanilla HTML</button>
+        <button class="code-tab" data-target="basic-react" onclick="switchTab(this, 'section-basic')">React</button>
+      </div>
+      <div class="code-block" id="basic-html"><button class="copy-btn" onclick="copyCode(this, 'basic-html')">Copiar</button>&lt;!-- HTML --&gt;
+&lt;lumina-button variant="glass" intensity="intense" accent-color="#7c5cff"&gt;
+  Click me
+&lt;/lumina-button&gt;
+
+&lt;script type="module"&gt;
+  const btn = document.querySelector('lumina-button');
+  
+  // Click event (LuminaUI custom)
+  btn.addEventListener('lumina-press', (e) =&gt; {
+    console.log('Pressed!', e);
+  });
+  
+  // Native double-click
+  btn.addEventListener('dblclick', () =&gt; {
+    console.log('Double-clicked!');
+  });
+  
+  // Keyboard: Enter or Space triggers click
+  btn.addEventListener('keydown', (e) =&gt; {
+    if (e.key === 'Enter' || e.key === ' ') {
+      console.log('Keyboard activation:', e.key);
+    }
+  });
+&lt;/script&gt;</div>
+      <div class="code-block" id="basic-react" style="display:none;"><button class="copy-btn" onclick="copyCode(this, 'basic-react')">Copiar</button>import 'lumina-ui';
+
+export function BasicButton() {
+  return (
+    &lt;lumina-button
+      variant="glass"
+      intensity="intense"
+      accent-color="#7c5cff"
+      onLuminaPress={(e) =&gt; console.log('Pressed!', e)}
+      onDblClick={() =&gt; console.log('Double-clicked!')}
+    &gt;
+      Click me
+    &lt;/lumina-button&gt;
+  );
+}</div>
+    </div>
+
+    <!-- ===== COLOR & VARIANT ===== -->
+    <div class="section" id="section-variants">
+      <h3>2. Cores & Variantes <span class="badge">6 variants</span></h3>
+      <p class="desc">6 variantes visuais: glass, morph, neural, void, aura, dimensional. Cada uma com técnica diferente.</p>
+      <div class="grid">
+        <lumina-button variant="glass" intensity="intense" accent-color="#7c5cff" speed="0.45" theme="dark">Glass</lumina-button>
         <lumina-button variant="morph" intensity="intense" accent-color="#78f0ff" speed="0.45" theme="dark">Morph</lumina-button>
         <lumina-button variant="neural" intensity="intense" accent-color="#ff6ec7" speed="0.5" theme="dark">Neural</lumina-button>
         <lumina-button variant="void" intensity="extreme" accent-color="#78f0ff" speed="0.4" theme="dark">Void</lumina-button>
         <lumina-button variant="aura" intensity="intense" accent-color="#ffd166" speed="0.5" theme="dark">Aura</lumina-button>
         <lumina-button variant="dimensional" intensity="intense" accent-color="#7c5cff" depth="deep" speed="0.45" theme="dark">Dimensional</lumina-button>
       </div>
-      <div class="event-log" id="log1"></div>
+      <div class="console" id="console-variants"></div>
+      <div class="code-block" id="variants-code"><button class="copy-btn" onclick="copyCode(this, 'variants-code')">Copiar</button>&lt;!-- Todas as 6 variantes --&gt;
+&lt;lumina-button variant="glass" intensity="intense" accent-color="#7c5cff"&gt;Glass&lt;/lumina-button&gt;
+&lt;lumina-button variant="morph" intensity="intense" accent-color="#78f0ff"&gt;Morph&lt;/lumina-button&gt;
+&lt;lumina-button variant="neural" intensity="intense" accent-color="#ff6ec7"&gt;Neural&lt;/lumina-button&gt;
+&lt;lumina-button variant="void" intensity="extreme" accent-color="#78f0ff"&gt;Void&lt;/lumina-button&gt;
+&lt;lumina-button variant="aura" intensity="intense" accent-color="#ffd166"&gt;Aura&lt;/lumina-button&gt;
+&lt;lumina-button variant="dimensional" intensity="intense" accent-color="#7c5cff" depth="deep"&gt;Dimensional&lt;/lumina-button&gt;</div>
     </div>
 
-    <div class="btn-row">
-      <h3>2. LuminaIconButton <span class="badge badge-glass">4 variantes</span></h3>
-      <p class="desc">Botão de ícone com glow circular e partículas. Tamanhos sm/md/lg.</p>
-      <div class="btn-grid">
-        <lumina-icon-button id="btn2" variant="glass" size="sm" intensity="intense" accent-color="#78f0ff" theme="dark">⚙</lumina-icon-button>
-        <lumina-icon-button variant="neural" size="md" intensity="intense" accent-color="#ff6ec7" theme="dark">★</lumina-icon-button>
-        <lumina-icon-button variant="aura" size="lg" intensity="intense" accent-color="#ffd166" theme="dark">♥</lumina-icon-button>
-        <lumina-icon-button variant="minimal" size="md" intensity="medium" accent-color="#7c5cff" theme="dark">☰</lumina-icon-button>
+    <!-- ===== DISABLED ===== -->
+    <div class="section" id="section-disabled">
+      <h3>3. Disabled <span class="badge">Estado desativado</span></h3>
+      <p class="desc">Botão desativado não dispara eventos e tem aparência reduzida.</p>
+      <div class="grid">
+        <lumina-button id="demo-disabled" variant="glass" intensity="intense" accent-color="#7c5cff" disabled theme="dark">Disabled button</lumina-button>
+        <lumina-button variant="neural" intensity="intense" accent-color="#ff6ec7" disabled theme="dark">Neural disabled</lumina-button>
       </div>
-      <div class="event-log" id="log2"></div>
+      <div class="console" id="console-disabled"></div>
+      <div class="code-block" id="disabled-code"><button class="copy-btn" onclick="copyCode(this, 'disabled-code')">Copiar</button>&lt;!-- Apenas adicione o atributo disabled --&gt;
+&lt;lumina-button variant="glass" disabled&gt;Disabled&lt;/lumina-button&gt;
+
+&lt;script type="module"&gt;
+  const btn = document.querySelector('lumina-button');
+  
+  // Verificar se está disabled
+  if (btn.hasAttribute('disabled')) {
+    console.log('Botão está desativado');
+  }
+  
+  // Habilitar/desabilitar via JS
+  btn.removeAttribute('disabled'); // habilita
+  btn.setAttribute('disabled', ''); // desabilita
+&lt;/script&gt;</div>
     </div>
 
-    <div class="btn-row">
-      <h3>3. LuminaFAB <span class="badge badge-glass">4 variantes</span></h3>
-      <p class="desc">Floating Action Button. O extended mostra texto. Posicionamento fixo no canto.</p>
-      <div class="btn-grid">
-        <lumina-fab variant="glass" accent-color="#7c5cff" theme="dark">+</lumina-fab>
-        <lumina-fab variant="neural" accent-color="#ff6ec7" theme="dark">★</lumina-fab>
-        <lumina-fab variant="aura" accent-color="#ffd166" theme="dark">♥</lumina-fab>
+    <!-- ===== ICON ===== -->
+    <div class="section" id="section-icon">
+      <h3>4. Ícone <span class="badge">Icon button</span></h3>
+      <p class="desc">Use lumina-icon-button para botões só de ícone, ou coloque emoji/SVG dentro do lumina-button.</p>
+      <div class="grid">
+        <lumina-icon-button id="demo-icon" variant="glass" size="md" intensity="intense" accent-color="#7c5cff" theme="dark">⚙</lumina-icon-button>
+        <lumina-icon-button variant="neural" size="lg" intensity="intense" accent-color="#ff6ec7" theme="dark">★</lumina-icon-button>
+        <lumina-icon-button variant="aura" size="md" intensity="intense" accent-color="#ffd166" theme="dark">♥</lumina-icon-button>
+        <lumina-button variant="glass" intensity="intense" accent-color="#78f0ff" theme="dark">🗑 Excluir</lumina-button>
+        <lumina-button variant="glass" intensity="intense" accent-color="#22c55e" theme="dark">✓ Salvar</lumina-button>
       </div>
-      <lumina-fab id="btn3" variant="extended" accent-color="#7c5cff" theme="dark" style="position:fixed;bottom:24px;right:24px;">+<span slot="label">Nova tarefa</span></lumina-fab>
-      <div class="event-log" id="log3"></div>
+      <div class="console" id="console-icon"></div>
+      <div class="code-block" id="icon-code"><button class="copy-btn" onclick="copyCode(this, 'icon-code')">Copiar</button>&lt;!-- Icon button (só ícone) --&gt;
+&lt;lumina-icon-button variant="glass" size="md" accent-color="#7c5cff"&gt;⚙&lt;/lumina-icon-button&gt;
+
+&lt;!-- Button com ícone + texto --&gt;
+&lt;lumina-button variant="glass" accent-color="#22c55e"&gt;✓ Salvar&lt;/lumina-button&gt;
+
+&lt;script type="module"&gt;
+  document.querySelector('lumina-icon-button')
+    .addEventListener('lumina-click', () =&gt; {
+      console.log('Ícone clicado!');
+    });
+&lt;/script&gt;</div>
     </div>
 
-    <div class="btn-row">
-      <h3>4. LuminaSplitButton <span class="badge badge-glass">3 variantes</span></h3>
-      <p class="desc">Ação principal + menu dropdown. Clique na seta para abrir o menu.</p>
-      <div class="btn-grid">
-        <lumina-split-button id="btn4" variant="glass" intensity="intense" accent-color="#7c5cff" theme="dark" menu-items='[{"label":"Editar","icon":"✎","value":"edit"},{"label":"Duplicar","icon":"⧉","value":"dup"},{"label":"Excluir","icon":"✕","value":"del"}]'>Salvar</lumina-split-button>
+    <!-- ===== DANGER ===== -->
+    <div class="section" id="section-danger">
+      <h3>5. Danger / Destructive <span class="badge">Cor semântica</span></h3>
+      <p class="desc">Use accent-color vermelho para ações destrutivas (excluir, remover).</p>
+      <div class="grid">
+        <lumina-button id="demo-danger" variant="void" intensity="extreme" accent-color="#ff5577" speed="0.4" theme="dark">Excluir permanentemente</lumina-button>
+        <lumina-button variant="dimensional" intensity="intense" accent-color="#ff5577" depth="deep" theme="dark">Deletar conta</lumina-button>
       </div>
-      <div class="event-log" id="log4"></div>
+      <div class="console" id="console-danger"></div>
+      <div class="code-block" id="danger-code"><button class="copy-btn" onclick="copyCode(this, 'danger-code')">Copiar</button>&lt;!-- Use accent-color vermelho para danger --&gt;
+&lt;lumina-button variant="void" intensity="extreme" accent-color="#ff5577"&gt;
+  Excluir permanentemente
+&lt;/lumina-button&gt;
+
+&lt;script type="module"&gt;
+  document.querySelector('lumina-button')
+    .addEventListener('lumina-press', () =&gt; {
+      if (confirm('Tem certeza?')) {
+        console.log('Confirmado — executando exclusão');
+      }
+    });
+&lt;/script&gt;</div>
     </div>
 
-    <div class="btn-row">
-      <h3>5. LuminaToggleButton <span class="badge badge-glass">3 variantes</span></h3>
-      <p class="desc">Botão que alterna pressed/released. Clique para ver o glow mudar + partículas.</p>
-      <div class="btn-grid">
-        <lumina-toggle-button id="btn5" variant="glass" intensity="intense" accent-color="#ffd166" theme="dark">Modo escuro</lumina-toggle-button>
-        <lumina-toggle-button variant="neural" intensity="intense" accent-color="#ff6ec7" pressed theme="dark">Neural ON</lumina-toggle-button>
-        <lumina-toggle-button variant="aura" intensity="intense" accent-color="#7c5cff" theme="dark">Aura</lumina-toggle-button>
+    <!-- ===== BLOCK ===== -->
+    <div class="section" id="section-block">
+      <h3>6. Block Button <span class="badge">Largura total</span></h3>
+      <p class="desc">Botão que ocupa toda a largura disponível do container.</p>
+      <div style="max-width:400px;">
+        <lumina-button id="demo-block" variant="glass" intensity="intense" accent-color="#7c5cff" speed="0.5" theme="dark" style="width:100%; display:block;">Botão em bloco (full width)</lumina-button>
       </div>
-      <div class="event-log" id="log5"></div>
+      <div class="console" id="console-block"></div>
+      <div class="code-block" id="block-code"><button class="copy-btn" onclick="copyCode(this, 'block-code')">Copiar</button>&lt;!-- Adicione style="width:100%" --&gt;
+&lt;lumina-button 
+  variant="glass" 
+  accent-color="#7c5cff"
+  style="width: 100%; display: block;"
+&gt;
+  Botão em bloco
+&lt;/lumina-button&gt;</div>
     </div>
 
-    <div class="btn-row">
-      <h3>6. LuminaButtonGroup <span class="badge badge-glass">3 variantes</span></h3>
-      <p class="desc">Grupo de botões conectados. Clique para selecionar.</p>
-      <div class="btn-grid">
-        <lumina-button-group id="btn6" variant="segmented" value="b" theme="dark" accent-color="#7c5cff" intensity="intense">
-          <button data-value="a">A</button>
-          <button data-value="b">B</button>
-          <button data-value="c">C</button>
+    <!-- ===== GHOST ===== -->
+    <div class="section" id="section-ghost">
+      <h3>7. Ghost Button <span class="badge">Minimalista</span></h3>
+      <p class="desc">Botão fantasma com variant="minimal" no icon-button, ou glass com baixa intensidade.</p>
+      <div class="grid">
+        <lumina-button id="demo-ghost" variant="glass" intensity="subtle" accent-color="#7c5cff" speed="0.3" theme="dark">Ghost button</lumina-button>
+        <lumina-icon-button variant="minimal" size="md" intensity="medium" accent-color="#7c5cff" theme="dark">⋯</lumina-icon-button>
+      </div>
+      <div class="console" id="console-ghost"></div>
+      <div class="code-block" id="ghost-code"><button class="copy-btn" onclick="copyCode(this, 'ghost-code')">Copiar</button>&lt;!-- Ghost = subtle intensity --&gt;
+&lt;lumina-button variant="glass" intensity="subtle" accent-color="#7c5cff"&gt;
+  Ghost button
+&lt;/lumina-button&gt;
+
+&lt;!-- Minimal icon button --&gt;
+&lt;lumina-icon-button variant="minimal" accent-color="#7c5cff"&gt;⋯&lt;/lumina-icon-button&gt;</div>
+    </div>
+
+    <!-- ===== LOADING ===== -->
+    <div class="section" id="section-loading">
+      <h3>8. Loading State <span class="badge">Estado de carregamento</span></h3>
+      <p class="desc">Use disabled + texto alternativo para simular loading.</p>
+      <div class="grid">
+        <lumina-button id="demo-loading" variant="glass" intensity="intense" accent-color="#7c5cff" disabled theme="dark">Carregando...</lumina-button>
+      </div>
+      <div class="console" id="console-loading"></div>
+      <div class="code-block" id="loading-code"><button class="copy-btn" onclick="copyCode(this, 'loading-code')">Copiar</button>&lt;script type="module"&gt;
+  const btn = document.querySelector('lumina-button');
+  
+  // Iniciar loading
+  function startLoading() {
+    btn.setAttribute('disabled', '');
+    btn.textContent = 'Carregando...';
+  }
+  
+  // Parar loading
+  function stopLoading() {
+    btn.removeAttribute('disabled');
+    btn.textContent = 'Salvar';
+  }
+  
+  // Exemplo: simular requisição
+  btn.addEventListener('lumina-press', async () =&gt; {
+    startLoading();
+    await fetch('/api/save').then(r =&gt; r.json());
+    stopLoading();
+    console.log('Salvo com sucesso!');
+  });
+&lt;/script&gt;
+
+&lt;!-- HTML --&gt;
+&lt;lumina-button variant="glass" disabled&gt;Carregando...&lt;/lumina-button&gt;</div>
+    </div>
+
+    <!-- ===== GRADIENT / CUSTOM ===== -->
+    <div class="section" id="section-gradient">
+      <h3>9. Gradient & Custom Colors <span class="badge">Personalização total</span></h3>
+      <p class="desc">Use accent-color com qualquer cor (hex, hsl, rgb). Combine com variant para efeitos únicos.</p>
+      <div class="grid">
+        <lumina-button id="demo-gradient" variant="aura" intensity="extreme" accent-color="#ff6ec7" speed="0.5" theme="dark">Pink Aura</lumina-button>
+        <lumina-button variant="dimensional" intensity="extreme" accent-color="#22c55e" depth="extrude" theme="dark">Green 3D</lumina-button>
+        <lumina-button variant="neural" intensity="extreme" accent-color="#f59e0b" theme="dark">Amber Neural</lumina-button>
+      </div>
+      <div class="console" id="console-gradient"></div>
+      <div class="code-block" id="gradient-code"><button class="copy-btn" onclick="copyCode(this, 'gradient-code')">Copiar</button>&lt;!-- Qualquer cor funciona: hex, hsl, rgb --&gt;
+&lt;lumina-button variant="aura" intensity="extreme" accent-color="#ff6ec7"&gt;Pink Aura&lt;/lumina-button&gt;
+&lt;lumina-button variant="dimensional" intensity="extreme" accent-color="#22c55e" depth="extrude"&gt;Green 3D&lt;/lumina-button&gt;
+&lt;lumina-button variant="neural" intensity="extreme" accent-color="hsl(35, 90%, 50%)"&gt;Amber Neural&lt;/lumina-button&gt;
+
+&lt;!-- Custom background via CSS variables --&gt;
+&lt;style&gt;
+  lumina-button.my-custom {
+    --lumina-surface: 30 20 60;
+    --lumina-surface-alpha: 0.7;
+    --lumina-border: rgba(255, 100, 200, 0.3);
+  }
+&lt;/style&gt;
+&lt;lumina-button class="my-custom" variant="glass"&gt;Custom bg&lt;/lumina-button&gt;</div>
+    </div>
+
+    <!-- ===== SPLIT BUTTON ===== -->
+    <div class="section" id="section-split">
+      <h3>10. Split Button <span class="badge">Ação + Menu</span></h3>
+      <p class="desc">Ação principal no botão esquerdo, menu dropdown na seta. Clique na seta!</p>
+      <div class="grid">
+        <lumina-split-button id="demo-split" variant="glass" intensity="intense" accent-color="#7c5cff" theme="dark" menu-items='[{"label":"Editar","icon":"✎","value":"edit"},{"label":"Duplicar","icon":"⧉","value":"dup"},{"label":"Excluir","icon":"✕","value":"del"}]'>Salvar</lumina-split-button>
+      </div>
+      <div class="console" id="console-split"></div>
+      <div class="code-block" id="split-code"><button class="copy-btn" onclick="copyCode(this, 'split-code')">Copiar</button>&lt;lumina-split-button
+  variant="glass"
+  accent-color="#7c5cff"
+  menu-items='[
+    {"label":"Editar","icon":"✎","value":"edit"},
+    {"label":"Duplicar","icon":"⧉","value":"dup"},
+    {"label":"Excluir","icon":"✕","value":"del"}
+  ]'
+&gt;
+  Salvar
+&lt;/lumina-split-button&gt;
+
+&lt;script type="module"&gt;
+  const sb = document.querySelector('lumina-split-button');
+  
+  // Ação principal (clique no botão esquerdo)
+  sb.addEventListener('lumina-click', () =&gt; {
+    console.log('Ação principal: Salvar');
+  });
+  
+  // Item do menu selecionado
+  sb.addEventListener('lumina-menu-select', (e) =&gt; {
+    console.log('Selecionou:', e.detail.label, e.detail.value);
+  });
+&lt;/script&gt;</div>
+    </div>
+
+    <!-- ===== TOGGLE BUTTON ===== -->
+    <div class="section" id="section-toggle">
+      <h3>11. Toggle Button <span class="badge">On/Off</span></h3>
+      <p class="desc">Botão que alterna entre pressed e released. Glow muda com o estado.</p>
+      <div class="grid">
+        <lumina-toggle-button id="demo-toggle" variant="glass" intensity="intense" accent-color="#ffd166" theme="dark">Modo escuro</lumina-toggle-button>
+      </div>
+      <div class="console" id="console-toggle"></div>
+      <div class="code-block" id="toggle-code"><button class="copy-btn" onclick="copyCode(this, 'toggle-code')">Copiar</button>&lt;lumina-toggle-button
+  variant="glass"
+  intensity="intense"
+  accent-color="#ffd166"
+&gt;
+  Modo escuro
+&lt;/lumina-toggle-button&gt;
+
+&lt;script type="module"&gt;
+  const tb = document.querySelector('lumina-toggle-button');
+  
+  tb.addEventListener('lumina-change', (e) =&gt; {
+    console.log('Toggle:', e.detail.pressed ? 'ON' : 'OFF');
+    if (e.detail.pressed) {
+      document.body.style.background = '#000';
+    } else {
+      document.body.style.background = '#fff';
+    }
+  });
+  
+  // Ler/definir estado via JS
+  console.log('Pressed:', tb.hasAttribute('pressed'));
+  tb.setAttribute('pressed', ''); // Forçar ON
+&lt;/script&gt;</div>
+    </div>
+
+    <!-- ===== BUTTON GROUP ===== -->
+    <div class="section" id="section-group">
+      <h3>12. Button Group <span class="badge">Seleção</span></h3>
+      <p class="desc">Grupo conectado com seleção única. Clique para selecionar.</p>
+      <div class="grid">
+        <lumina-button-group id="demo-group" variant="segmented" value="b" theme="dark" accent-color="#7c5cff" intensity="intense">
+          <button data-value="grid">▦ Grid</button>
+          <button data-value="list">☰ Lista</button>
+          <button data-value="map">🗺 Mapa</button>
         </lumina-button-group>
       </div>
-      <div class="event-log" id="log6"></div>
+      <div class="console" id="console-group"></div>
+      <div class="code-block" id="group-code"><button class="copy-btn" onclick="copyCode(this, 'group-code')">Copiar</button>&lt;lumina-button-group
+  variant="segmented"
+  value="list"
+  accent-color="#7c5cff"
+&gt;
+  &lt;button data-value="grid"&gt;▦ Grid&lt;/button&gt;
+  &lt;button data-value="list"&gt;☰ Lista&lt;/button&gt;
+  &lt;button data-value="map"&gt;🗺 Mapa&lt;/button&gt;
+&lt;/lumina-button-group&gt;
+
+&lt;script type="module"&gt;
+  const group = document.querySelector('lumina-button-group');
+  
+  group.addEventListener('lumina-change', (e) =&gt; {
+    console.log('Selecionado:', e.detail.value);
+    // e.detail.value = "grid" | "list" | "map"
+  });
+  
+  // Ler seleção atual
+  console.log('Atual:', group.getAttribute('value'));
+&lt;/script&gt;</div>
     </div>
 
-    <div class="btn-row">
-      <h3>7. LuminaCommandButton <span class="badge badge-glass">3 variantes</span></h3>
-      <p class="desc">Botão com atalho de teclado. Tente pressionar Cmd+K (ou Ctrl+K)!</p>
-      <div class="btn-grid">
-        <lumina-command-button id="btn7" variant="glass" intensity="intense" accent-color="#78f0ff" shortcut="⌘K" theme="dark">Buscar comandos</lumina-command-button>
-        <lumina-command-button variant="neural" intensity="intense" accent-color="#ff6ec7" shortcut="Ctrl+S" theme="dark">Salvar</lumina-command-button>
+    <!-- ===== COMMAND BUTTON ===== -->
+    <div class="section" id="section-command">
+      <h3>13. Command Button <span class="badge">Atalho de teclado</span></h3>
+      <p class="desc">Exibe atalho e escuta globalmente. Tente pressionar Ctrl+S!</p>
+      <div class="grid">
+        <lumina-command-button id="demo-command" variant="glass" intensity="intense" accent-color="#78f0ff" shortcut="Ctrl+S" theme="dark">Salvar (Ctrl+S)</lumina-command-button>
       </div>
-      <div class="event-log" id="log7"></div>
+      <div class="console" id="console-command"></div>
+      <div class="code-block" id="command-code"><button class="copy-btn" onclick="copyCode(this, 'command-code')">Copiar</button>&lt;lumina-command-button
+  variant="glass"
+  accent-color="#78f0ff"
+  shortcut="Ctrl+S"
+&gt;
+  Salvar (Ctrl+S)
+&lt;/lumina-command-button&gt;
+
+&lt;script type="module"&gt;
+  const cmd = document.querySelector('lumina-command-button');
+  
+  // Click normal
+  cmd.addEventListener('lumina-click', () =&gt; {
+    console.log('Comando executado');
+  });
+  
+  // Atalho pressionado (escuta global automaticamente!)
+  cmd.addEventListener('lumina-shortcut', (e) =&gt; {
+    console.log('Atalho:', e.detail.shortcut);
+    // Salvar documento...
+  });
+&lt;/script&gt;</div>
     </div>
 
-    <div class="btn-row">
-      <h3>8. LuminaRippleButton <span class="badge badge-glass">3 variantes</span></h3>
-      <p class="desc">Ripple expansivo no ponto exato do clique.</p>
-      <div class="btn-grid">
-        <lumina-ripple-button id="btn8" variant="glass" intensity="intense" accent-color="#7c5cff" ripple-duration="800" theme="dark">Clique aqui</lumina-ripple-button>
-        <lumina-ripple-button variant="neural" intensity="intense" accent-color="#ff6ec7" theme="dark">Neural ripple</lumina-ripple-button>
+    <!-- ===== RIPPLE ===== -->
+    <div class="section" id="section-ripple">
+      <h3>14. Ripple Button <span class="badge">Efeito ripple</span></h3>
+      <p class="desc">Ripple expansivo no ponto exato do clique. Clique em diferentes lugares!</p>
+      <div class="grid">
+        <lumina-ripple-button id="demo-ripple" variant="glass" intensity="intense" accent-color="#7c5cff" ripple-duration="800" theme="dark">Clique em qualquer lugar</lumina-ripple-button>
       </div>
-      <div class="event-log" id="log8"></div>
+      <div class="console" id="console-ripple"></div>
+      <div class="code-block" id="ripple-code"><button class="copy-btn" onclick="copyCode(this, 'ripple-code')">Copiar</button>&lt;lumina-ripple-button
+  variant="glass"
+  accent-color="#7c5cff"
+  ripple-duration="800"
+&gt;
+  Clique em qualquer lugar
+&lt;/lumina-ripple-button&gt;
+
+&lt;script type="module"&gt;
+  const rb = document.querySelector('lumina-ripple-button');
+  
+  rb.addEventListener('lumina-ripple', (e) =&gt; {
+    console.log('Ripple em:', e.detail.x, e.detail.y);
+  });
+  
+  rb.addEventListener('lumina-click', () =&gt; {
+    console.log('Clicked!');
+  });
+&lt;/script&gt;</div>
     </div>
 
-    <div class="btn-row">
-      <h3>9. LuminaMagneticButton <span class="badge badge-glass">3 variantes</span></h3>
-      <p class="desc">Atrai o cursor! Aproxime o mouse para sentir o efeito magnético.</p>
-      <div class="btn-grid">
-        <lumina-magnetic-button id="btn9" variant="glass" intensity="intense" accent-color="#ff6ec7" magnetic-strength="0.5" theme="dark">Aproxime o cursor</lumina-magnetic-button>
+    <!-- ===== PORTAL ===== -->
+    <div class="section" id="section-portal">
+      <h3>15. Portal Button <span class="badge">Efeito dimensional</span></h3>
+      <p class="desc">Swirl + partículas sugadas ao clicar. Efeito de portal dimensional.</p>
+      <div class="grid">
+        <lumina-portal-button id="demo-portal" variant="void" intensity="extreme" accent-color="#78f0ff" theme="dark">Entrar no portal</lumina-portal-button>
       </div>
-      <div class="event-log" id="log9"></div>
+      <div class="console" id="console-portal"></div>
+      <div class="code-block" id="portal-code"><button class="copy-btn" onclick="copyCode(this, 'portal-code')">Copiar</button>&lt;lumina-portal-button
+  variant="void"
+  intensity="extreme"
+  accent-color="#78f0ff"
+&gt;
+  Entrar no portal
+&lt;/lumina-portal-button&gt;
+
+&lt;script type="module"&gt;
+  const pb = document.querySelector('lumina-portal-button');
+  
+  pb.addEventListener('lumina-portal-open', () =&gt; {
+    console.log('Portal aberto! Navegando...');
+    // window.location.href = '/dashboard';
+  });
+&lt;/script&gt;</div>
     </div>
 
-    <div class="btn-row">
-      <h3>10. LuminaBreathButton <span class="badge badge-aura">3 variantes</span></h3>
-      <p class="desc">Respira em loop contínuo. Passe o cursor para pausar.</p>
-      <div class="btn-grid">
-        <lumina-breath-button id="btn10" variant="aura" intensity="intense" accent-color="#ffd166" theme="dark">Respirando...</lumina-breath-button>
-        <lumina-breath-button variant="subtle" intensity="medium" accent-color="#7c5cff" theme="dark">Subtle breath</lumina-breath-button>
+    <!-- ===== GESTURE ===== -->
+    <div class="section" id="section-gesture">
+      <h3>16. Gesture Button <span class="badge">Gestos</span></h3>
+      <p class="desc">Reconhece: hold (segure 0.5s), swipe (arraste), double-tap (2x rápido).</p>
+      <div class="grid">
+        <lumina-gesture-button id="demo-gesture" variant="neural" intensity="intense" accent-color="#ff6ec7" gestures="hold,swipe,double-tap" theme="dark">Toque • segure • arraste • 2x</lumina-gesture-button>
       </div>
-      <div class="event-log" id="log10"></div>
-    </div>
+      <div class="console" id="console-gesture"></div>
+      <div class="code-block" id="gesture-code"><button class="copy-btn" onclick="copyCode(this, 'gesture-code')">Copiar</button>&lt;lumina-gesture-button
+  variant="neural"
+  accent-color="#ff6ec7"
+  gestures="hold,swipe,double-tap"
+&gt;
+  Toque • segure • arraste
+&lt;/lumina-gesture-button&gt;
 
-    <div class="btn-row">
-      <h3>11. LuminaNeuralButton <span class="badge badge-neural">3 variantes</span></h3>
-      <p class="desc">Rede neural visível por trás do botão. Partículas conectadas por linhas.</p>
-      <div class="btn-grid">
-        <lumina-neural-button id="btn11" variant="neural" intensity="intense" accent-color="#ff6ec7" particle-count="25" theme="dark">Neural</lumina-neural-button>
-        <lumina-neural-button variant="intense" intensity="extreme" accent-color="#7c5cff" particle-count="30" theme="dark">Intense</lumina-neural-button>
-      </div>
-      <div class="event-log" id="log11"></div>
-    </div>
-
-    <div class="btn-row">
-      <h3>12. LuminaPortalButton <span class="badge badge-void">3 variantes</span></h3>
-      <p class="desc">Efeito de portal dimensional ao clicar — swirl + partículas sugadas.</p>
-      <div class="btn-grid">
-        <lumina-portal-button id="btn12" variant="void" intensity="extreme" accent-color="#78f0ff" theme="dark">Entrar no portal</lumina-portal-button>
-        <lumina-portal-button variant="dimensional" intensity="intense" accent-color="#7c5cff" theme="dark">Dimensional portal</lumina-portal-button>
-      </div>
-      <div class="event-log" id="log12"></div>
-    </div>
-
-    <div class="btn-row">
-      <h3>13. LuminaEchoButton <span class="badge badge-glass">3 variantes</span></h3>
-      <p class="desc">Ondas concêntricas se expandem a partir do clique.</p>
-      <div class="btn-grid">
-        <lumina-echo-button id="btn13" variant="glass" intensity="intense" accent-color="#7c5cff" echo-count="3" theme="dark">Eco</lumina-echo-button>
-        <lumina-echo-button variant="aura" intensity="intense" accent-color="#ffd166" echo-count="5" theme="dark">Aura echo</lumina-echo-button>
-      </div>
-      <div class="event-log" id="log13"></div>
-    </div>
-
-    <div class="btn-row">
-      <h3>14. LuminaMorphButton <span class="badge badge-morph">3 variantes</span></h3>
-      <p class="desc">Morphs de forma no hover. Passe o cursor para ver o clip-path mudar!</p>
-      <div class="btn-grid">
-        <lumina-morph-button id="btn14" variant="morph" intensity="intense" accent-color="#7c5cff" from="pill" to="hexagon" theme="dark">Morph</lumina-morph-button>
-        <lumina-morph-button variant="glass" intensity="intense" accent-color="#78f0ff" from="squircle" to="star" theme="dark">Star morph</lumina-morph-button>
-      </div>
-      <div class="event-log" id="log14"></div>
-    </div>
-
-    <div class="btn-row">
-      <h3>15. LuminaGestureButton <span class="badge badge-neural">3 variantes</span></h3>
-      <p class="desc">Reconhece gestos: hold (segure 0.5s), swipe (arraste), double-tap (2x rápido).</p>
-      <div class="btn-grid">
-        <lumina-gesture-button id="btn15" variant="neural" intensity="intense" accent-color="#ff6ec7" gestures="hold,swipe,double-tap" theme="dark">Toque • segure • arraste</lumina-gesture-button>
-      </div>
-      <div class="event-log" id="log15"></div>
+&lt;script type="module"&gt;
+  const gb = document.querySelector('lumina-gesture-button');
+  
+  // Detecta tipo de gesto
+  gb.addEventListener('lumina-gesture', (e) =&gt; {
+    console.log('Gesto:', e.detail.type);
+    // e.detail.type = "hold" | "swipe" | "double-tap"
+    
+    if (e.detail.type === 'hold') {
+      console.log('Menu de contexto...');
+    } else if (e.detail.type === 'swipe') {
+      console.log('Próximo item...');
+    } else if (e.detail.type === 'double-tap') {
+      console.log('Favoritar!');
+    }
+  });
+&lt;/script&gt;</div>
     </div>
 
     <p style="text-align:center; margin-top:48px; color:rgba(245,245,255,0.3); font-size:13px;">
-      Esta página usa <code style="color:#78f0ff;">import 'https://esm.sh/lumina-ui@latest'</code> — sem build, sem npm, sem React. Apenas HTML + JS puro.
+      💡 Todos os botões nesta página são Web Components reais funcionando com HTML + JS puro. Sem React, sem Vue, sem build.
     </p>
+
+    <script type="module">
+      // Initialize live demo
+      updateLiveDemo();
+    </script>
   </body>
 </html>
