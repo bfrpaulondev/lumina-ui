@@ -3609,7 +3609,9 @@ customElements.define(Navigation.tagName, Navigation);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <a href="#home" aria-current="page">Início</a>
+  <a href="#about">Sobre</a>
+  <a href="#contact">Contato</a>
 </lumina-navigation>
 <script type="module">
   const el = document.querySelector('lumina-navigation');
@@ -3623,7 +3625,7 @@ export function NavigationExample() {
   return (
     <lumina-navigation variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaNavChange={(e) => console.log(e.detail)}>
-      Conteúdo
+      <a href="#home" aria-current="page">Início</a><a href="#about">Sobre</a><a href="#contact">Contato</a>
     </lumina-navigation>
   );
 }`,
@@ -3668,7 +3670,9 @@ customElements.define(Tabs.tagName, Tabs);
   speed="0.5"
   orientation="horizontal"
 >
-  Conteúdo de exemplo
+  <lumina-tab id="t1" label="Geral" icon="*">Conteúdo da aba Geral.</lumina-tab>
+  <lumina-tab id="t2" label="Conta" icon="A" badge="3">Conteúdo da aba Conta.</lumina-tab>
+  <lumina-tab id="t3" label="Ajuda" icon="?">Conteúdo da aba Ajuda.</lumina-tab>
 </lumina-tabs>
 <script type="module">
   const el = document.querySelector('lumina-tabs');
@@ -3682,7 +3686,9 @@ export function TabsExample() {
   return (
     <lumina-tabs variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} orientation="horizontal"
       onLuminaTabChange={(e) => console.log(e.detail)}>
-      Conteúdo
+      <lumina-tab id="t1" label="Geral" icon="*">Conteúdo da aba Geral.</lumina-tab>
+        <lumina-tab id="t2" label="Conta" icon="A" badge="3">Conteúdo da aba Conta.</lumina-tab>
+        <lumina-tab id="t3" label="Ajuda" icon="?">Conteúdo da aba Ajuda.</lumina-tab>
     </lumina-tabs>
   );
 }`,
@@ -3724,7 +3730,9 @@ customElements.define(Breadcrumbs.tagName, Breadcrumbs);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <a href="#/">Home</a>
+  <a href="#/docs">Documentação</a>
+  <a href="#/docs/forms" aria-current="page">Forms</a>
 </lumina-breadcrumbs>
 <script type="module">
   const el = document.querySelector('lumina-breadcrumbs');
@@ -3738,7 +3746,7 @@ export function BreadcrumbsExample() {
   return (
     <lumina-breadcrumbs variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaNavigate={(e) => console.log(e.detail)}>
-      Conteúdo
+      <a href="#/">Home</a><a href="#/docs">Documentação</a><a href="#/docs/forms" aria-current="page">Forms</a>
     </lumina-breadcrumbs>
   );
 }`,
@@ -3783,7 +3791,7 @@ customElements.define(Pagination.tagName, Pagination);
   page="0"
   total="0"
 >
-  Conteúdo de exemplo
+  
 </lumina-pagination>
 <script type="module">
   const el = document.querySelector('lumina-pagination');
@@ -3797,7 +3805,7 @@ export function PaginationExample() {
   return (
     <lumina-pagination variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} page={0} total={0}
       onLuminaPageChange={(e) => console.log(e.detail)}>
-      Conteúdo
+      
     </lumina-pagination>
   );
 }`,
@@ -3839,7 +3847,11 @@ customElements.define(Sidebar.tagName, Sidebar);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <div slot="header"><h3>Minha App</h3></div>
+  <a href="#/dashboard">Dashboard</a>
+  <a href="#/projects">Projetos</a>
+  <a href="#/settings">Configurações</a>
+  <div slot="footer"><small>v1.0.0</small></div>
 </lumina-sidebar>
 <script type="module">
   const el = document.querySelector('lumina-sidebar');
@@ -3853,7 +3865,11 @@ export function SidebarExample() {
   return (
     <lumina-sidebar variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaToggle={(e) => console.log(e.detail)}>
-      Conteúdo
+      <div slot="header"><h3>Minha App</h3></div>
+        <a href="#/dashboard">Dashboard</a>
+        <a href="#/projects">Projetos</a>
+        <a href="#/settings">Configurações</a>
+        <div slot="footer"><small>v1.0.0</small></div>
     </lumina-sidebar>
   );
 }`,
@@ -3899,7 +3915,9 @@ customElements.define(Drawer.tagName, Drawer);
   placement="left"
   size="md"
 >
-  Conteúdo de exemplo
+  <h2 slot="header">Filtros</h2>
+  <p>Conteúdo do drawer — pode conter filtros, menus, ou qualquer HTML.</p>
+  <lumina-button variant="glass">Aplicar filtros</lumina-button>
 </lumina-drawer>
 <script type="module">
   const el = document.querySelector('lumina-drawer');
@@ -3913,7 +3931,9 @@ export function DrawerExample() {
   return (
     <lumina-drawer variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} placement="left" size="md"
       onLuminaOpen={(e) => console.log(e.detail)}>
-      Conteúdo
+      <h2 slot="header">Filtros</h2>
+        <p>Conteúdo do drawer.</p>
+        <lumina-button variant="glass">Aplicar filtros</lumina-button>
     </lumina-drawer>
   );
 }`,
@@ -3955,7 +3975,10 @@ customElements.define(MegaMenu.tagName, MegaMenu);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <a href="#/products">Produtos</a>
+  <a href="#/solutions">Soluções</a>
+  <a href="#/docs">Documentação</a>
+  <a href="#/pricing">Preços</a>
 </lumina-mega-menu>
 <script type="module">
   const el = document.querySelector('lumina-mega-menu');
@@ -3969,7 +3992,7 @@ export function MegaMenuExample() {
   return (
     <lumina-mega-menu variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaNavigate={(e) => console.log(e.detail)}>
-      Conteúdo
+      <a href="#/products">Produtos</a><a href="#/solutions">Soluções</a><a href="#/docs">Documentação</a><a href="#/pricing">Preços</a>
     </lumina-mega-menu>
   );
 }`,
@@ -4011,7 +4034,7 @@ customElements.define(CommandPalette.tagName, CommandPalette);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  
 </lumina-command-palette>
 <script type="module">
   const el = document.querySelector('lumina-command-palette');
@@ -4025,7 +4048,7 @@ export function CommandPaletteExample() {
   return (
     <lumina-command-palette variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaExecute={(e) => console.log(e.detail)}>
-      Conteúdo
+      
     </lumina-command-palette>
   );
 }`,
@@ -4067,7 +4090,10 @@ customElements.define(FloatingNav.tagName, FloatingNav);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <a href="#features">Features</a>
+  <a href="#pricing">Preços</a>
+  <a href="#docs">Docs</a>
+  <lumina-button size="sm">Começar</lumina-button>
 </lumina-floating-nav>
 <script type="module">
   const el = document.querySelector('lumina-floating-nav');
@@ -4081,7 +4107,7 @@ export function FloatingNavExample() {
   return (
     <lumina-floating-nav variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaShow={(e) => console.log(e.detail)}>
-      Conteúdo
+      <a href="#features">Features</a><a href="#pricing">Preços</a><a href="#docs">Docs</a><lumina-button size="sm">Começar</lumina-button>
     </lumina-floating-nav>
   );
 }`,
@@ -4126,7 +4152,7 @@ customElements.define(StepIndicator.tagName, StepIndicator);
   current="0"
   total="0"
 >
-  Conteúdo de exemplo
+  
 </lumina-step-indicator>
 <script type="module">
   const el = document.querySelector('lumina-step-indicator');
@@ -4140,7 +4166,7 @@ export function StepIndicatorExample() {
   return (
     <lumina-step-indicator variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} current={0} total={0}
       onLuminaStepChange={(e) => console.log(e.detail)}>
-      Conteúdo
+      
     </lumina-step-indicator>
   );
 }`,
@@ -4182,7 +4208,9 @@ customElements.define(ProgressNav.tagName, ProgressNav);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <a href="#step1" data-step="0">Passo 1</a>
+  <a href="#step2" data-step="1">Passo 2</a>
+  <a href="#step3" data-step="2">Passo 3</a>
 </lumina-progress-nav>
 <script type="module">
   const el = document.querySelector('lumina-progress-nav');
@@ -4196,7 +4224,7 @@ export function ProgressNavExample() {
   return (
     <lumina-progress-nav variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaNavigate={(e) => console.log(e.detail)}>
-      Conteúdo
+      <a href="#step1" data-step="0">Passo 1</a><a href="#step2" data-step="1">Passo 2</a><a href="#step3" data-step="2">Passo 3</a>
     </lumina-progress-nav>
   );
 }`,
@@ -4238,7 +4266,11 @@ customElements.define(OrbitalNav.tagName, OrbitalNav);
   accent-color="#ff6ec7"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <a href="#home">Home</a>
+  <a href="#about">Sobre</a>
+  <a href="#work">Trabalhos</a>
+  <a href="#contact">Contato</a>
+  <div slot="center"><span>★</span></div>
 </lumina-orbital-nav>
 <script type="module">
   const el = document.querySelector('lumina-orbital-nav');
@@ -4252,7 +4284,7 @@ export function OrbitalNavExample() {
   return (
     <lumina-orbital-nav variant="dimensional" intensity="intense" accent-color="#ff6ec7" speed={0.5}
       onLuminaNavigate={(e) => console.log(e.detail)}>
-      Conteúdo
+      <a href="#home">Home</a><a href="#about">Sobre</a><a href="#work">Trabalhos</a><a href="#contact">Contato</a><div slot="center"><span>★</span></div>
     </lumina-orbital-nav>
   );
 }`,
@@ -4297,8 +4329,8 @@ customElements.define(Alert.tagName, Alert);
   dismissible
   auto-dismiss="0"
 >
-  <span slot="title">Sucesso</span>
-  Operação concluída.
+  <span slot="title">Sucesso!</span>
+  Operação concluída com sucesso. Seus dados foram salvos.
 </lumina-alert>
 <script type="module">
   const el = document.querySelector('lumina-alert');
@@ -4312,7 +4344,7 @@ export function AlertExample() {
   return (
     <lumina-alert variant="glass" intensity="intense" accent-color="#22c55e" speed={0.5} dismissible auto-dismiss={0}
       onLuminaClose={(e) => console.log(e.detail)}>
-      Conteúdo
+      <span slot="title">Sucesso!</span>Operação concluída com sucesso.
     </lumina-alert>
   );
 }`,
@@ -4372,7 +4404,7 @@ export function ToastExample() {
   return (
     <lumina-toast variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} duration={4000} position="top-right"
       onLuminaDismiss={(e) => console.log(e.detail)}>
-      Conteúdo
+      Salvo com sucesso!<button slot="actions" data-action="undo">Desfazer</button>
     </lumina-toast>
   );
 }`,
@@ -4536,7 +4568,7 @@ export function BadgeExample() {
   return (
     <lumina-badge variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
       onLuminaRemove={(e) => console.log(e.detail)}>
-      Conteúdo
+      NEW
     </lumina-badge>
   );
 }`,
@@ -4596,7 +4628,7 @@ export function ChipExample() {
   return (
     <lumina-chip variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} removable
       onLuminaRemove={(e) => console.log(e.detail)}>
-      TypeScript
+      <span slot="icon">⚛</span>TypeScript
     </lumina-chip>
   );
 }`,
@@ -4747,7 +4779,7 @@ export function StatusIndicatorExample() {
   return (
     <lumina-status-indicator variant="online" intensity="intense" accent-color="#22c55e" speed={0.5} status="online"
       onLuminaStatusChange={(e) => console.log(e.detail)}>
-      Conteúdo
+      Online
     </lumina-status-indicator>
   );
 }`,
@@ -4790,7 +4822,7 @@ customElements.define(NotificationBadge.tagName, NotificationBadge);
   speed="0.5"
   count="0"
 >
-  Conteúdo
+  5
 </lumina-notification-badge>
 <script type="module">
   const el = document.querySelector('lumina-notification-badge');
@@ -4804,7 +4836,7 @@ export function NotificationBadgeExample() {
   return (
     <lumina-notification-badge variant="glass" intensity="intense" accent-color="#ff5577" speed={0.5} count={0}
       onLuminaClick={(e) => console.log(e.detail)}>
-      Conteúdo
+      5
     </lumina-notification-badge>
   );
 }`,
@@ -4851,7 +4883,7 @@ customElements.define(PulseIndicator.tagName, PulseIndicator);
 export function PulseIndicatorExample() {
   return (
     <lumina-pulse-indicator variant="aura" intensity="intense" accent-color="#ffd166" speed={0.5}>
-      Conteúdo
+      
     </lumina-pulse-indicator>
   );
 }`,
@@ -4906,7 +4938,7 @@ export function NeuralLoaderExample() {
   return (
     <lumina-neural-loader variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} progress={0}
       onLuminaProgress={(e) => console.log(e.detail)}>
-      Conteúdo
+      
     </lumina-neural-loader>
   );
 }`,

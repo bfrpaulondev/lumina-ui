@@ -275,6 +275,158 @@ def _input_react_content(tag):
 # Per-card slot content for vanilla HTML snippets.
 # Uses REAL slots from the manifest — not invented 'title'/'subtitle' slots.
 # Each entry shows the proper way to populate that card.
+# Per-navigation component content for vanilla HTML snippets.
+def _navigation_vanilla_content(tag):
+    if tag == 'lumina-tabs':
+        return (
+            '<lumina-tab id="t1" label="Geral" icon="*">Conteúdo da aba Geral.</lumina-tab>\n'
+            '  <lumina-tab id="t2" label="Conta" icon="A" badge="3">Conteúdo da aba Conta.</lumina-tab>\n'
+            '  <lumina-tab id="t3" label="Ajuda" icon="?">Conteúdo da aba Ajuda.</lumina-tab>'
+        )
+    if tag == 'lumina-breadcrumbs':
+        return (
+            '<a href="#/">Home</a>\n'
+            '  <a href="#/docs">Documentação</a>\n'
+            '  <a href="#/docs/forms" aria-current="page">Forms</a>'
+        )
+    if tag == 'lumina-sidebar':
+        return (
+            '<div slot="header"><h3>Minha App</h3></div>\n'
+            '  <a href="#/dashboard">Dashboard</a>\n'
+            '  <a href="#/projects">Projetos</a>\n'
+            '  <a href="#/settings">Configurações</a>\n'
+            '  <div slot="footer"><small>v1.0.0</small></div>'
+        )
+    if tag == 'lumina-drawer':
+        return (
+            '<h2 slot="header">Filtros</h2>\n'
+            '  <p>Conteúdo do drawer — pode conter filtros, menus, ou qualquer HTML.</p>\n'
+            '  <lumina-button variant="glass">Aplicar filtros</lumina-button>'
+        )
+    if tag == 'lumina-mega-menu':
+        return (
+            '<a href="#/products">Produtos</a>\n'
+            '  <a href="#/solutions">Soluções</a>\n'
+            '  <a href="#/docs">Documentação</a>\n'
+            '  <a href="#/pricing">Preços</a>'
+        )
+    if tag == 'lumina-command-palette':
+        # command-palette uses items attribute, not slot
+        return ''
+    if tag == 'lumina-floating-nav':
+        return (
+            '<a href="#features">Features</a>\n'
+            '  <a href="#pricing">Preços</a>\n'
+            '  <a href="#docs">Docs</a>\n'
+            '  <lumina-button size="sm">Começar</lumina-button>'
+        )
+    if tag == 'lumina-navigation':
+        return (
+            '<a href="#home" aria-current="page">Início</a>\n'
+            '  <a href="#about">Sobre</a>\n'
+            '  <a href="#contact">Contato</a>'
+        )
+    if tag == 'lumina-progress-nav':
+        return (
+            '<a href="#step1" data-step="0">Passo 1</a>\n'
+            '  <a href="#step2" data-step="1">Passo 2</a>\n'
+            '  <a href="#step3" data-step="2">Passo 3</a>'
+        )
+    if tag == 'lumina-orbital-nav':
+        return (
+            '<a href="#home">Home</a>\n'
+            '  <a href="#about">Sobre</a>\n'
+            '  <a href="#work">Trabalhos</a>\n'
+            '  <a href="#contact">Contato</a>\n'
+            '  <div slot="center"><span>★</span></div>'
+        )
+    # pagination, step-indicator: self-closing (use attrs)
+    return ''
+
+
+def _navigation_react_content(tag):
+    if tag == 'lumina-tabs':
+        return (
+            '<lumina-tab id="t1" label="Geral" icon="*">Conteúdo da aba Geral.</lumina-tab>\n'
+            '        <lumina-tab id="t2" label="Conta" icon="A" badge="3">Conteúdo da aba Conta.</lumina-tab>\n'
+            '        <lumina-tab id="t3" label="Ajuda" icon="?">Conteúdo da aba Ajuda.</lumina-tab>'
+        )
+    if tag == 'lumina-breadcrumbs':
+        return '<a href="#/">Home</a><a href="#/docs">Documentação</a><a href="#/docs/forms" aria-current="page">Forms</a>'
+    if tag == 'lumina-sidebar':
+        return (
+            '<div slot="header"><h3>Minha App</h3></div>\n'
+            '        <a href="#/dashboard">Dashboard</a>\n'
+            '        <a href="#/projects">Projetos</a>\n'
+            '        <a href="#/settings">Configurações</a>\n'
+            '        <div slot="footer"><small>v1.0.0</small></div>'
+        )
+    if tag == 'lumina-drawer':
+        return (
+            '<h2 slot="header">Filtros</h2>\n'
+            '        <p>Conteúdo do drawer.</p>\n'
+            '        <lumina-button variant="glass">Aplicar filtros</lumina-button>'
+        )
+    if tag == 'lumina-floating-nav':
+        return '<a href="#features">Features</a><a href="#pricing">Preços</a><a href="#docs">Docs</a><lumina-button size="sm">Começar</lumina-button>'
+    if tag == 'lumina-navigation':
+        return '<a href="#home" aria-current="page">Início</a><a href="#about">Sobre</a><a href="#contact">Contato</a>'
+    if tag == 'lumina-orbital-nav':
+        return '<a href="#home">Home</a><a href="#about">Sobre</a><a href="#work">Trabalhos</a><a href="#contact">Contato</a><div slot="center"><span>★</span></div>'
+    if tag == 'lumina-mega-menu':
+        return '<a href="#/products">Produtos</a><a href="#/solutions">Soluções</a><a href="#/docs">Documentação</a><a href="#/pricing">Preços</a>'
+    if tag == 'lumina-progress-nav':
+        return '<a href="#step1" data-step="0">Passo 1</a><a href="#step2" data-step="1">Passo 2</a><a href="#step3" data-step="2">Passo 3</a>'
+    return ''
+
+
+# Per-feedback component content for vanilla HTML snippets.
+def _feedback_vanilla_content(tag):
+    if tag == 'lumina-progress':
+        return ''  # self-closing, value attr
+    if tag == 'lumina-skeleton':
+        return ''  # self-closing, shape attr
+    if tag == 'lumina-badge':
+        return 'NEW'
+    if tag == 'lumina-chip':
+        return '<span slot="icon">⚛</span>\n  TypeScript'
+    if tag == 'lumina-toast':
+        return 'Salvo com sucesso!\n  <button slot="actions" data-action="undo">Desfazer</button>'
+    if tag == 'lumina-alert':
+        return '<span slot="title">Sucesso!</span>\n  Operação concluída com sucesso. Seus dados foram salvos.'
+    if tag == 'lumina-loading':
+        return ''  # self-closing (size + text attrs)
+    if tag == 'lumina-spinner':
+        return ''
+    if tag == 'lumina-status-indicator':
+        return 'Online'
+    if tag == 'lumina-notification-badge':
+        return '5'
+    if tag == 'lumina-pulse-indicator':
+        return ''
+    if tag == 'lumina-neural-loader':
+        return ''
+    return 'Conteúdo'
+
+
+def _feedback_react_content(tag):
+    if tag == 'lumina-progress': return ''
+    if tag == 'lumina-skeleton': return ''
+    if tag == 'lumina-badge': return 'NEW'
+    if tag == 'lumina-chip': return '<span slot="icon">⚛</span>TypeScript'
+    if tag == 'lumina-toast':
+        return 'Salvo com sucesso!<button slot="actions" data-action="undo">Desfazer</button>'
+    if tag == 'lumina-alert':
+        return '<span slot="title">Sucesso!</span>Operação concluída com sucesso.'
+    if tag == 'lumina-loading': return ''
+    if tag == 'lumina-spinner': return ''
+    if tag == 'lumina-status-indicator': return 'Online'
+    if tag == 'lumina-notification-badge': return '5'
+    if tag == 'lumina-pulse-indicator': return ''
+    if tag == 'lumina-neural-loader': return ''
+    return 'Conteúdo'
+
+
 def _card_vanilla_content(tag):
     if tag == 'lumina-card':
         # Real slots: header, default, media, footer
@@ -530,21 +682,10 @@ def gen_vanilla_snippet(spec):
         if extra_attrs:
             attrs.extend(extra_attrs)
         # inputs are usually self-closing unless they have slot content (radio-group, input with icons)
+    elif cat == 'navigation':
+        content = _navigation_vanilla_content(tag)
     elif cat == 'feedback':
-        if tag == 'lumina-progress':
-            content = ''
-        elif tag == 'lumina-badge':
-            content = 'NEW'
-        elif tag == 'lumina-chip':
-            content = '<span slot="icon">⚛</span>\n  TypeScript'
-        elif tag == 'lumina-toast':
-            content = 'Salvo com sucesso!\n  <button slot="actions" data-action="undo">Desfazer</button>'
-        elif tag == 'lumina-alert':
-            content = '<span slot="title">Sucesso</span>\n  Operação concluída.'
-        elif tag == 'lumina-skeleton':
-            content = ''
-        else:
-            content = 'Conteúdo'
+        content = _feedback_vanilla_content(tag)
     elif cat == 'overlays':
         if tag in ('lumina-modal', 'lumina-dialog', 'lumina-drawer-modal', 'lumina-confirmation-dialog'):
             content = '<span slot="title">Título</span>\n  <p>Conteúdo do modal.</p>\n  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>'
@@ -640,11 +781,10 @@ def gen_react_snippet(spec):
         content, extra_attrs = _input_react_content(tag)
         if extra_attrs:
             attrs.extend(extra_attrs)
+    elif cat == 'navigation':
+        content = _navigation_react_content(tag)
     elif cat == 'feedback':
-        if tag == 'lumina-progress':
-            content = ''
-        elif tag == 'lumina-chip':
-            content = 'TypeScript'
+        content = _feedback_react_content(tag)
 
     # Event handler
     event_handler = ''

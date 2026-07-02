@@ -8,6 +8,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { intensityToMultiplier, prefersReducedMotion, randRange } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 interface TrailParticle {
   x: number;
@@ -176,6 +177,11 @@ export class LuminaProgress extends LuminaElement {
         100% { left: 100%; }
       }
 
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) {
         .lumina-progress__shimmer,
         .lumina-progress__fill,

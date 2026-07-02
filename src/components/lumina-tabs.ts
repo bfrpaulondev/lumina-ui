@@ -17,6 +17,7 @@ import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { coerceAttr } from '../core/utils';
 import { prefersReducedMotion } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 const ORIENTATIONS = ['horizontal', 'vertical'] as const;
 type Orientation = (typeof ORIENTATIONS)[number];
@@ -251,6 +252,11 @@ export class LuminaTabs extends LuminaElement {
           inset 0 1px 0 rgb(255 255 255 / 0.25);
       }
 
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) {
         .lmt__indicator, .lmt__panel { transition: none !important; animation: none !important; }
       }

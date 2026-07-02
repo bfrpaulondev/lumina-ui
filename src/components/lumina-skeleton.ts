@@ -5,6 +5,7 @@
 
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class Skeleton extends LuminaElement {
   static tagName = 'lumina-skeleton';
@@ -51,6 +52,11 @@ export class Skeleton extends LuminaElement {
       :host([variant="neural"]) .lmsk { border-color: rgb(var(--lumina-accent-rgb) / 0.2); }
       :host([variant="neural"]) .lmsk::after { background: radial-gradient(circle at 50% 50%, rgb(var(--lumina-accent-rgb) / 0.2), transparent 70%); animation: lmsk-neural-pulse 2s ease-in-out infinite; }
       @keyframes lmsk-neural-pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmsk::after, .lmsk-card-line::after { animation: none !important; } }
     `;
   }

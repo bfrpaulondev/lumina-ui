@@ -6,6 +6,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { clamp } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class PulseIndicator extends LuminaElement {
   static tagName = 'lumina-pulse-indicator';
@@ -41,6 +42,11 @@ export class PulseIndicator extends LuminaElement {
       :host([variant="aura"]) .lmpi__pulse { background: #ffd166; }
       :host([variant="subtle"]) { --lmpi-speed: 3s; }
       :host([variant="subtle"]) .lmpi__pulse { animation-timing-function: var(--lumina-ease-in-out); }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmpi__pulse { animation: none !important; opacity: 0; } }
     `;
   }

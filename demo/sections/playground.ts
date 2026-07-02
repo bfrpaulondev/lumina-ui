@@ -267,6 +267,16 @@ function buildGalleryHTML(meta: ComponentMeta, state: { variant: string; intensi
     return buildInputGallery(tag, meta, state, a);
   }
 
+  // ===== NAVIGATION: rich gallery =====
+  if (cat === 'navigation') {
+    return buildNavigationGallery(tag, meta, state, a);
+  }
+
+  // ===== FEEDBACK: rich gallery =====
+  if (cat === 'feedback') {
+    return buildFeedbackGallery(tag, meta, state, a);
+  }
+
   // ===== Default: single preview =====
   return `<div class="playground__gallery-row">
     <div class="playground__gallery-label">Preview</div>
@@ -1603,6 +1613,144 @@ function buildParallaxCardGallery(state: { variant: string; intensity: string; a
       </div>
     </div>
   `;
+}
+
+/**
+ * Build the navigation gallery — shows variants, real content, and interactive examples.
+ */
+function buildNavigationGallery(tag: string, meta: ComponentMeta, state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = meta.variants;
+
+  // Variant showcase row
+  const variantRow = variants.length > 1 ? `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes (${variants.length})</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <${tag} id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" style="min-width:200px;">
+            ${_navigationPreviewContent(tag)}
+          </${tag}>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  // Real-world usage
+  const usageRow = `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Exemplo de uso</div>
+      <div class="playground__gallery-items">
+        <${tag} id="demo-usage" ${attrs} style="min-width:300px;max-width:500px;">
+          ${_navigationPreviewContent(tag)}
+        </${tag}>
+      </div>
+    </div>
+  `;
+
+  // Colors row
+  const colorsRow = `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Cores customizadas</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <${tag} id="demo-c1" variant="${variants[0]}" intensity="extreme" accent-color="#ff6ec7" theme="dark" style="min-width:180px;">${_navigationPreviewContent(tag)}</${tag}>
+        <${tag} id="demo-c2" variant="${variants[0]}" intensity="extreme" accent-color="#22c55e" theme="dark" style="min-width:180px;">${_navigationPreviewContent(tag)}</${tag}>
+        <${tag} id="demo-c3" variant="${variants[0]}" intensity="extreme" accent-color="#f59e0b" theme="dark" style="min-width:180px;">${_navigationPreviewContent(tag)}</${tag}>
+      </div>
+    </div>
+  `;
+
+  return variantRow + usageRow + colorsRow;
+}
+
+function _navigationPreviewContent(tag: string): string {
+  if (tag === 'lumina-tabs') {
+    return `<lumina-tab id="t1" label="Geral" icon="*">Conteúdo Geral</lumina-tab><lumina-tab id="t2" label="Conta" icon="A" badge="3">Conta</lumina-tab><lumina-tab id="t3" label="Ajuda" icon="?">Ajuda</lumina-tab>`;
+  }
+  if (tag === 'lumina-breadcrumbs') return `<a href="#/">Home</a><a href="#/docs">Docs</a><a aria-current="page">Forms</a>`;
+  if (tag === 'lumina-sidebar') return `<div slot="header"><strong>App</strong></div><a href="#/dash">Dashboard</a><a href="#/proj">Projetos</a><a href="#/set">Config</a><div slot="footer"><small>v1.0</small></div>`;
+  if (tag === 'lumina-drawer') return `<h2 slot="header">Filtros</h2><p>Conteúdo do drawer.</p>`;
+  if (tag === 'lumina-mega-menu') return `<a href="#/p">Produtos</a><a href="#/s">Soluções</a><a href="#/d">Docs</a>`;
+  if (tag === 'lumina-floating-nav') return `<a href="#f">Features</a><a href="#p">Preços</a><lumina-button size="sm">Começar</lumina-button>`;
+  if (tag === 'lumina-navigation') return `<a aria-current="page">Início</a><a>Sobre</a><a>Contato</a>`;
+  if (tag === 'lumina-progress-nav') return `<a data-step="0">Passo 1</a><a data-step="1">Passo 2</a><a data-step="2">Passo 3</a>`;
+  if (tag === 'lumina-orbital-nav') return `<a>Home</a><a>Sobre</a><a>Work</a><div slot="center"><span>★</span></div>`;
+  // pagination, step-indicator, command-palette: self-closing
+  return '';
+}
+
+/**
+ * Build the feedback gallery — shows variants, states, and real examples.
+ */
+function buildFeedbackGallery(tag: string, meta: ComponentMeta, state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = meta.variants;
+
+  // For self-closing components (progress, skeleton, loading, spinner, etc.)
+  const selfClosing = ['lumina-progress', 'lumina-skeleton', 'lumina-loading', 'lumina-spinner', 'lumina-pulse-indicator', 'lumina-neural-loader'].includes(tag);
+
+  if (selfClosing) {
+    const variantRow = `
+      <div class="playground__gallery-row">
+        <div class="playground__gallery-label">Todas as variantes (${variants.length})</div>
+        <div class="playground__gallery-items" style="align-items:center;min-height:100px;">
+          ${variants.map((v: string, i: number) => {
+            const extraAttrs = tag === 'lumina-progress' ? 'value="60"' :
+              tag === 'lumina-skeleton' ? 'shape="rectangle" width="200px" height="60px"' :
+              tag === 'lumina-loading' ? 'size="48" text="Carregando..."' :
+              tag === 'lumina-spinner' ? 'size="48"' : '';
+            return `<${tag} id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" ${extraAttrs}></${tag}>`;
+          }).join('')}
+        </div>
+      </div>
+    `;
+    const colorsRow = `
+      <div class="playground__gallery-row">
+        <div class="playground__gallery-label">Cores customizadas</div>
+        <div class="playground__gallery-items" style="align-items:center;min-height:100px;">
+          <${tag} id="demo-c1" variant="${variants[0]}" intensity="extreme" accent-color="#ff6ec7" theme="dark" ${tag === 'lumina-progress' ? 'value="70"' : tag === 'lumina-loading' ? 'size="48"' : ''}></${tag}>
+          <${tag} id="demo-c2" variant="${variants[0]}" intensity="extreme" accent-color="#22c55e" theme="dark" ${tag === 'lumina-progress' ? 'value="40"' : tag === 'lumina-loading' ? 'size="48"' : ''}></${tag}>
+          <${tag} id="demo-c3" variant="${variants[0]}" intensity="extreme" accent-color="#f59e0b" theme="dark" ${tag === 'lumina-progress' ? 'value="90"' : tag === 'lumina-loading' ? 'size="48"' : ''}></${tag}>
+        </div>
+      </div>
+    `;
+    return variantRow + colorsRow;
+  }
+
+  // For content components (alert, toast, badge, chip, status-indicator, notification-badge)
+  const variantRow = variants.length > 1 ? `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes (${variants.length})</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <${tag} id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" style="min-width:180px;">
+            ${_feedbackPreviewContent(tag)}
+          </${tag}>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  const usageRow = `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Exemplo de uso</div>
+      <div class="playground__gallery-items">
+        <${tag} id="demo-usage" ${attrs} style="min-width:300px;max-width:500px;">
+          ${_feedbackPreviewContent(tag)}
+        </${tag}>
+      </div>
+    </div>
+  `;
+
+  return variantRow + usageRow;
+}
+
+function _feedbackPreviewContent(tag: string): string {
+  if (tag === 'lumina-alert') return `<span slot="title">Sucesso!</span> Operação concluída com sucesso.`;
+  if (tag === 'lumina-toast') return `Salvo com sucesso!<button slot="actions" data-action="undo">Desfazer</button>`;
+  if (tag === 'lumina-badge') return `NEW`;
+  if (tag === 'lumina-chip') return `<span slot="icon">⚛</span>TypeScript`;
+  if (tag === 'lumina-status-indicator') return `Online`;
+  if (tag === 'lumina-notification-badge') return `5`;
+  return `Conteúdo`;
 }
 
 function buildSinglePreview(tag: string, attrs: string, meta: ComponentMeta): string {

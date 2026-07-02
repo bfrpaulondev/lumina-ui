@@ -5,6 +5,7 @@
 
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 const STATUS_COLORS: Record<string, string> = {
   online: '#22c55e', offline: '#6b7280', busy: '#ef4444', away: '#f59e0b', neural: 'var(--lumina-accent)',
@@ -51,6 +52,11 @@ export class StatusIndicator extends LuminaElement {
       .lmsi:hover .lmsi__tooltip { opacity: 1; }
       .lmsi__label { font-size: 13px; font-weight: 500; }
       .lmsi__label:empty { display: none; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmsi__dot, .lmsi__pulse { animation: none !important; } }
     `;
   }

@@ -5,6 +5,7 @@
 
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class NotificationBadge extends LuminaElement {
   static tagName = 'lumina-notification-badge';
@@ -55,6 +56,11 @@ export class NotificationBadge extends LuminaElement {
       .lmnb__count { line-height: 1; }
       :host([variant="neural"]) .lmnb__badge { background: var(--lumina-accent); box-shadow: 0 0 0 2px var(--lumina-bg, #06060c), 0 0 12px rgb(var(--lumina-accent-rgb) / 0.7); }
       :host([variant="aura"]) .lmnb__badge { background: #ffd166; color: #1a1a2e; box-shadow: 0 0 0 2px var(--lumina-bg, #06060c), 0 0 12px rgb(255 209 102 / 0.7); }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmnb__badge { animation: none !important; transition: none !important; } }
     `;
   }

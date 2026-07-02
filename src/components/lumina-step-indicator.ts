@@ -18,6 +18,7 @@
  */
 
 import { LuminaElement } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class StepIndicator extends LuminaElement {
   static tagName = 'lumina-step-indicator';
@@ -84,6 +85,11 @@ export class StepIndicator extends LuminaElement {
         -webkit-backdrop-filter: blur(20px) saturate(1.5);
         border: 1px solid var(--lumina-border);
       }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) {
         .lmc__glow { transition: none !important; }
       }

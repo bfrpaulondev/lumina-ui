@@ -6,6 +6,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { clamp, prefersReducedMotion, randRange } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 interface Node { x: number; y: number; vx: number; vy: number; }
 
@@ -36,6 +37,11 @@ export class NeuralLoader extends LuminaElement {
       .lmnl__network { width: 100%; height: 100%; }
       :host([variant="intense"]) { --lmnl-size: 100px; }
       :host([variant="subtle"]) { --lmnl-size: 60px; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmnl__network { opacity: 0.5; } }
     `;
   }

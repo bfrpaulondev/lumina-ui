@@ -6,6 +6,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { prefersReducedMotion } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class Spinner extends LuminaElement {
   static tagName = 'lumina-spinner';
@@ -39,6 +40,11 @@ export class Spinner extends LuminaElement {
       :host([variant="aura"]) .lmsp__ring { border-top-color: #ffd166; border-right-color: rgb(255 209 102 / 0.3); animation-duration: 1.5s; }
       :host([variant="aura"]) .lmsp__core { background: #ffd166; box-shadow: 0 0 12px #ffd166, 0 0 32px rgb(255 209 102 / 0.5); }
       :host([variant="glass"]) .lmsp__ring { border-top-color: rgb(255 255 255 / 0.6); border-right-color: rgb(255 255 255 / 0.15); }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmsp__ring, .lmsp__core { animation: none !important; } }
     `;
   }
