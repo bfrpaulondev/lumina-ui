@@ -5,9 +5,13 @@
 
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class VoiceInput extends LuminaElement {
   static tagName = 'lumina-voice-input';
+  static get observedAttributes(): string[] {
+    return [...LuminaElement.observedAttributes, 'value', 'placeholder', 'name', 'disabled', 'required', 'invalid', 'valid'];
+  }
   private input: HTMLInputElement | null = null;
   private micBtn: HTMLElement | null = null;
   private canvas: HTMLCanvasElement | null = null;
@@ -43,17 +47,39 @@ export class VoiceInput extends LuminaElement {
       @keyframes lmvi-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgb(239 68 68 / 0.5); } 50% { box-shadow: 0 0 0 10px rgb(239 68 68 / 0); } }
       .lmvi__waveform { display: block; width: 100%; height: 40px; margin-top: 4px; opacity: 0; transition: opacity var(--lumina-speed) var(--lumina-ease-out); }
       .lmvi__waveform[data-active] { opacity: 1; }
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) .lmvi__bg { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) .lmvi__bg { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
     `;
   }
+  get value(): string { return this.input?.value ?? ''; }
+  set value(v: string) { if (this.input) this.input.value = v; this.setAttribute('value', v); }
+
   protected mounted(): void {
     this.input = this.$$('.lmvi__el') as HTMLInputElement | null;
     this.micBtn = this.$$('.lmvi__mic');
     this.canvas = this.$$('.lmvi__waveform') as HTMLCanvasElement | null;
     this.ctx = this.canvas?.getContext('2d') ?? null;
     this.micBtn?.addEventListener('click', this.toggleRecording);
+    this.input?.addEventListener('input', this.onInput);
+    this.input?.addEventListener('focus', this.onFocus);
+    this.input?.addEventListener('blur', this.onBlur);
+    const initial = this.getAttribute('value');
+    if (initial !== null && this.input) this.input.value = initial;
   }
-  protected unmounted(): void { cancelAnimationFrame(this.raf); if (this.recognition) this.recognition.stop(); }
+  protected unmounted(): void { cancelAnimationFrame(this.raf); if (this.recognition) this.recognition.stop(); this.input?.removeEventListener('input', this.onInput); this.input?.removeEventListener('focus', this.onFocus); this.input?.removeEventListener('blur', this.onBlur); }
   protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'value' && value !== null && this.input) this.input.value = value;
+    else if (name === 'disabled' && this.input) (this.input as any).disabled = value !== null;
+  }
+  private onInput = (e: Event): void => {
+    this.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, composed: true, detail: { value: (e.target as HTMLInputElement).value } }));
+  };
+  private onFocus = (): void => { this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this.value } })); };
+  private onBlur = (): void => { this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this.value } })); };
   private toggleRecording = (): void => {
     if (this.recording) { this.stopRecording(); } else { this.startRecording(); }
   };

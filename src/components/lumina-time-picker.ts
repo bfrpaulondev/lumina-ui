@@ -9,7 +9,7 @@ import { clamp } from '../core/utils';
 
 export class TimePicker extends LuminaElement {
   static tagName = 'lumina-time-picker';
-  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value', 'format']; }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value', 'format', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _value = '12:00';
   private _format = '24h';
   private trigger: HTMLElement | null = null;
@@ -69,6 +69,8 @@ export class TimePicker extends LuminaElement {
     this.updateTrigger();
     this.updateHand();
     this.trigger?.addEventListener('click', () => this.toggle());
+    this.trigger?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this._value } })));
+    this.trigger?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this._value } })));
     this.dial?.addEventListener('pointerdown', this.onPointerDown);
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);

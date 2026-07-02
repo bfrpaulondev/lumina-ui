@@ -208,7 +208,20 @@ export class Form extends LuminaElement {
 
   /** Get the value of a single field (clean value for masked inputs). */
   private _getFieldValue(el: HTMLElement): any {
-    if (el.tagName.toLowerCase() === 'lumina-masked-input') {
+    const tag = el.tagName.toLowerCase();
+    if (tag === 'lumina-masked-input') {
+      return (el as any).value ?? '';
+    }
+    if (tag === 'lumina-switch' || tag === 'lumina-checkbox') {
+      return (el as any).checked ?? false;
+    }
+    if (tag === 'lumina-autocomplete') {
+      return (el as any).value ?? '';
+    }
+    if (tag === 'lumina-radio-group') {
+      return (el as any).value ?? '';
+    }
+    if (tag === 'lumina-multi-select') {
       return (el as any).value ?? '';
     }
     if ('value' in el) return (el as HTMLInputElement).value;

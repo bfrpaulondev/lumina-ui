@@ -10,7 +10,7 @@ interface Option { value: string; label: string; }
 
 export class MultiSelect extends LuminaElement {
   static tagName = 'lumina-multi-select';
-  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'options', 'value', 'max']; }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'options', 'value', 'max', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _options: Option[] = [];
   private _selected: string[] = [];
   private _max = 0;
@@ -82,6 +82,8 @@ export class MultiSelect extends LuminaElement {
     this.renderMenu();
     this.$$('.lmms__add')?.addEventListener('click', this.toggleMenu);
     this.searchEl?.addEventListener('input', () => this.renderMenu());
+    this.$$('.lmms__add')?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this.value } })));
+    this.$$('.lmms__add')?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this.value } })));
     document.addEventListener('click', this.onDocClick);
   }
   protected unmounted(): void { document.removeEventListener('click', this.onDocClick); }

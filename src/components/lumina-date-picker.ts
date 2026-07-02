@@ -11,7 +11,7 @@ const DAYS = ['D','S','T','Q','Q','S','S'];
 
 export class DatePicker extends LuminaElement {
   static tagName = 'lumina-date-picker';
-  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value']; }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _value = '';
   private viewDate = new Date();
   private trigger: HTMLElement | null = null;
@@ -72,6 +72,8 @@ export class DatePicker extends LuminaElement {
     this.renderWeekdays();
     this.renderDays();
     this.trigger?.addEventListener('click', () => this.toggle());
+    this.trigger?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this._value } })));
+    this.trigger?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this._value } })));
     this.$$('.lmdp__prev')?.addEventListener('click', () => { this.viewDate.setMonth(this.viewDate.getMonth() - 1); this.renderDays(); });
     this.$$('.lmdp__next')?.addEventListener('click', () => { this.viewDate.setMonth(this.viewDate.getMonth() + 1); this.renderDays(); });
     document.addEventListener('click', this.onDocClick);

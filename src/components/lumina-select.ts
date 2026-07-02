@@ -21,6 +21,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { prefersReducedMotion } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 interface Option {
   value: string;
@@ -38,6 +39,11 @@ export class LuminaSelect extends LuminaElement {
       'placeholder',
       'searchable',
       'options',
+      'name',
+      'disabled',
+      'required',
+      'invalid',
+      'valid',
     ];
   }
 
@@ -292,6 +298,10 @@ export class LuminaSelect extends LuminaElement {
 
       @keyframes lmsl-spin { to { transform: rotate(360deg); } }
 
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="trigger"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="trigger"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) {
         .lmsl, .lmsl__bg, .lmsl__glow, .lmsl__chevron, .lmsl__dropdown {
           animation: none !important;
@@ -327,6 +337,8 @@ export class LuminaSelect extends LuminaElement {
 
     this.trigger?.addEventListener('click', this.onTriggerClick);
     this.searchInput?.addEventListener('input', this.onSearchInput);
+    this.trigger?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this._value } })));
+    this.trigger?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this._value } })));
     document.addEventListener('click', this.onDocClick);
     document.addEventListener('keydown', this.onKeydown);
   }

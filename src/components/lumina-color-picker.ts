@@ -36,7 +36,7 @@ function hslToHex(h: number, s: number, l: number): string {
 
 export class ColorPicker extends LuminaElement {
   static tagName = 'lumina-color-picker';
-  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value']; }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _value = '#7c5cff';
   private trigger: HTMLElement | null = null;
   private panel: HTMLElement | null = null;
@@ -102,6 +102,8 @@ export class ColorPicker extends LuminaElement {
     this.lightSlider = this.$$('.lmcp__light') as HTMLInputElement | null;
     this.updatePreview();
     this.trigger?.addEventListener('click', () => this.toggle());
+    this.trigger?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this._value } })));
+    this.trigger?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this._value } })));
     this.hueSlider?.addEventListener('input', () => this.updateFromSliders());
     this.$$('.lmcp__sat')?.addEventListener('input', () => this.updateFromSliders());
     this.lightSlider?.addEventListener('input', () => this.updateFromSliders());

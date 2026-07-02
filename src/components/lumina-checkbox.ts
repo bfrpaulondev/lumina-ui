@@ -6,14 +6,16 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { prefersReducedMotion } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class Checkbox extends LuminaElement {
   static tagName = 'lumina-checkbox';
-  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'checked', 'indeterminate']; }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'checked', 'indeterminate', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _checked = false;
   private _indeterminate = false;
   private box: HTMLElement | null = null;
 
+  get value(): any { return this._checked; }
   get checked(): boolean { return this._checked; }
   set checked(v: boolean) { this._checked = v; if (v) this.setAttribute('checked',''); else this.removeAttribute('checked'); this.updateState(); }
   get indeterminate(): boolean { return this._indeterminate; }
@@ -54,6 +56,10 @@ export class Checkbox extends LuminaElement {
       :host(:focus-visible) .lmcb__box { outline: 2px solid var(--lumina-accent); outline-offset: 2px; }
       :host([variant="morph"]) .lmcb__box { border-radius: 50%; }
       :host([variant="morph"][checked]) .lmcb__box { border-radius: 6px; }
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) .lmcb__box { border-color: rgb(255 70 90 / 0.6); box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10); }
+      :host([valid]) .lmcb__box { border-color: rgb(34 197 94 / 0.5); }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmcb__box, .lmcb__check, .lmcb__indeterminate { transition: none !important; animation: none !important; } }
     `;
   }
@@ -66,14 +72,18 @@ export class Checkbox extends LuminaElement {
     this.updateState();
     this.$$('.lmcb')?.addEventListener('click', this.onClick);
     this.addEventListener('keydown', this.onKeydown);
+    this.addEventListener('focus', this.onFocus);
+    this.addEventListener('blur', this.onBlur);
   }
-  protected unmounted(): void { this.removeEventListener('keydown', this.onKeydown); }
+  protected unmounted(): void { this.removeEventListener('keydown', this.onKeydown); this.removeEventListener('focus', this.onFocus); this.removeEventListener('blur', this.onBlur); }
   protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
   attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
     super.attributeChangedCallback(name, _old, value);
     if (name === 'checked') { this._checked = value !== null; this.updateState(); }
     else if (name === 'indeterminate') { this._indeterminate = value !== null; this.updateState(); }
   }
+  private onFocus = (): void => { this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { checked: this._checked } })); };
+  private onBlur = (): void => { this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { checked: this._checked } })); };
   private updateState(): void {
     this.setAttribute('aria-checked', this._indeterminate ? 'mixed' : String(this._checked));
   }

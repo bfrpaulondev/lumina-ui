@@ -5,15 +5,17 @@
 
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class SearchInput extends LuminaElement {
   static tagName = 'lumina-search-input';
   static get observedAttributes(): string[] {
-    return [...LuminaElement.observedAttributes, 'value', 'suggestions', 'voice'];
+    return [...LuminaElement.observedAttributes, 'value', 'suggestions', 'voice', 'placeholder', 'name', 'disabled', 'required', 'invalid', 'valid', 'floating-label'];
   }
   private _value = '';
   private _suggestions: string[] = [];
   private _voice = false;
+  private _floatingLabel = false;
   private input: HTMLInputElement | null = null;
   private suggestionsEl: HTMLElement | null = null;
   private iconEl: HTMLElement | null = null;
@@ -26,12 +28,15 @@ export class SearchInput extends LuminaElement {
   set voice(v: boolean) { this._voice = v; if (v) this.setAttribute('voice',''); else this.removeAttribute('voice'); }
 
   protected render(): string {
+    const placeholderAttr = this._floatingLabel ? '' : `placeholder="${this.getAttribute('placeholder') ?? 'Buscar...'}"`;
+    const labelSlot = this._floatingLabel ? `<slot name="label"></slot>` : '';
     return `
-      <div class="lms" part="field">
+      <div class="lms" part="field" data-lumina-root>
+        ${labelSlot}
         <div class="lms__shell" part="control">
-          <div class="lms__bg" aria-hidden="true"></div>
+          <div class="lms__bg" part="bg" aria-hidden="true"></div>
           <span class="lms__icon" part="icon" aria-hidden="true">🔍</span>
-          <input class="lms__el" type="text" placeholder="Buscar..." />
+          <input class="lms__el" part="input" type="text" ${placeholderAttr} name="${this.getAttribute('name') ?? ''}" value="${this.getAttribute('value') ?? ''}" ${this.hasAttribute('disabled') ? 'disabled' : ''} ${this.hasAttribute('required') ? 'required' : ''} aria-invalid="${this.hasAttribute('invalid')}" />
           <button class="lms__voice" type="button" aria-label="Busca por voz" hidden>🎤</button>
         </div>
         <div class="lms__suggestions" part="suggestions" aria-hidden="true"></div>
@@ -60,6 +65,7 @@ export class SearchInput extends LuminaElement {
       .lms__highlight { color: var(--lumina-accent); font-weight: 700; }
       :host([variant="minimal"]) .lms__bg { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; border-color: transparent; border-bottom: 1px solid var(--lumina-border); border-radius: 0; }
       :host([variant="minimal"]) .lms__shell { border-radius: 0; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lms__icon, .lms__suggestions, .lms__suggestion { transition: none !important; animation: none !important; } }
     `;
   }
@@ -68,6 +74,7 @@ export class SearchInput extends LuminaElement {
     const sugAttr = this.getAttribute('suggestions');
     if (sugAttr) { try { this._suggestions = JSON.parse(sugAttr); } catch { this._suggestions = []; } }
     this._voice = this.hasAttribute('voice');
+    this._floatingLabel = this.hasAttribute('floating-label');
     this.input = this.$$('.lms__el') as HTMLInputElement | null;
     this.suggestionsEl = this.$$('.lms__suggestions');
     this.iconEl = this.$$('.lms__icon');
@@ -76,26 +83,36 @@ export class SearchInput extends LuminaElement {
     if (this.input) {
       this.input.value = this._value;
       this.input.addEventListener('input', this.onInput);
+      this.input.addEventListener('focus', this.onFocus);
+      this.input.addEventListener('blur', this.onBlur);
     }
     this.iconEl?.addEventListener('click', this.onIconClick);
     voiceBtn?.addEventListener('click', this.onVoiceClick);
     document.addEventListener('click', this.onDocClick);
     this.updateIcon();
+    this._updateFloatingState();
   }
-  protected unmounted(): void { document.removeEventListener('click', this.onDocClick); }
+  protected unmounted(): void { document.removeEventListener('click', this.onDocClick); this.input?.removeEventListener('focus', this.onFocus); this.input?.removeEventListener('blur', this.onBlur); }
   protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
   attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
     super.attributeChangedCallback(name, _old, value);
-    if (name === 'value') { this._value = value ?? ''; if (this.input) this.input.value = this._value; this.updateIcon(); this.filterSuggestions(); }
+    if (name === 'value') { this._value = value ?? ''; if (this.input) this.input.value = this._value; this.updateIcon(); this.filterSuggestions(); this._updateFloatingState(); }
     else if (name === 'suggestions' && value) { try { this._suggestions = JSON.parse(value); this.filterSuggestions(); } catch {} }
     else if (name === 'voice') this._voice = value !== null;
+    else if (name === 'disabled' && this.input) { (this.input as any).disabled = value !== null; }
+    else if (name === 'floating-label') this._floatingLabel = value !== null;
   }
   private onInput = (e: Event): void => {
     this._value = (e.target as HTMLInputElement).value;
     this.updateIcon();
     this.filterSuggestions();
+    this._updateFloatingState();
+    this.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, composed: true, detail: { value: this._value } }));
     this.dispatchEvent(new CustomEvent('lumina-search', { bubbles: true, composed: true, detail: { value: this._value } }));
   };
+  private onFocus = (): void => { this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this._value } })); };
+  private onBlur = (): void => { this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this._value } })); };
+  private _updateFloatingState(): void { this.toggleAttribute('data-has-value', this._value.length > 0); }
   private onIconClick = (): void => {
     if (this._value) { this.value = ''; this.input?.focus(); }
   };

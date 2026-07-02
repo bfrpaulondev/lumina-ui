@@ -148,6 +148,8 @@ export class Autocomplete extends LuminaElement {
     this.loadingEl = this.$$('.lmau__loading');
     this.input?.addEventListener('input', this.onInput);
     this.input?.addEventListener('keydown', this.onKeydown);
+    this.input?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this._query } })));
+    this.input?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this._query } })));
     this.suggestionsEl?.addEventListener('scroll', this.onScroll);
     document.addEventListener('click', this.onDocClick);
   }

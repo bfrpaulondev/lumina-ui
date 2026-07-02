@@ -9,7 +9,7 @@ import { clamp } from '../core/utils';
 
 export class RangeSlider extends LuminaElement {
   static tagName = 'lumina-range-slider';
-  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'min-value', 'max-value', 'min', 'max']; }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'min-value', 'max-value', 'min', 'max', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _min = 0;
   private _max = 100;
   private _minVal = 25;
@@ -73,6 +73,10 @@ export class RangeSlider extends LuminaElement {
     this.tooltipMax = this.thumbMax?.querySelector('.lmrs__tooltip') ?? null;
     this.updateUI();
     this.track?.addEventListener('pointerdown', this.onPointerDown);
+    this.thumbMin?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this.minValue } })));
+    this.thumbMin?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this.minValue } })));
+    this.thumbMax?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this.maxValue } })));
+    this.thumbMax?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this.maxValue } })));
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
     this.thumbMin?.addEventListener('keydown', (e) => this.onKeydown(e, 'min'));

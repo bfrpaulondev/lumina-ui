@@ -19,6 +19,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { clamp } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 interface Mark {
   value: number;
@@ -36,6 +37,11 @@ export class LuminaSlider extends LuminaElement {
       'max',
       'step',
       'marks',
+      'name',
+      'disabled',
+      'required',
+      'invalid',
+      'valid',
     ];
   }
 
@@ -275,6 +281,10 @@ export class LuminaSlider extends LuminaElement {
         50%      { transform: translate(-50%, calc(-50% - 1px)); }
       }
 
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) {
         .lms__fill, .lms__thumb, .lms__tooltip { transition: none !important; animation: none !important; }
       }
@@ -319,6 +329,8 @@ export class LuminaSlider extends LuminaElement {
 
     // Pointer events
     this.track?.addEventListener('pointerdown', this.onPointerDown);
+    this.thumb?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this._value } })));
+    this.thumb?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this._value } })));
     document.addEventListener('pointermove', this.onPointerMove);
     document.addEventListener('pointerup', this.onPointerUp);
 

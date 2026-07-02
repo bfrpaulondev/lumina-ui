@@ -6,9 +6,13 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { prefersReducedMotion } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class SignaturePad extends LuminaElement {
   static tagName = 'lumina-signature-pad';
+  static get observedAttributes(): string[] {
+    return [...LuminaElement.observedAttributes, 'name', 'disabled', 'required', 'invalid', 'valid'];
+  }
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
   private drawing = false;
@@ -38,6 +42,10 @@ export class SignaturePad extends LuminaElement {
       .lmsp__clear:hover, .lmsp__export:hover { background: rgb(var(--lumina-accent-rgb) / 0.3); }
       :host([variant="minimal"]) .lmsp { border: 0; background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
       :host([variant="minimal"]) .lmsp__toolbar { background: transparent; border: 0; }
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) .lmsp { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) .lmsp { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
     `;
   }
   protected mounted(): void {
@@ -45,6 +53,8 @@ export class SignaturePad extends LuminaElement {
     this.ctx = this.canvas?.getContext('2d') ?? null;
     this.resizeCanvas();
     this.canvas?.addEventListener('pointerdown', this.onPointerDown);
+    this.canvas?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: {} })));
+    this.canvas?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: {} })));
     this.canvas?.addEventListener('pointermove', this.onPointerMove);
     this.canvas?.addEventListener('pointerup', this.onPointerUp);
     this.canvas?.addEventListener('pointerleave', this.onPointerUp);

@@ -10,7 +10,7 @@ interface FileItem { name: string; size: number; type: string; url?: string; pro
 
 export class FileUpload extends LuminaElement {
   static tagName = 'lumina-file-upload';
-  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'accept', 'multiple', 'max-size']; }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'accept', 'multiple', 'max-size', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _accept = '';
   private _multiple = false;
   private _maxSize = 0;
@@ -87,6 +87,8 @@ export class FileUpload extends LuminaElement {
     this.previewEl = this.$$('.lmfu__preview');
     this.progressEl = this.$$('.lmfu__progress');
     this.dropzone?.addEventListener('click', () => this.fileInput?.click());
+    this.dropzone?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: {} })));
+    this.dropzone?.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: {} })));
     this.fileInput?.addEventListener('change', (e) => { const files = (e.target as HTMLInputElement).files; if (files) this.addFiles(Array.from(files)); });
     this.dropzone?.addEventListener('dragover', (e) => { e.preventDefault(); this.dropzone?.setAttribute('data-dragging', ''); });
     this.dropzone?.addEventListener('dragleave', () => this.dropzone?.removeAttribute('data-dragging'));

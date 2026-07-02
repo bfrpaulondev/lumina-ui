@@ -6,12 +6,13 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { intensityToMultiplier, prefersReducedMotion, randRange } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 interface Particle { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; size: number; }
 
 export class Switch extends LuminaElement {
   static tagName = 'lumina-switch';
-  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'checked']; }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'checked', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _checked = false;
   private canvas: HTMLCanvasElement | null = null;
   private ctx: CanvasRenderingContext2D | null = null;
@@ -19,6 +20,7 @@ export class Switch extends LuminaElement {
   private raf = 0;
   private button: HTMLElement | null = null;
 
+  get value(): any { return this._checked; }
   get checked(): boolean { return this._checked; }
   set checked(v: boolean) { this._checked = v; if (v) this.setAttribute('checked',''); else this.removeAttribute('checked'); }
 
@@ -54,6 +56,10 @@ export class Switch extends LuminaElement {
       .lmsw__label:empty { display: none; }
       :host([variant="void"]) .lmsw__track { background: rgb(0 0 0 / 0.6); }
       :host([variant="void"][checked]) .lmsw__thumb { box-shadow: 0 0 12px var(--lumina-accent), 0 2px 6px rgb(0 0 0 / 0.4); }
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) .lmsw__track { border-color: rgb(255 70 90 / 0.6); box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10); }
+      :host([valid]) .lmsw__track { border-color: rgb(34 197 94 / 0.5); }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmsw__thumb, .lmsw__aura, .lmsw__glow { transition: none !important; animation: none !important; } }
     `;
   }
@@ -65,13 +71,18 @@ export class Switch extends LuminaElement {
     this.setAttribute('role', 'switch');
     this.setAttribute('aria-checked', String(this._checked));
     this.button?.addEventListener('click', this.onClick);
+    this.button?.addEventListener('focus', this.onFocus);
+    this.button?.addEventListener('blur', this.onBlur);
   }
-  protected unmounted(): void { cancelAnimationFrame(this.raf); }
+  protected unmounted(): void { cancelAnimationFrame(this.raf); this.button?.removeEventListener('focus', this.onFocus); this.button?.removeEventListener('blur', this.onBlur); }
   protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
   attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
     super.attributeChangedCallback(name, _old, value);
     if (name === 'checked') { this._checked = value !== null; this.setAttribute('aria-checked', String(this._checked)); }
+    else if (name === 'disabled' && this.button) { (this.button as any).disabled = value !== null; }
   }
+  private onFocus = (): void => { this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { checked: this._checked } })); };
+  private onBlur = (): void => { this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { checked: this._checked } })); };
   private onClick = (): void => {
     this._checked = !this._checked;
     if (this._checked) this.setAttribute('checked',''); else this.removeAttribute('checked');

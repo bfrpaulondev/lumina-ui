@@ -6,14 +6,16 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { randRange } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 interface Particle { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; }
 
 export class PasswordInput extends LuminaElement {
   static tagName = 'lumina-password-input';
-  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value']; }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value', 'placeholder', 'name', 'disabled', 'required', 'invalid', 'valid', 'floating-label']; }
   private _value = '';
   private _visible = false;
+  private _floatingLabel = false;
   private input: HTMLInputElement | null = null;
   private strengthBar: HTMLElement | null = null;
   private canvas: HTMLCanvasElement | null = null;
@@ -25,11 +27,14 @@ export class PasswordInput extends LuminaElement {
   set value(v: string) { this._value = v; this.setAttribute('value', v); if (this.input) this.input.value = v; this.updateStrength(); }
 
   protected render(): string {
+    const placeholderAttr = this._floatingLabel ? '' : `placeholder="${this.getAttribute('placeholder') ?? 'Digite sua senha...'}"`;
+    const labelSlot = this._floatingLabel ? `<slot name="label"></slot>` : '';
     return `
-      <label class="lmpw" part="field">
+      <label class="lmpw" part="field" data-lumina-root>
+        ${labelSlot}
         <div class="lmpw__shell" part="control">
-          <div class="lmpw__bg" aria-hidden="true"></div>
-          <input class="lmpw__el" type="password" placeholder="Digite sua senha..." />
+          <div class="lmpw__bg" part="bg" aria-hidden="true"></div>
+          <input class="lmpw__el" part="input" type="password" ${placeholderAttr} name="${this.getAttribute('name') ?? ''}" value="${this.getAttribute('value') ?? ''}" ${this.hasAttribute('disabled') ? 'disabled' : ''} ${this.hasAttribute('required') ? 'required' : ''} aria-invalid="${this.hasAttribute('invalid')}" />
           <button class="lmpw__toggle" part="toggle" type="button" aria-label="Mostrar senha">👁</button>
         </div>
         <div class="lmpw__strength" part="strength-meter">
@@ -65,11 +70,13 @@ export class PasswordInput extends LuminaElement {
       :host([data-strength="4"]) .lmpw__strength-label { color: #22c55e; }
       .lmpw__particles { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
       :host([variant="secure"]) .lmpw__bg { border-color: rgb(var(--lumina-accent-rgb) / 0.3); }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmpw__strength-bar::after { transition: none !important; } }
     `;
   }
   protected mounted(): void {
     this._value = this.getAttribute('value') ?? '';
+    this._floatingLabel = this.hasAttribute('floating-label');
     this.input = this.$$('.lmpw__el') as HTMLInputElement | null;
     this.strengthBar = this.$$('.lmpw__strength-bar');
     this.canvas = this.$$('.lmpw__particles') as HTMLCanvasElement | null;
@@ -77,21 +84,30 @@ export class PasswordInput extends LuminaElement {
     if (this.input) {
       this.input.value = this._value;
       this.input.addEventListener('input', this.onInput);
+      this.input.addEventListener('focus', this.onFocus);
+      this.input.addEventListener('blur', this.onBlur);
     }
     this.$$('.lmpw__toggle')?.addEventListener('click', this.toggleVisibility);
     this.updateStrength();
+    this._updateFloatingState();
   }
-  protected unmounted(): void { cancelAnimationFrame(this.raf); }
+  protected unmounted(): void { cancelAnimationFrame(this.raf); this.input?.removeEventListener('focus', this.onFocus); this.input?.removeEventListener('blur', this.onBlur); }
   protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
   attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
     super.attributeChangedCallback(name, _old, value);
-    if (name === 'value') { this._value = value ?? ''; if (this.input) this.input.value = this._value; this.updateStrength(); }
+    if (name === 'value') { this._value = value ?? ''; if (this.input) this.input.value = this._value; this.updateStrength(); this._updateFloatingState(); }
+    else if (name === 'disabled' && this.input) { (this.input as any).disabled = value !== null; }
+    else if (name === 'floating-label') { this._floatingLabel = value !== null; }
   }
   private onInput = (e: Event): void => {
     this._value = (e.target as HTMLInputElement).value;
     this.updateStrength();
+    this._updateFloatingState();
     this.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, composed: true, detail: { value: this._value } }));
   };
+  private onFocus = (): void => { this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this._value } })); };
+  private onBlur = (): void => { this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this._value } })); };
+  private _updateFloatingState(): void { this.toggleAttribute('data-has-value', this._value.length > 0); }
   private toggleVisibility = (): void => {
     this._visible = !this._visible;
     if (this.input) {

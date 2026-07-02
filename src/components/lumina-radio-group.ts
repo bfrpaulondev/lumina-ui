@@ -9,7 +9,7 @@ import type { LuminaElementAttributes } from '../core/LuminaElement';
 
 export class RadioGroup extends LuminaElement {
   static tagName = 'lumina-radio-group';
-  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value']; }
+  static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'value', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _value = '';
   private indicator: HTMLElement | null = null;
   private observer: MutationObserver | null = null;
@@ -49,6 +49,8 @@ export class RadioGroup extends LuminaElement {
     this.observer = new MutationObserver(() => this.buildOptions());
     this.observer.observe(this, { childList: true, subtree: true });
     this.addEventListener('click', this.onClick);
+    this.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this._value } })));
+    this.addEventListener('blur', () => this.dispatchEvent(new CustomEvent('lumina-blur', { bubbles: true, composed: true, detail: { value: this._value } })));
     this.addEventListener('keydown', this.onKeydown);
   }
   protected unmounted(): void { this.observer?.disconnect(); }
