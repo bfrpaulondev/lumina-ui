@@ -112,6 +112,10 @@ export class CodeViewer extends HTMLElement {
 
   setTabs(tabs: CodeViewerTab[], activeId?: string): void {
     this.tabs = tabs;
+    // Force Monaco to recalculate layout
+    if (this.editor) {
+      setTimeout(() => this.editor?.layout(), 100);
+    }
     this.activeTabId = activeId ?? tabs[0]?.id ?? '';
     this.renderShell();
     this.initEditor();
