@@ -129,6 +129,45 @@ def _input_vanilla_content(tag):
         return ('', ['placeholder="Digite algo positivo ou negativo..."'])
     if tag == 'lumina-context-input':
         return ('', ['placeholder="Detecta contexto automaticamente..."'])
+    if tag == 'lumina-masked-input':
+        return (
+            '<span slot="label">CPF</span>\n'
+            '  <span slot="left-icon">#</span>\n'
+            '  <span slot="error">CPF inválido</span>',
+            ['mask="###.###.###-##"', 'placeholder="000.000.000-00"', 'name="cpf"']
+        )
+    if tag == 'lumina-form-field':
+        return (
+            '<lumina-input slot="control" placeholder="email@exemplo.com"></lumina-input>\n'
+            '  <span slot="error">Email inválido</span>',
+            ['label="Email"', 'hint="Use seu email corporativo"', 'required']
+        )
+    if tag == 'lumina-form-list':
+        return (
+            '<div data-lfl-item style="display:flex;gap:8px;align-items:center;">\n'
+            '    <lumina-input placeholder="Telefone" style="flex:1;"></lumina-input>\n'
+            '  </div>\n'
+            '  <div data-lfl-item style="display:flex;gap:8px;align-items:center;">\n'
+            '    <lumina-input placeholder="Telefone" style="flex:1;"></lumina-input>\n'
+            '  </div>',
+            ['add-label="Adicionar telefone"', 'movable', 'max="5"']
+        )
+    if tag == 'lumina-form':
+        return (
+            '<lumina-form-field label="Nome" required>\n'
+            '    <lumina-input slot="control" name="nome" data-validate="required" placeholder="Seu nome"></lumina-input>\n'
+            '    <span slot="error">Nome é obrigatório</span>\n'
+            '  </lumina-form-field>\n'
+            '  <lumina-form-field label="Email" required>\n'
+            '    <lumina-input slot="control" name="email" data-validate="required email" placeholder="email@exemplo.com"></lumina-input>\n'
+            '    <span slot="error">Email inválido</span>\n'
+            '  </lumina-form-field>\n'
+            '  <lumina-form-field label="CPF">\n'
+            '    <lumina-masked-input slot="control" name="cpf" mask="###.###.###-##" data-validate="cpf" placeholder="000.000.000-00"></lumina-masked-input>\n'
+            '    <span slot="error">CPF inválido</span>\n'
+            '  </lumina-form-field>',
+            []
+        )
     return ('', [])
 
 
@@ -191,6 +230,45 @@ def _input_react_content(tag):
         return ('', ['placeholder="Digite algo positivo ou negativo..."'])
     if tag == 'lumina-context-input':
         return ('', ['placeholder="Detecta contexto automaticamente..."'])
+    if tag == 'lumina-masked-input':
+        return (
+            '<span slot="label">CPF</span>\n'
+            '        <span slot="left-icon">#</span>\n'
+            '        <span slot="error">CPF inválido</span>',
+            ['mask="###.###.###-##"', 'placeholder="000.000.000-00"', 'name="cpf"']
+        )
+    if tag == 'lumina-form-field':
+        return (
+            '<lumina-input slot="control" placeholder="email@exemplo.com" />\n'
+            '        <span slot="error">Email inválido</span>',
+            ['label="Email"', 'hint="Use seu email corporativo"', 'required']
+        )
+    if tag == 'lumina-form-list':
+        return (
+            '<div data-lfl-item style={{display:"flex",gap:8,alignItems:"center"}}>\n'
+            '          <lumina-input placeholder="Telefone" style={{flex:1}} />\n'
+            '        </div>\n'
+            '        <div data-lfl-item style={{display:"flex",gap:8,alignItems:"center"}}>\n'
+            '          <lumina-input placeholder="Telefone" style={{flex:1}} />\n'
+            '        </div>',
+            ['add-label="Adicionar telefone"', 'movable', 'max={5}']
+        )
+    if tag == 'lumina-form':
+        return (
+            '<lumina-form-field label="Nome" required>\n'
+            '          <lumina-input slot="control" name="nome" data-validate="required" placeholder="Seu nome" />\n'
+            '          <span slot="error">Nome é obrigatório</span>\n'
+            '        </lumina-form-field>\n'
+            '        <lumina-form-field label="Email" required>\n'
+            '          <lumina-input slot="control" name="email" data-validate="required email" placeholder="email@exemplo.com" />\n'
+            '          <span slot="error">Email inválido</span>\n'
+            '        </lumina-form-field>\n'
+            '        <lumina-form-field label="CPF">\n'
+            '          <lumina-masked-input slot="control" name="cpf" mask="###.###.###-##" data-validate="cpf" placeholder="000.000.000-00" />\n'
+            '          <span slot="error">CPF inválido</span>\n'
+            '        </lumina-form-field>',
+            []
+        )
     return ('', [])
 
 

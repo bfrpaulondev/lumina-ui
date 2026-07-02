@@ -542,6 +542,10 @@ function buildInputGallery(tag: string, meta: ComponentMeta, state: { variant: s
   if (tag === 'lumina-textarea') return buildTextareaGallery(state, attrs);
   if (tag === 'lumina-neural-input') return buildNeuralInputGallery(state, attrs);
   if (tag === 'lumina-context-input') return buildContextInputGallery(state, attrs);
+  if (tag === 'lumina-masked-input') return buildMaskedInputGallery(state, attrs);
+  if (tag === 'lumina-form-field') return buildFormFieldGallery(state, attrs);
+  if (tag === 'lumina-form-list') return buildFormListGallery(state, attrs);
+  if (tag === 'lumina-form') return buildFormGallery(state, attrs);
 
   // === Fallback: variants + states + colors ===
   return buildGenericInputGallery(tag, meta, state, attrs);
@@ -1129,6 +1133,146 @@ function buildContextInputGallery(state: { variant: string; intensity: string; a
         ${variants.map((v: string, i: number) => `
           <lumina-context-input id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" placeholder="Variante ${v}" style="min-width:200px;"></lumina-context-input>
         `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-masked-input — masks (CPF, CNPJ, phone, card, currency) + formatter/parser.
+ */
+function buildMaskedInputGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Máscaras comuns — digite para ver a formatação</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:14px;">
+        <lumina-masked-input id="demo-1" ${attrs} mask="###.###.###-##" placeholder="CPF 000.000.000-00">
+          <span slot="label">CPF</span>
+        </lumina-masked-input>
+        <lumina-masked-input id="demo-2" ${attrs} mask="##.###.###/####-##" placeholder="CNPJ 00.000.000/0000-00">
+          <span slot="label">CNPJ</span>
+        </lumina-masked-input>
+        <lumina-masked-input id="demo-3" ${attrs} mask="(##) #####-####" placeholder="Telefone (00) 00000-0000">
+          <span slot="label">Telefone</span>
+        </lumina-masked-input>
+        <lumina-masked-input id="demo-4" ${attrs} mask="#### #### #### ####" placeholder="Cartão 0000 0000 0000 0000">
+          <span slot="label">Cartão</span>
+        </lumina-masked-input>
+        <lumina-masked-input id="demo-5" ${attrs} mask="##/##/####" placeholder="Data 00/00/0000">
+          <span slot="label">Data</span>
+        </lumina-masked-input>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Estados de validação — invalid (vermelho + shake) e valid (verde + check)</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:14px;">
+        <lumina-masked-input id="demo-err" ${attrs} mask="###.###.###-##" invalid placeholder="CPF inválido">
+          <span slot="label">CPF (inválido)</span>
+          <span slot="error">CPF não existe</span>
+        </lumina-masked-input>
+        <lumina-masked-input id="demo-ok" ${attrs} mask="###.###.###-##" valid value="12345678909" placeholder="CPF válido">
+          <span slot="label">CPF (válido)</span>
+        </lumina-masked-input>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Programático — valor limpo vs formatado (abra o console)</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:14px;">
+        <lumina-masked-input id="demo-prog" ${attrs} mask="###.###.###-##" value="98765432100" placeholder="Valor setado via JS">
+          <span slot="label">Valor inicial (clean: 98765432100)</span>
+        </lumina-masked-input>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-form-field — wrapper with label/hint/error/success states.
+ */
+function buildFormFieldGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">FormField — label, hint, required, error/success animados</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:16px;max-width:480px;">
+        <lumina-form-field label="Email" hint="Use seu email corporativo" required>
+          <lumina-input slot="control" placeholder="email@exemplo.com"></lumina-input>
+        </lumina-form-field>
+        <lumina-form-field label="Senha" hint="Mínimo 8 caracteres" invalid>
+          <lumina-input slot="control" type="password" placeholder="Senha" value="123"></lumina-input>
+          <span slot="error">Senha muito curta — mínimo 8 caracteres</span>
+        </lumina-form-field>
+        <lumina-form-field label="Confirmação" valid>
+          <lumina-input slot="control" placeholder="Confirme a senha" value="minhasenha123"></lumina-input>
+        </lumina-form-field>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-form-list — dynamic list with add/remove/move.
+ */
+function buildFormListGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">FormList — clique em "Adicionar" para adicionar itens, use as setas para mover</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;">
+        <lumina-form-list id="demo-fl1" ${attrs} add-label="Adicionar telefone" movable max="5">
+          <div data-lfl-item style="display:flex;gap:8px;align-items:center;">
+            <lumina-input placeholder="Telefone" mask="(##) #####-####" style="flex:1;"></lumina-input>
+          </div>
+          <div data-lfl-item style="display:flex;gap:8px;align-items:center;">
+            <lumina-input placeholder="Telefone" mask="(##) #####-####" style="flex:1;"></lumina-input>
+          </div>
+        </lumina-form-list>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Lista de endereços (sem move, max 3)</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;">
+        <lumina-form-list id="demo-fl2" variant="neural" intensity="${state.intensity}" accent-color="#ff6ec7" theme="dark" add-label="Adicionar endereço" max="3">
+          <div data-lfl-item style="display:flex;flex-direction:column;gap:6px;">
+            <lumina-input placeholder="Rua" style="width:100%;"></lumina-input>
+            <div style="display:flex;gap:6px;">
+              <lumina-input placeholder="Cidade" style="flex:1;"></lumina-input>
+              <lumina-input placeholder="CEP" mask="#####-###" style="flex:1;"></lumina-input>
+            </div>
+          </div>
+        </lumina-form-list>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-form — full form with validation.
+ */
+function buildFormGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Form completo — clique em Enviar para ver a validação</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;max-width:520px;">
+        <lumina-form id="demo-fm1" ${attrs}>
+          <lumina-form-field label="Nome" required hint="Como aparece no documento">
+            <lumina-input slot="control" name="nome" data-validate="required" placeholder="Seu nome completo"></lumina-input>
+            <span slot="error">Nome é obrigatório</span>
+          </lumina-form-field>
+          <lumina-form-field label="Email" required>
+            <lumina-input slot="control" name="email" data-validate="required email" placeholder="email@exemplo.com"></lumina-input>
+            <span slot="error">Email inválido</span>
+          </lumina-form-field>
+          <lumina-form-field label="CPF" hint="Apenas dígitos (validação real)">
+            <lumina-masked-input slot="control" name="cpf" mask="###.###.###-##" data-validate="cpf" placeholder="000.000.000-00"></lumina-masked-input>
+            <span slot="error">CPF inválido</span>
+          </lumina-form-field>
+          <lumina-form-field label="Senha" required>
+            <lumina-input slot="control" name="senha" type="password" data-validate="required min:8" placeholder="Mínimo 8 caracteres"></lumina-input>
+            <span slot="error">Senha muito curta</span>
+          </lumina-form-field>
+        </lumina-form>
       </div>
     </div>
   `;
