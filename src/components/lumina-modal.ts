@@ -270,7 +270,12 @@ export class LuminaModal extends LuminaElement {
 
     document.addEventListener('keydown', this.onKeyDown);
 
-    if (this.hasAttribute('open')) {
+    // `open` is a boolean attribute per HTML spec — its presence means
+    // "true" regardless of value. Treat the literal string "false" as
+    // "do not open" so that <lumina-modal open="false"> behaves the way
+    // most users coming from React/Vue would expect.
+    const openAttr = this.getAttribute('open');
+    if (openAttr !== null && openAttr !== 'false') {
       // Defer to ensure dialog is rendered
       requestAnimationFrame(() => this.showModal());
     }

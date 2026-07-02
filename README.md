@@ -13,7 +13,11 @@ A library of **Web Components** (Custom Elements + Shadow DOM) that delivers **l
 - **A11y by default** — ARIA, focus management, `prefers-reduced-motion` everywhere.
 - **Customizable** — All visual tokens are CSS variables. Configure via attributes or properties.
 
-## Components (MVP)
+## Components
+
+The library ships **100+ Web Components** across 8 categories (Buttons, Cards, Inputs, Navigation, Feedback, Overlays, Data Display, Unique). The original MVP components below are the most battle-tested; the rest are documented in the live playground.
+
+**MVP (core, stable):**
 
 | # | Component          | Highlights                                                    |
 |---|--------------------|---------------------------------------------------------------|
@@ -34,7 +38,8 @@ A library of **Web Components** (Custom Elements + Shadow DOM) that delivers **l
 <!doctype html>
 <html>
   <head>
-    <script type="module" src="https://bfrpaulondev.github.io/lumina-ui/assets/main-[hash].js"></script>
+    <!-- Stable library bundle (no hash, versioned via the v0.3.x line). -->
+    <script src="https://bfrpaulondev.github.io/lumina-ui/lumina-ui.js"></script>
   </head>
   <body>
     <lumina-button variant="dimensional" intensity="intense" accent-color="#7c5cff">
@@ -43,6 +48,8 @@ A library of **Web Components** (Custom Elements + Shadow DOM) that delivers **l
   </body>
 </html>
 ```
+
+> **Note:** do **not** load the `assets/main-<hash>.js` bundle from the playground — that is the SPA demo (it logs to the console, mounts a router, and pulls in Monaco). The file above is the lib-only bundle.
 
 Or as a library:
 
