@@ -1,9 +1,13 @@
 /**
- * Playground section — interactive component browser with live preview
- * and Monaco-based code viewer (TypeScript source, Vanilla usage, React usage).
+ * LuminaUI — Playground section (v2)
  *
- * v0.3.0 — now browses all 100 components grouped by category.
+ * Redesigned with:
+ * - Rich multi-variant previews for buttons (semantic types + states + variants)
+ * - Live event console showing all lumina-* and native events
+ * - Code that mirrors exactly what's in the preview
+ * - Interactive controls for variant/intensity/accent
  */
+
 import type { Route } from '../app';
 import { COMPONENT_METAS, CATEGORIES } from '../data/components';
 import type { ComponentMeta } from '../data/components';
@@ -35,7 +39,7 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
   }).join('');
 
   root.innerHTML = `
-    ${sectionHead('01', 'Playground', '100 componentes · 8 categorias · código TypeScript/Vanilla/React · Monaco editor embutido.').outerHTML}
+    ${sectionHead('01', 'Playground', '100 componentes · 8 categorias · código TypeScript/Vanilla/React · console de eventos ao vivo.').outerHTML}
 
     <div class="playground__layout">
       <aside class="playground__sidebar">
@@ -73,15 +77,24 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
           </div>
         </div>
 
-        <div class="playground__split">
-          <div class="playground__preview" data-preview>
-            <div class="playground__preview-inner" data-preview-inner></div>
+        <!-- Event Console (always visible) -->
+        <div class="playground__console" data-console>
+          <div class="playground__console-head">
+            <span class="playground__console-title">📡 Event Console</span>
+            <button class="playground__console-clear" data-console-clear>Limpar</button>
           </div>
-          <div class="playground__code">
-            <lumina-code-viewer data-viewer></lumina-code-viewer>
-          </div>
+          <div class="playground__console-body" data-console-body></div>
         </div>
 
+        <!-- Preview Gallery -->
+        <div class="playground__gallery" data-gallery></div>
+
+        <!-- Code Viewer -->
+        <div class="playground__code">
+          <lumina-code-viewer data-viewer></lumina-code-viewer>
+        </div>
+
+        <!-- Info Grid -->
         <div class="playground__info" data-info></div>
       </div>
     </div>
@@ -89,13 +102,13 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
 
   // ---- Wire up ----------------------------------------------------------
   const viewer = root.querySelector('[data-viewer]') as any;
-  const previewInner = root.querySelector('[data-preview-inner]') as HTMLElement;
+  const gallery = root.querySelector('[data-gallery]') as HTMLElement;
+  const consoleBody = root.querySelector('[data-console-body]') as HTMLElement;
   const variantSel = root.querySelector('[data-variant]') as HTMLSelectElement;
   const intensitySel = root.querySelector('[data-intensity]') as HTMLSelectElement;
   const accentInput = root.querySelector('[data-accent]') as HTMLInputElement;
   const infoHost = root.querySelector('[data-info]') as HTMLElement;
 
-  // Populate variant select with the component's variants
   const componentVariants = current.variants;
   variantSel.innerHTML = componentVariants
     .map((v: string) => `<option value="${v}">${v}</option>`)
@@ -107,8 +120,77 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
     accent: current.accent ?? '#7c5cff',
   };
 
-  function renderPreview(): void {
-    previewInner.innerHTML = buildPreviewHTML(current, state);
+  // ===== Event Console =====
+  function logEvent(eventName: string, detail?: any): void {
+    const time = new Date().toLocaleTimeString();
+    const detailStr = detail ? ` <span style="color:#78f0ff">detail: ${JSON.stringify(detail)}</span>` : '';
+    const entry = document.createElement('div');
+    entry.className = 'playground__console-entry';
+    entry.innerHTML = `<span style="color:rgba(245,245,255,0.4)">[${time}]</span> <span style="color:#7c5cff;font-weight:700">${eventName}</span>${detailStr}`;
+    consoleBody.appendChild(entry);
+    consoleBody.scrollTop = consoleBody.scrollHeight;
+  }
+
+  // Clear console
+  root.querySelector('[data-console-clear]')?.addEventListener('click', () => {
+    consoleBody.innerHTML = '';
+  });
+
+  // ===== Attach events to all elements in gallery =====
+  function attachGalleryEvents(): void {
+    const allLumina = gallery.querySelectorAll('[id^="demo-"]');
+    allLumina.forEach((el) => {
+      const events = [
+        'lumina-click', 'lumina-press', 'lumina-hover-start', 'lumina-hover-end',
+        'lumina-focus', 'lumina-blur', 'lumina-change', 'lumina-ripple',
+        'lumina-magnetic-start', 'lumina-portal-open', 'lumina-echo',
+        'lumina-shortcut', 'lumina-gesture', 'lumina-menu-open', 'lumina-menu-close',
+        'lumina-menu-select', 'lumina-morph-start', 'lumina-morph-end',
+        'lumina-card-select', 'lumina-stack-change', 'lumina-reveal',
+        'lumina-parallax', 'lumina-hover', 'lumina-interact',
+        'lumina-particle-interact', 'lumina-memory-update', 'lumina-echo',
+        'lumina-context-change', 'lumina-sentiment-change', 'lumina-input',
+        'lumina-file-add', 'lumina-file-remove', 'lumina-upload-progress',
+        'lumina-color-change', 'lumina-date-change', 'lumina-time-change',
+        'lumina-signature-start', 'lumina-signature-end',
+        'lumina-voice-start', 'lumina-voice-end', 'lumina-transcript',
+        'lumina-tab-change', 'lumina-nav-change', 'lumina-navigate',
+        'lumina-page-change', 'lumina-toggle', 'lumina-step-change',
+        'lumina-show', 'lumina-hide', 'lumina-select', 'lumina-confirm',
+        'lumina-cancel', 'lumina-open', 'lumina-close', 'lumina-dismiss',
+        'lumina-close', 'lumina-strength-change', 'lumina-visibility-toggle',
+        'lumina-suggestion-select', 'lumina-suggestion-highlight',
+        'lumina-progress', 'lumina-progress-complete',
+        'lumina-status-change', 'lumina-clear', 'lumina-pulse',
+        'lumina-depth-change', 'lumina-particle-burst',
+        'lumina-backdrop-click', 'lumina-zoom-change', 'lumina-navigate',
+        'lumina-expand', 'lumina-collapse', 'lumina-reveal-start',
+        'lumina-reveal-complete', 'lumina-morph', 'lumina-tilt-start',
+        'lumina-tilt-end', 'lumina-press',
+      ];
+      events.forEach((evt) => {
+        el.addEventListener(evt, (e: Event) => {
+          const ce = e as CustomEvent;
+          logEvent(evt, ce.detail);
+        });
+      });
+
+      // Native events
+      ['click', 'dblclick'].forEach((nativeEvt) => {
+        el.addEventListener(nativeEvt, () => {
+          logEvent(`native:${nativeEvt}`);
+          if (nativeEvt === 'dblclick') {
+            logEvent('💡 Double-click detectado! Use addEventListener("dblclick", ...) para capturar.');
+          }
+        });
+      });
+    });
+  }
+
+  // ===== Gallery: build rich multi-variant previews =====
+  function renderGallery(): void {
+    gallery.innerHTML = buildGalleryHTML(current, state);
+    attachGalleryEvents();
   }
 
   function renderViewer(): void {
@@ -135,272 +217,337 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
     `;
   }
 
-  variantSel.addEventListener('change', () => { state.variant = variantSel.value; renderPreview(); });
-  intensitySel.addEventListener('change', () => { state.intensity = intensitySel.value; renderPreview(); });
-  accentInput.addEventListener('input', () => { state.accent = accentInput.value; renderPreview(); });
+  variantSel.addEventListener('change', () => { state.variant = variantSel.value; renderGallery(); });
+  intensitySel.addEventListener('change', () => { state.intensity = intensitySel.value; renderGallery(); });
+  accentInput.addEventListener('input', () => { state.accent = accentInput.value; renderGallery(); });
 
-  renderPreview();
+  renderGallery();
   renderViewer();
   renderInfo();
 
   return root;
 }
 
-/** Build live preview HTML per component category. */
-function buildPreviewHTML(meta: ComponentMeta, state: { variant: string; intensity: string; accent: string }): string {
+/**
+ * Build the gallery HTML — a rich multi-variant showcase for each component.
+ * For buttons, this includes semantic types (primary, default, dashed, text, link),
+ * states (danger, ghost, disabled, loading), and all visual variants.
+ */
+function buildGalleryHTML(meta: ComponentMeta, state: { variant: string; intensity: string; accent: string }): string {
   const tag = meta.tag;
-  const attrs = `variant="${state.variant}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark"`;
   const cat = meta.category;
+  const a = `variant="${state.variant}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark"`;
 
-  // Special previews for each button type
+  // ===== BUTTONS: rich gallery with semantic types + states + variants =====
   if (cat === 'buttons') {
-    switch (tag) {
-      case 'lumina-button':
-        return `<${tag} ${attrs} speed="0.45">Click me</${tag}>`;
-      case 'lumina-icon-button':
-        return `<${tag} ${attrs} size="lg">⚙</${tag}>`;
-      case 'lumina-fab':
-        return `<div style="position:relative; width:100%; min-height:200px;">
-          <${tag} ${attrs} extended position="bottom-right">
-            +
-            <span slot="label">Nova tarefa</span>
-          </${tag}>
-        </div>`;
-      case 'lumina-split-button':
-        return `<${tag} ${attrs}
-          menu-items='[{"label":"Editar","icon":"✎","value":"edit"},{"label":"Duplicar","icon":"⧉","value":"dup"},{"label":"Excluir","icon":"✕","value":"del"}]'
-        >Salvar</${tag}>`;
-      case 'lumina-toggle-button':
-        return `<${tag} ${attrs} pressed>Modo escuro</${tag}>`;
-      case 'lumina-button-group':
-        return `<${tag} ${attrs} variant="segmented" value="b">
+    return buildButtonGallery(tag, state, a);
+  }
+
+  // ===== Default: single preview =====
+  return `<div class="playground__gallery-row">
+    <div class="playground__gallery-label">Preview</div>
+    <div class="playground__gallery-items">${buildSinglePreview(tag, a, meta)}</div>
+  </div>`;
+}
+
+function buildButtonGallery(tag: string, state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  // Special galleries for each button type
+  switch (tag) {
+    case 'lumina-button':
+      return buildLuminaButtonGallery(state, attrs);
+    case 'lumina-icon-button':
+      return `
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Sizes (sm / md / lg)</div>
+          <div class="playground__gallery-items">
+            <lumina-icon-button id="demo-1" ${attrs} size="sm">⚙</lumina-icon-button>
+            <lumina-icon-button id="demo-2" ${attrs} size="md">★</lumina-icon-button>
+            <lumina-icon-button id="demo-3" ${attrs} size="lg">♥</lumina-icon-button>
+          </div>
+        </div>
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Variants</div>
+          <div class="playground__gallery-items">
+            <lumina-icon-button id="demo-4" variant="glass" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">⚙</lumina-icon-button>
+            <lumina-icon-button id="demo-5" variant="neural" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">⚙</lumina-icon-button>
+            <lumina-icon-button id="demo-6" variant="aura" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">⚙</lumina-icon-button>
+            <lumina-icon-button id="demo-7" variant="minimal" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">⚙</lumina-icon-button>
+          </div>
+        </div>
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Disabled</div>
+          <div class="playground__gallery-items">
+            <lumina-icon-button id="demo-8" ${attrs} size="md" disabled>⚙</lumina-icon-button>
+          </div>
+        </div>
+      `;
+    case 'lumina-fab':
+      return `
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Variants</div>
+          <div class="playground__gallery-items" style="min-height:80px;">
+            <lumina-fab id="demo-1" variant="glass" accent-color="${state.accent}" theme="dark">+</lumina-fab>
+            <lumina-fab id="demo-2" variant="neural" accent-color="${state.accent}" theme="dark">★</lumina-fab>
+            <lumina-fab id="demo-3" variant="aura" accent-color="${state.accent}" theme="dark">♥</lumina-fab>
+          </div>
+        </div>
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Extended (with label)</div>
+          <div class="playground__gallery-items">
+            <lumina-fab id="demo-4" variant="extended" accent-color="${state.accent}" theme="dark">+<span slot="label">Nova tarefa</span></lumina-fab>
+          </div>
+        </div>
+      `;
+    case 'lumina-split-button':
+      return `
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Split Button (clique na seta para o menu)</div>
+          <div class="playground__gallery-items">
+            <lumina-split-button id="demo-1" ${attrs}
+              menu-items='[{"label":"Editar","icon":"✎","value":"edit"},{"label":"Duplicar","icon":"⧉","value":"dup"},{"label":"Excluir","icon":"✕","value":"del"}]'
+            >Salvar</lumina-split-button>
+          </div>
+        </div>
+      `;
+    case 'lumina-toggle-button':
+      return `
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Toggle (clique para alternar)</div>
+          <div class="playground__gallery-items">
+            <lumina-toggle-button id="demo-1" ${attrs}>Modo escuro</lumina-toggle-button>
+            <lumina-toggle-button id="demo-2" variant="neural" intensity="${state.intensity}" accent-color="#ff6ec7" pressed theme="dark">Neural ON</lumina-toggle-button>
+            <lumina-toggle-button id="demo-3" variant="aura" intensity="${state.intensity}" accent-color="#ffd166" theme="dark">Aura</lumina-toggle-button>
+          </div>
+        </div>
+      `;
+    case 'lumina-button-group':
+      return `
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Segmented (clique para selecionar)</div>
+          <div class="playground__gallery-items">
+            <lumina-button-group id="demo-1" ${attrs} variant="segmented" value="b">
+              <button data-value="a">A</button>
+              <button data-value="b">B</button>
+              <button data-value="c">C</button>
+            </lumina-button-group>
+          </div>
+        </div>
+      `;
+    case 'lumina-command-button':
+      return `
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Command Button (tente Ctrl+S!)</div>
+          <div class="playground__gallery-items">
+            <lumina-command-button id="demo-1" ${attrs} shortcut="⌘K">Buscar comandos</lumina-command-button>
+            <lumina-command-button id="demo-2" variant="neural" intensity="${state.intensity}" accent-color="#ff6ec7" shortcut="Ctrl+S" theme="dark">Salvar</lumina-command-button>
+          </div>
+        </div>
+      `;
+    case 'lumina-ripple-button':
+      return `
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Ripple (clique em diferentes pontos!)</div>
+          <div class="playground__gallery-items">
+            <lumina-ripple-button id="demo-1" ${attrs} ripple-duration="800">Clique aqui</lumina-ripple-button>
+          </div>
+        </div>
+      `;
+    case 'lumina-magnetic-button':
+      return `
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Magnetic (aproxime o cursor!)</div>
+          <div class="playground__gallery-items">
+            <lumina-magnetic-button id="demo-1" ${attrs} magnetic-strength="0.5">Aproxime o cursor</lumina-magnetic-button>
+          </div>
+        </div>
+      `;
+    case 'lumina-gesture-button':
+      return `
+        <div class="playground__gallery-row">
+          <div class="playground__gallery-label">Gesture (toque • segure 0.5s • arraste • 2x clique)</div>
+          <div class="playground__gallery-items">
+            <lumina-gesture-button id="demo-1" ${attrs} gestures="hold,swipe,double-tap">Toque • segure • arraste</lumina-gesture-button>
+          </div>
+        </div>
+      `;
+    default:
+      return `<div class="playground__gallery-row">
+        <div class="playground__gallery-label">Demo</div>
+        <div class="playground__gallery-items">
+          <${tag} id="demo-1" ${attrs}>${tag.replace('lumina-', '').replace(/-/g, ' ')}</${tag}>
+        </div>
+      </div>`;
+  }
+}
+
+/**
+ * The main lumina-button gallery — shows semantic types, states, and variants.
+ */
+function buildLuminaButtonGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  return `
+    <!-- Semantic Types -->
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">🔵 Primary (ação principal)</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-primary" ${attrs} speed="0.45">Confirmar</lumina-button>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">⚪️ Default (sem prioridade)</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-default" ${attrs} intensity="medium">Cancelar</lumina-button>
+        <lumina-button id="demo-default2" ${attrs} intensity="medium">Voltar</lumina-button>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">🔤 Text (ação secundária)</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-text" variant="glass" intensity="subtle" accent-color="${state.accent}" speed="0.3" theme="dark">Saiba mais</lumina-button>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">🔗 Link (link externo)</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-link" variant="glass" intensity="subtle" accent-color="#78f0ff" speed="0.3" theme="dark">Abrir documentação →</lumina-button>
+      </div>
+    </div>
+
+    <!-- States -->
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">🔴 Danger (ação de risco)</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-danger" variant="void" intensity="extreme" accent-color="#ff5577" speed="0.4" theme="dark">Excluir permanentemente</lumina-button>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">👻 Ghost (fundo complexo)</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-ghost" variant="glass" intensity="subtle" accent-color="${state.accent}" speed="0.3" theme="dark">Ghost button</lumina-button>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">🚫 Disabled (indisponível)</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-disabled" ${attrs} disabled>Disabled</lumina-button>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">🔃 Loading (carregando)</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-loading" ${attrs} disabled>Carregando...</lumina-button>
+      </div>
+    </div>
+
+    <!-- Block -->
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">⬛ Block (largura total)</div>
+      <div class="playground__gallery-items" style="max-width:300px;">
+        <lumina-button id="demo-block" ${attrs} style="width:100%;display:block;">Botão em bloco</lumina-button>
+      </div>
+    </div>
+
+    <!-- All Variants -->
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">🎨 Todas as variantes</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-v1" variant="glass" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark">Glass</lumina-button>
+        <lumina-button id="demo-v2" variant="morph" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark">Morph</lumina-button>
+        <lumina-button id="demo-v3" variant="neural" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark">Neural</lumina-button>
+        <lumina-button id="demo-v4" variant="void" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark">Void</lumina-button>
+        <lumina-button id="demo-v5" variant="aura" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark">Aura</lumina-button>
+        <lumina-button id="demo-v6" variant="dimensional" intensity="${state.intensity}" accent-color="${state.accent}" depth="deep" theme="dark">Dimensional</lumina-button>
+      </div>
+    </div>
+
+    <!-- Icon + Text -->
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">🔤 Ícone + Texto</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-icon1" ${attrs}>✓ Salvar</lumina-button>
+        <lumina-button id="demo-icon2" ${attrs}>🗑 Excluir</lumina-button>
+        <lumina-button id="demo-icon3" ${attrs}>⬇ Download</lumina-button>
+        <lumina-button id="demo-icon4" ${attrs}>⚡ Ação rápida</lumina-button>
+      </div>
+    </div>
+
+    <!-- Custom Colors -->
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">🌈 Cores customizadas</div>
+      <div class="playground__gallery-items">
+        <lumina-button id="demo-c1" variant="aura" intensity="extreme" accent-color="#ff6ec7" theme="dark">Pink</lumina-button>
+        <lumina-button id="demo-c2" variant="dimensional" intensity="extreme" accent-color="#22c55e" depth="extrude" theme="dark">Green 3D</lumina-button>
+        <lumina-button id="demo-c3" variant="neural" intensity="extreme" accent-color="#f59e0b" theme="dark">Amber</lumina-button>
+        <lumina-button id="demo-c4" variant="void" intensity="extreme" accent-color="#ef4444" theme="dark">Red Void</lumina-button>
+      </div>
+    </div>
+  `;
+}
+
+function buildSinglePreview(tag: string, attrs: string, meta: ComponentMeta): string {
+  const cat = meta.category;
+  switch (cat) {
+    case 'cards':
+      return `<${tag} id="demo-1" ${attrs}>
+        <h3 slot="title">${meta.name.replace('Lumina', '')}</h3>
+        <p>Conteúdo de exemplo.</p>
+      </${tag}>`;
+    case 'inputs':
+      if (tag === 'lumina-select') {
+        return `<${tag} id="demo-1" ${attrs} searchable placeholder="Escolha..." options='[{"value":"br","label":"Brasil","icon":"🇧🇷"},{"value":"us","label":"EUA","icon":"🇺🇸"}]'></${tag}>`;
+      }
+      if (tag === 'lumina-slider') {
+        return `<${tag} id="demo-1" ${attrs} min="0" max="100" value="50" step="5"></${tag}>`;
+      }
+      if (tag === 'lumina-radio-group') {
+        return `<${tag} id="demo-1" ${attrs} value="b">
           <button data-value="a">A</button>
           <button data-value="b">B</button>
           <button data-value="c">C</button>
         </${tag}>`;
-      case 'lumina-command-button':
-        return `<${tag} ${attrs} shortcut="⌘K">Buscar comandos</${tag}>`;
-      case 'lumina-ripple-button':
-        return `<${tag} ${attrs} ripple-duration="800">Clique para ripple</${tag}>`;
-      case 'lumina-magnetic-button':
-        return `<${tag} ${attrs} magnetic-strength="0.5">Aproxime o cursor</${tag}>`;
-      case 'lumina-breath-button':
-        return `<${tag} ${attrs}>Respirando...</${tag}>`;
-      case 'lumina-neural-button':
-        return `<${tag} ${attrs} particle-count="25">Neural</${tag}>`;
-      case 'lumina-portal-button':
-        return `<${tag} ${attrs}>Entrar no portal</${tag}>`;
-      case 'lumina-echo-button':
-        return `<${tag} ${attrs} echo-count="3">Eco</${tag}>`;
-      case 'lumina-morph-button':
-        return `<${tag} ${attrs} from="pill" to="hexagon">Morph</${tag}>`;
-      case 'lumina-gesture-button':
-        return `<${tag} ${attrs} gestures="hold,swipe,double-tap">Toque • segure • arraste</${tag}>`;
-      default:
-        return `<${tag} ${attrs}>Click</${tag}>`;
-    }
-  }
-
-  // Special previews for each card type
-  if (cat === 'cards') {
-    switch (tag) {
-      case 'lumina-card':
-        return `<${tag} ${attrs}>
-          <h3 slot="title">Card principal</h3>
-          <p slot="subtitle">tilt 3D + glow contextual</p>
-          <p>Passe o cursor para ver o tilt e o glow seguir.</p>
-        </${tag}>`;
-      case 'lumina-glass-card':
-        return `<${tag} ${attrs} blur="24">
-          <h3>Glass com refração</h3>
-          <p>Borda com refração de luz que reage ao cursor.</p>
-        </${tag}>`;
-      case 'lumina-morph-card':
-        return `<${tag} ${attrs}>
-          <h3>Morph card</h3>
-          <p>Hover para ver o clip-path morph.</p>
-        </${tag}>`;
-      case 'lumina-neural-card':
-        return `<${tag} ${attrs} particle-count="50">
-          <h3>Neural card</h3>
-          <p>Rede neural canvas reativa ao cursor.</p>
-        </${tag}>`;
-      case 'lumina-void-card':
-        return `<${tag} ${attrs}>
-          <h3>Void card</h3>
-          <p>Portal giratório com sucção de partículas.</p>
-        </${tag}>`;
-      case 'lumina-dimensional-card':
-        return `<${tag} ${attrs} interactive depth="deep">
-          <h3>Dimensional card</h3>
-          <p>3 camadas 3D com parallax — mova o cursor.</p>
-        </${tag}>`;
-      case 'lumina-hover-card':
-        return `<${tag} ${attrs}>
-          <div slot="preview"><strong>Hover me</strong></div>
-          <p>Conteúdo revelado ao hover! Esta seção fica oculta até o cursor entrar.</p>
-        </${tag}>`;
-      case 'lumina-context-card':
-        return `<${tag} ${attrs} auto-adapt>
-          <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='100'%3E%3Crect fill='%237c5cff' width='200' height='100'/%3E%3C/svg%3E" alt="demo" style="width:100%;border-radius:8px;" />
-          <p style="padding:12px;">Card detecta conteúdo (imagem) e ajusta padding/glow automaticamente.</p>
-        </${tag}>`;
-      case 'lumina-breath-card':
-        return `<${tag} ${attrs}>
-          <h3>Breath card</h3>
-          <p>Respirando em loop contínuo.</p>
-        </${tag}>`;
-      case 'lumina-stack-card':
-        return `<${tag} ${attrs} count="3" style="width:300px;height:200px;"></${tag}>`;
-      case 'lumina-reveal-card':
-        return `<${tag} ${attrs}>
-          <h3>Reveal card</h3>
-          <p>Role a página (ou recarregue) para ver o reveal animation.</p>
-        </${tag}>`;
-      case 'lumina-parallax-card':
-        return `<${tag} ${attrs}>
-          <h3>Parallax card</h3>
-          <p>3 camadas com velocidades diferentes — mova o cursor.</p>
-        </${tag}>`;
-      case 'lumina-glow-card':
-        return `<${tag} ${attrs} glow-intensity="0.8">
-          <h3>Glow card</h3>
-          <p>Glow que segue o cursor e pulsa.</p>
-        </${tag}>`;
-      case 'lumina-particle-card':
-        return `<${tag} ${attrs} particle-count="60">
-          <h3>Particle card</h3>
-          <p>Clique para ver o burst de partículas.</p>
-        </${tag}>`;
-      case 'lumina-liquid-card':
-        return `<${tag} ${attrs}>
-          <h3>Liquid card</h3>
-          <p>Arraste o cursor — a superfície deforma. Clique para ondas.</p>
-        </${tag}>`;
-      case 'lumina-holo-card':
-        return `<${tag} ${attrs}>
-          <h3>Holo card</h3>
-          <p>Iridescência que muda com o ângulo do mouse.</p>
-        </${tag}>`;
-      case 'lumina-memory-card':
-        return `<${tag} ${attrs} memory-enabled>
-          <h3>Memory card</h3>
-          <p>Passe o cursor e clique — o card "lembra" das interações.</p>
-        </${tag}>`;
-      case 'lumina-echo-card':
-        return `<${tag} ${attrs} echo-intensity="0.8">
-          <h3>Echo card</h3>
-          <p>Clique para ver ondas se propagando.</p>
-        </${tag}>`;
-      default:
-        return `<${tag} ${attrs}>
-          <h3>${meta.name.replace('Lumina', '')}</h3>
-          <p>Conteúdo de exemplo.</p>
-        </${tag}>`;
-    }
-  }
-
-  switch (cat) {
-    case 'inputs':
-      if (tag === 'lumina-textarea' || tag === 'lumina-signature-pad' || tag === 'lumina-file-upload') {
-        return `<${tag} ${attrs} placeholder="Digite algo..."></${tag}>`;
       }
-      if (tag === 'lumina-select') {
-        return `<${tag} ${attrs} searchable placeholder="Escolha..." options='[{"value":"br","label":"Brasil","icon":"🇧🇷"},{"value":"us","label":"EUA","icon":"🇺🇸"},{"value":"pt","label":"Portugal","icon":"🇵🇹"}]'></${tag}>`;
-      }
-      if (tag === 'lumina-slider') {
-        return `<${tag} ${attrs} min="0" max="100" value="50" step="5" marks='[{"value":0,"label":"0"},{"value":50,"label":"Médio"},{"value":100,"label":"Máx"}]'></${tag}>`;
-      }
-      if (tag === 'lumina-radio-group') {
-        return `<${tag} ${attrs} value="b">
-          <button data-value="a">Opção A</button>
-          <button data-value="b">Opção B</button>
-          <button data-value="c">Opção C</button>
-        </${tag}>`;
-      }
-      if (tag === 'lumina-checkbox') {
-        return `<${tag} ${attrs}>Aceito os termos</${tag}>`;
-      }
-      if (tag === 'lumina-switch') {
-        return `<${tag} ${attrs} checked>Notificações</${tag}>`;
-      }
-      if (tag === 'lumina-multi-select') {
-        return `<${tag} ${attrs} options='[{"value":"js","label":"JavaScript"},{"value":"ts","label":"TypeScript"},{"value":"py","label":"Python"},{"value":"go","label":"Go"}]' value="ts"></${tag}>`;
-      }
-      if (tag === 'lumina-autocomplete') {
-        return `<${tag} ${attrs} suggestions='[{"value":"react","label":"React"},{"value":"vue","label":"Vue"},{"value":"svelte","label":"Svelte"},{"value":"angular","label":"Angular"}]'></${tag}>`;
-      }
-      if (tag === 'lumina-search-input') {
-        return `<${tag} ${attrs} suggestions='["React","Vue","Svelte","Angular","Solid","Qwik"]'></${tag}>`;
-      }
-      return `<${tag} ${attrs} placeholder="Digite algo..."></${tag}>`;
+      return `<${tag} id="demo-1" ${attrs} placeholder="Digite algo..."></${tag}>`;
     case 'navigation':
       if (tag === 'lumina-tabs') {
-        return `<${tag} ${attrs} active-tab="t2">
-          <lumina-tab id="t1" label="Geral" icon="⚙">Conteúdo da aba Geral</lumina-tab>
-          <lumina-tab id="t2" label="Conta" icon="👤" badge="3">Conteúdo da aba Conta</lumina-tab>
-          <lumina-tab id="t3" label="Ajuda" icon="?">Conteúdo da aba Ajuda</lumina-tab>
+        return `<${tag} id="demo-1" ${attrs} active-tab="t2">
+          <lumina-tab id="t1" label="Geral" icon="⚙">Conteúdo Geral</lumina-tab>
+          <lumina-tab id="t2" label="Conta" icon="👤" badge="3">Conteúdo Conta</lumina-tab>
+          <lumina-tab id="t3" label="Ajuda" icon="?">Conteúdo Ajuda</lumina-tab>
         </${tag}>`;
       }
-      if (tag === 'lumina-tabs') {
-        return `<${tag} ${attrs}><span>Item A</span><span>Item B</span><span>Item C</span></${tag}>`;
-      }
-      return `<${tag} ${attrs}><span>Item 1</span><span>Item 2</span></${tag}>`;
+      return `<${tag} id="demo-1" ${attrs}><span>Item 1</span><span>Item 2</span></${tag}>`;
     case 'feedback':
-      if (tag === 'lumina-progress') return `<${tag} ${attrs} value="62"></${tag}>`;
-      if (tag === 'lumina-skeleton') return `<${tag} ${attrs} shape="rectangle" width="200px" height="60px"></${tag}>`;
-      if (tag === 'lumina-loading') return `<${tag} ${attrs} size="64" text="Carregando..."></${tag}>`;
-      if (tag === 'lumina-spinner') return `<${tag} ${attrs} size="40"></${tag}>`;
-      if (tag === 'lumina-alert') return `<${tag} ${attrs} dismissible auto-dismiss="0"><span slot="title">Sucesso</span>Operação concluída com sucesso.</${tag}>`;
-      if (tag === 'lumina-toast') return `<${tag} ${attrs} duration="6000" position="top-right">Salvo com sucesso!<button slot="actions" data-action="undo">Desfazer</button></${tag}>`;
-      if (tag === 'lumina-chip') return `<${tag} ${attrs} selectable removable><span slot="icon">⚛</span>TypeScript</${tag}>`;
-      if (tag === 'lumina-status-indicator' || tag === 'lumina-pulse-indicator') {
-        return `<${tag} ${attrs}>Online</${tag}>`;
-      }
-      if (tag === 'lumina-notification-badge') return `<${tag} ${attrs} count="7"><span style="font-size:24px;">🔔</span></${tag}>`;
-      return `<${tag} ${attrs}>${meta.name.replace('Lumina', '')}</${tag}>`;
+      if (tag === 'lumina-progress') return `<${tag} id="demo-1" ${attrs} value="62"></${tag}>`;
+      if (tag === 'lumina-skeleton') return `<${tag} id="demo-1" ${attrs} shape="rectangle" width="200px" height="60px"></${tag}>`;
+      if (tag === 'lumina-loading') return `<${tag} id="demo-1" ${attrs} size="64" text="Carregando..."></${tag}>`;
+      return `<${tag} id="demo-1" ${attrs}>${meta.name.replace('Lumina', '')}</${tag}>`;
     case 'overlays':
-      if (tag === 'lumina-modal' || tag === 'lumina-dialog' || tag === 'lumina-confirmation-dialog' || tag === 'lumina-drawer-modal') {
-        return `<div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
-          <lumina-button ${attrs} id="preview-open-${tag}">Abrir ${meta.name.replace('Lumina', '')}</lumina-button>
-          <${tag} ${attrs}>
+      if (tag === 'lumina-modal' || tag.endsWith('-dialog') || tag === 'lumina-drawer-modal') {
+        return `<div style="display:flex;flex-direction:column;gap:12px;align-items:center;">
+          <lumina-button id="demo-open-${tag}" ${attrs}>Abrir ${meta.name.replace('Lumina', '')}</lumina-button>
+          <${tag} id="demo-1" ${attrs}>
             <span slot="title">${meta.name.replace('Lumina', '')}</span>
             <p>Preview do ${tag}.</p>
             <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
           </${tag}>
         </div>`;
       }
-      if (tag === 'lumina-drawer') {
-        return `<div style="display:flex; flex-direction:column; gap:12px; align-items:center;">
-          <lumina-button ${attrs} id="preview-open-drawer">Abrir drawer</lumina-button>
-          <${tag} ${attrs}>
-            <h2 slot="header">Filtros</h2>
-            <p>Conteúdo do drawer.</p>
-          </${tag}>
-        </div>`;
-      }
-      if (tag === 'lumina-tooltip' || tag === 'lumina-popover') {
-        return `<${tag} ${attrs} content="Hint contextual">
-          <lumina-button ${attrs}>Hover me</lumina-button>
-        </${tag}>`;
-      }
-      return `<${tag} ${attrs}>Trigger</${tag}>`;
+      return `<${tag} id="demo-1" ${attrs}>Trigger</${tag}>`;
     case 'data':
-      if (tag === 'lumina-avatar') return `<${tag} ${attrs} name="John Doe" status="online" size="lg"></${tag}>`;
-      if (tag === 'lumina-avatar-group') return `<${tag} ${attrs} max="3">
-        <lumina-avatar name="A"></lumina-avatar>
-        <lumina-avatar name="B"></lumina-avatar>
-        <lumina-avatar name="C"></lumina-avatar>
-        <lumina-avatar name="D"></lumina-avatar>
-      </${tag}>`;
-      return `<${tag} ${attrs}>
-        <div>Row 1</div><div>Row 2</div><div>Row 3</div>
+      if (tag === 'lumina-avatar') return `<${tag} id="demo-1" ${attrs} name="John Doe" status="online" size="lg"></${tag}>`;
+      return `<${tag} id="demo-1" ${attrs}>
+        <div>Row 1</div><div>Row 2</div>
       </${tag}>`;
     case 'unique':
-      return `<${tag} ${attrs}>
-        <p>Unique component — ${meta.tagline}</p>
+      return `<${tag} id="demo-1" ${attrs}>
+        <p>${meta.tagline}</p>
       </${tag}>`;
     default:
-      return `<${tag} ${attrs}>Default</${tag}>`;
+      return `<${tag} id="demo-1" ${attrs}>Default</${tag}>`;
   }
 }

@@ -1848,3 +1848,86 @@ kbd {
   transition: opacity 0.2s;
 }
 .variant-detail__playground-link:hover { opacity: 0.7; }
+
+/* ===== Playground Event Console ===== */
+.playground__console {
+  margin-bottom: 20px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+.playground__console-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.playground__console-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(245, 245, 255, 0.7);
+}
+.playground__console-clear {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(245, 245, 255, 0.6);
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: 600 11px 'Inter', sans-serif;
+  transition: all 0.2s;
+}
+.playground__console-clear:hover {
+  background: rgba(124, 92, 255, 0.2);
+  color: #fff;
+}
+.playground__console-body {
+  padding: 12px 14px;
+  max-height: 160px;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  line-height: 1.6;
+}
+.playground__console-body:empty::before {
+  content: '💡 Clique, dê duplo clique, ou interaja com os botões abaixo. Os eventos aparecem aqui em tempo real.';
+  color: rgba(245, 245, 255, 0.3);
+  font-style: italic;
+}
+.playground__console-entry {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ===== Playground Gallery ===== */
+.playground__gallery {
+  margin-bottom: 20px;
+}
+.playground__gallery-row {
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.playground__gallery-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(245, 245, 255, 0.5);
+  margin-bottom: 12px;
+}
+.playground__gallery-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.playground__gallery-items > * {
+  min-width: 0;
+}
