@@ -15,6 +15,7 @@ export type ValidationRule = (value: any, allValues?: FormValues) => string | nu
 /** Required — value must be non-empty. */
 export const required: ValidationRule = (value) => {
   if (value === null || value === undefined) return 'Campo obrigatório';
+  if (value === false) return 'Campo obrigatório'; // for checkbox/switch
   if (typeof value === 'string' && !value.trim()) return 'Campo obrigatório';
   if (Array.isArray(value) && value.length === 0) return 'Campo obrigatório';
   return null;

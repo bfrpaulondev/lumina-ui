@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LuminaUI — Developer Test Suite</title>
+  <style>
+    body {
+      margin: 0;
+      background: #06060c;
+      color: #f5f5ff;
+      font-family: 'Inter', system-ui, sans-serif;
+      padding: 40px 20px;
+    }
+    .container { max-width: 900px; margin: 0 auto; }
+    h1 { font-size: 28px; color: #7c5cff; margin-bottom: 8px; }
+    h2 { font-size: 18px; color: #78f0ff; margin: 32px 0 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; }
+    .test-section { background: rgba(20,20,32,0.6); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+    .test-row { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; align-items: flex-end; }
+    .test-row > * { min-width: 200px; }
+    .log { background: #06060c; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px; font-family: 'JetBrains Mono', monospace; font-size: 12px; max-height: 200px; overflow-y: auto; margin-top: 12px; }
+    .log-entry { padding: 2px 0; color: rgba(245,245,255,0.7); }
+    .log-entry.pass { color: #4ade80; }
+    .log-entry.fail { color: #f87171; font-weight: bold; }
+    .log-entry.info { color: #78f0ff; }
+    button.test-btn { background: rgba(124,92,255,0.2); border: 1px solid rgba(124,92,255,0.4); color: #fff; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px; }
+    button.test-btn:hover { background: rgba(124,92,255,0.35); }
+    .field-group { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+    .label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: rgba(245,245,255,0.5); }
+    .summary { position: sticky; top: 20px; background: rgba(20,20,32,0.95); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+    .summary-stat { display: inline-block; margin-right: 16px; font-size: 14px; }
+    .summary-stat strong { color: #7c5cff; font-size: 18px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>LuminaUI — Developer Test Suite</h1>
+    <p style="color: rgba(245,245,255,0.5); margin-bottom: 24px;">
+      Simula um developer real usando os componentes num projeto pessoal. Cada teste verifica a API documentada.
+    </p>
+
+    <div class="summary" id="summary">
+      <span class="summary-stat">Pass: <strong id="pass-count">0</strong></span>
+      <span class="summary-stat">Fail: <strong id="fail-count">0</strong></span>
+      <span class="summary-stat">Total: <strong id="total-count">0</strong></span>
+    </div>
+
+    <!-- ===== TEST 1: lumina-input basic ===== -->
+    <h2>1. lumina-input — básico</h2>
+    <div class="test-section">
+      <div class="field-group">
+        <span class="label">Input normal</span>
+        <lumina-input id="test-input-1" placeholder="Digite seu nome" name="nome"></lumina-input>
+      </div>
+      <div class="field-group">
+        <span class="label">Input com valor inicial</span>
+        <lumina-input id="test-input-2" value="João Silva" name="preenchido"></lumina-input>
+      </div>
+      <div class="field-group">
+        <span class="label">Input disabled</span>
+        <lumina-input id="test-input-3" disabled value="não editável"></lumina-input>
+      </div>
+      <button class="test-btn" onclick="runTest1()">Rodar testes do input</button>
+      <div class="log" id="log-1"></div>
+    </div>
+
+    <!-- ===== TEST 2: lumina-masked-input ===== -->
+    <h2>2. lumina-masked-input — máscaras</h2>
+    <div class="test-section">
+      <div class="field-group">
+        <span class="label">CPF</span>
+        <lumina-masked-input id="test-cpf" mask="###.###.###-##" name="cpf" placeholder="000.000.000-00"></lumina-masked-input>
+      </div>
+      <div class="field-group">
+        <span class="label">Telefone</span>
+        <lumina-masked-input id="test-phone" mask="(##) #####-####" name="phone" placeholder="(00) 00000-0000"></lumina-masked-input>
+      </div>
+      <div class="field-group">
+        <span class="label">Valor setado via JS (deve formatar)</span>
+        <lumina-masked-input id="test-cpf-js" mask="###.###.###-##" name="cpfjs"></lumina-masked-input>
+      </div>
+      <button class="test-btn" onclick="runTest2()">Rodar testes de máscara</button>
+      <div class="log" id="log-2"></div>
+    </div>
+
+    <!-- ===== TEST 3: lumina-form com validação ===== -->
+    <h2>3. lumina-form — validação completa</h2>
+    <div class="test-section">
+      <lumina-form id="test-form" validate-on="blur">
+        <lumina-form-field label="Nome" required>
+          <lumina-input slot="control" name="nome" data-validate="required min:3" placeholder="Seu nome"></lumina-input>
+          <span slot="error"></span>
+        </lumina-form-field>
+        <lumina-form-field label="Email" required>
+          <lumina-input slot="control" name="email" data-validate="required email" placeholder="email@exemplo.com"></lumina-input>
+          <span slot="error"></span>
+        </lumina-form-field>
+        <lumina-form-field label="Senha" required>
+          <lumina-input slot="control" name="senha" type="password" data-validate="required min:8" placeholder="Mínimo 8 chars"></lumina-input>
+          <span slot="error"></span>
+        </lumina-form-field>
+        <lumina-form-field label="Confirmar" required>
+          <lumina-input slot="control" name="confirm" type="password" data-validate="required match:senha" placeholder="Repita a senha"></lumina-input>
+          <span slot="error"></span>
+        </lumina-form-field>
+        <lumina-form-field label="CPF">
+          <lumina-masked-input slot="control" name="cpf" mask="###.###.###-##" data-validate="cpf" placeholder="000.000.000-00"></lumina-masked-input>
+          <span slot="error"></span>
+        </lumina-form-field>
+        <lumina-form-field label="Aceito termos" required>
+          <lumina-checkbox slot="control" name="termos" data-validate="required"></lumina-checkbox>
+          <span slot="error"></span>
+        </lumina-form-field>
+      </lumina-form>
+      <button class="test-btn" onclick="runTest3()">Validar form (deve falhar — campos vazios)</button>
+      <button class="test-btn" onclick="runTest3b()">Preencher + validar (deve passar)</button>
+      <div class="log" id="log-3"></div>
+    </div>
+
+    <!-- ===== TEST 4: lumina-switch / checkbox / radio ===== -->
+    <h2>4. lumina-switch / checkbox / radio-group</h2>
+    <div class="test-section">
+      <div class="test-row">
+        <lumina-switch id="test-switch" name="notif"></lumina-switch>
+        <lumina-checkbox id="test-checkbox" name="agree"></lumina-checkbox>
+      </div>
+      <div class="field-group">
+        <span class="label">Radio group</span>
+        <lumina-radio-group id="test-radio" name="plan" value="free">
+          <button data-value="free">Free</button>
+          <button data-value="pro">Pro</button>
+          <button data-value="enterprise">Enterprise</button>
+        </lumina-radio-group>
+      </div>
+      <button class="test-btn" onclick="runTest4()">Rodar testes de toggle/radio</button>
+      <div class="log" id="log-4"></div>
+    </div>
+
+    <!-- ===== TEST 5: lumina-select / autocomplete ===== -->
+    <h2>5. lumina-select / autocomplete</h2>
+    <div class="test-section">
+      <div class="field-group">
+        <span class="label">Select</span>
+        <lumina-select id="test-select" name="country" placeholder="Escolha um país"
+          options='[{"value":"br","label":"Brasil"},{"value":"us","label":"EUA"},{"value":"pt","label":"Portugal"}]'></lumina-select>
+      </div>
+      <div class="field-group">
+        <span class="label">Autocomplete multi</span>
+        <lumina-autocomplete id="test-autocomplete" name="langs" multi
+          suggestions='[{"value":"ts","label":"TypeScript"},{"value":"js","label":"JavaScript"},{"value":"py","label":"Python"}]'></lumina-autocomplete>
+      </div>
+      <button class="test-btn" onclick="runTest5()">Rodar testes de select/autocomplete</button>
+      <div class="log" id="log-5"></div>
+    </div>
+
+    <!-- ===== TEST 6: lumina-form-list ===== -->
+    <h2>6. lumina-form-list — campos dinâmicos</h2>
+    <div class="test-section">
+      <lumina-form-list id="test-formlist" add-label="Adicionar email" movable max="3">
+        <div data-lfl-item style="display:flex;gap:8px;align-items:center;">
+          <lumina-input placeholder="email@exemplo.com" style="flex:1;"></lumina-input>
+        </div>
+      </lumina-form-list>
+      <button class="test-btn" onclick="runTest6()">Rodar testes de form-list</button>
+      <div class="log" id="log-6"></div>
+    </div>
+
+    <!-- ===== TEST 7: floating label ===== -->
+    <h2>7. Floating label</h2>
+    <div class="test-section">
+      <div class="field-group">
+        <span class="label">Floating label no lumina-input</span>
+        <lumina-input id="test-floating" floating-label>
+          <span slot="label">Email floating</span>
+        </lumina-input>
+      </div>
+      <div class="field-group">
+        <span class="label">Floating label no masked-input</span>
+        <lumina-masked-input id="test-floating-mask" floating-label mask="###.###.###-##">
+          <span slot="label">CPF floating</span>
+        </lumina-masked-input>
+      </div>
+      <button class="test-btn" onclick="runTest7()">Rodar testes de floating label</button>
+      <div class="log" id="log-7"></div>
+    </div>
+  </div>
+
+  <script src="./lumina-ui.js"></script>
+  <script>
+    window.pass = 0;
+    window.fail = 0;
+
+    window.log = function(logId, msg, type = 'info') {
+      const el = document.getElementById(logId);
+      if (!el) return;
+      const entry = document.createElement('div');
+      entry.className = 'log-entry ' + type;
+      const time = new Date().toLocaleTimeString();
+      entry.textContent = `[${time}] ${msg}`;
+      el.appendChild(entry);
+      el.scrollTop = el.scrollHeight;
+      if (type === 'pass') window.pass++;
+      if (type === 'fail') window.fail++;
+      document.getElementById('pass-count').textContent = window.pass;
+      document.getElementById('fail-count').textContent = window.fail;
+      document.getElementById('total-count').textContent = window.pass + window.fail;
+    };
+
+    window.assert = function(logId, condition, msg) {
+      window.log(logId, msg, condition ? 'pass' : 'fail');
+      return condition;
+    };
+
+    // Wait for components to be defined
+    window.waitForComponents = async function() {
+      const tags = ['lumina-input', 'lumina-masked-input', 'lumina-form', 'lumina-form-field',
+        'lumina-switch', 'lumina-checkbox', 'lumina-radio-group', 'lumina-select',
+        'lumina-autocomplete', 'lumina-form-list'];
+      for (const tag of tags) {
+        await customElements.whenDefined(tag);
+      }
+    };
+
+    // ===== TEST 1: lumina-input =====
+    window.runTest1 = async function() {
+      const logId = 'log-1';
+      await window.waitForComponents();
+      const input1 = document.getElementById('test-input-1');
+      const input2 = document.getElementById('test-input-2');
+      const input3 = document.getElementById('test-input-3');
+
+      // Test 1a: value getter
+      window.assert(logId, input1.value === '', 'value inicial vazio: "' + input1.value + '"');
+      window.assert(logId, input2.value === 'João Silva', 'value inicial "João Silva": "' + input2.value + '"');
+
+      // Test 1b: value setter
+      input1.value = 'Maria';
+      window.assert(logId, input1.value === 'Maria', 'value após set "Maria": "' + input1.value + '"');
+
+      // Test 1c: events
+      let changeFired = false;
+      let focusFired = false;
+      let blurFired = false;
+      input1.addEventListener('lumina-change', () => changeFired = true);
+      input1.addEventListener('lumina-focus', () => focusFired = true);
+      input1.addEventListener('lumina-blur', () => blurFired = true);
+
+      const inner = input1.shadowRoot.querySelector('input');
+      inner.value = 'Pedro';
+      inner.dispatchEvent(new Event('input', { bubbles: true }));
+      window.assert(logId, changeFired, 'lumina-change disparado ao digitar');
+
+      inner.dispatchEvent(new Event('focus'));
+      window.assert(logId, focusFired, 'lumina-focus disparado');
+
+      inner.dispatchEvent(new Event('blur'));
+      window.assert(logId, blurFired, 'lumina-blur disparado');
+
+      // Test 1d: disabled
+      const disabledInner = input3.shadowRoot.querySelector('input');
+      window.assert(logId, disabledInner.disabled === true, 'input disabled está realmente disabled');
+
+      // Test 1e: invalid/valid states
+      input1.setAttribute('invalid', '');
+      const hasInvalid = input1.shadowRoot.querySelector('.lumina-input').classList.contains('lumina-input--floating') ||
+                         input1.hasAttribute('invalid');
+      window.assert(logId, input1.hasAttribute('invalid'), 'invalid attribute refletido');
+      input1.removeAttribute('invalid');
+      input1.setAttribute('valid', '');
+      window.assert(logId, input1.hasAttribute('valid'), 'valid attribute refletido');
+    };
+
+    // ===== TEST 2: masked-input =====
+    window.runTest2 = async function() {
+      const logId = 'log-2';
+      await window.waitForComponents();
+      const cpf = document.getElementById('test-cpf');
+      const phone = document.getElementById('test-phone');
+      const cpfJs = document.getElementById('test-cpf-js');
+
+      // Test 2a: set value via JS — should format
+      cpfJs.value = '12345678900';
+      window.assert(logId, cpfJs.value === '12345678900', 'clean value: "' + cpfJs.value + '"');
+      window.assert(logId, cpfJs.formattedValue === '123.456.789-00', 'formatted value: "' + cpfJs.formattedValue + '"');
+
+      // Test 2b: type into CPF
+      const inner = cpf.shadowRoot.querySelector('input');
+      inner.value = '98765432100';
+      inner.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText' }));
+      window.assert(logId, cpf.value === '98765432100', 'clean após digitar: "' + cpf.value + '"');
+      window.assert(logId, cpf.formattedValue === '987.654.321-00', 'formatted após digitar: "' + cpf.formattedValue + '"');
+
+      // Test 2c: phone mask
+      const phoneInner = phone.shadowRoot.querySelector('input');
+      phoneInner.value = '11999998888';
+      phoneInner.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText' }));
+      window.assert(logId, phone.formattedValue === '(11) 99999-8888', 'phone formatted: "' + phone.formattedValue + '"');
+
+      // Test 2d: lumina-change event with detail
+      let changeDetail = null;
+      cpf.addEventListener('lumina-change', (e) => changeDetail = e.detail);
+      phoneInner.value = '';
+      phoneInner.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText' }));
+      // cpf change should have detail with value + formattedValue
+      inner.value = '11111111111';
+      inner.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText' }));
+      window.assert(logId, changeDetail && changeDetail.value === '11111111111', 'change detail.value: ' + (changeDetail?.value || 'null'));
+      window.assert(logId, changeDetail && changeDetail.formattedValue === '111.111.111-11', 'change detail.formattedValue: ' + (changeDetail?.formattedValue || 'null'));
+    };
+
+    // ===== TEST 3: form validation =====
+    window.runTest3 = async function() {
+      const logId = 'log-3';
+      await window.waitForComponents();
+      const form = document.getElementById('test-form');
+
+      const errors = form.validate();
+      const errorCount = Object.keys(errors).length;
+      window.assert(logId, errorCount === 5, '5 campos required vazios devem falhar (got ' + errorCount + ')');
+      window.assert(logId, errors.nome === 'Campo obrigatório', 'nome: "' + errors.nome + '"');
+      window.assert(logId, errors.email === 'Campo obrigatório', 'email: "' + errors.email + '"');
+      window.assert(logId, errors.senha === 'Campo obrigatório', 'senha: "' + errors.senha + '"');
+      window.assert(logId, errors.confirm === 'Campo obrigatório', 'confirm: "' + errors.confirm + '"');
+      window.assert(logId, errors.termos === 'Campo obrigatório', 'termos: "' + errors.termos + '"');
+      // CPF is not required, so it shouldn't be in errors
+      window.assert(logId, !errors.cpf, 'CPF não required não deve estar nos erros');
+    };
+
+    window.runTest3b = async function() {
+      const logId = 'log-3';
+      await window.waitForComponents();
+      const form = document.getElementById('test-form');
+
+      // Fill all fields
+      const nome = form.querySelector('[name=nome]');
+      nome.shadowRoot.querySelector('input').value = 'João';
+      nome.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, detail: { value: 'João' } }));
+
+      const email = form.querySelector('[name=email]');
+      email.shadowRoot.querySelector('input').value = 'joao@exemplo.com';
+      email.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, detail: { value: 'joao@exemplo.com' } }));
+
+      const senha = form.querySelector('[name=senha]');
+      senha.shadowRoot.querySelector('input').value = 'minhasenha123';
+      senha.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, detail: { value: 'minhasenha123' } }));
+
+      const confirm = form.querySelector('[name=confirm]');
+      confirm.shadowRoot.querySelector('input').value = 'minhasenha123';
+      confirm.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, detail: { value: 'minhasenha123' } }));
+
+      const cpf = form.querySelector('[name=cpf]');
+      cpf.value = '52998224725'; // valid CPF
+
+      const termos = form.querySelector('[name=termos]');
+      termos.checked = true;
+
+      // Small delay to let attributes settle
+      await new Promise(r => setTimeout(r, 100));
+
+      const errors = form.validate();
+      const errorCount = Object.keys(errors).length;
+      const errorList = Object.entries(errors).map(([k,v]) => `${k}: ${v}`).join(', ') || '(none)';
+      window.assert(logId, errorCount === 0, '0 erros após preencher (got ' + errorCount + ': ' + errorList + ')');
+
+      // Test getValues
+      const values = form.getValues();
+      window.assert(logId, values.nome === 'João', 'getValues().nome: "' + values.nome + '"');
+      window.assert(logId, values.email === 'joao@exemplo.com', 'getValues().email: "' + values.email + '"');
+      window.assert(logId, values.cpf === '52998224725', 'getValues().cpf (clean): "' + values.cpf + '"');
+      window.assert(logId, values.termos === true, 'getValues().termos (checkbox): ' + values.termos);
+    };
+
+    // ===== TEST 4: switch/checkbox/radio =====
+    window.runTest4 = async function() {
+      const logId = 'log-4';
+      await window.waitForComponents();
+      const sw = document.getElementById('test-switch');
+      const cb = document.getElementById('test-checkbox');
+      const radio = document.getElementById('test-radio');
+
+      // Switch
+      window.assert(logId, sw.checked === false, 'switch inicia false');
+      window.assert(logId, sw.value === false, 'switch.value inicia false');
+      sw.shadowRoot.querySelector('button').click();
+      window.assert(logId, sw.checked === true, 'switch após click: true');
+      window.assert(logId, sw.value === true, 'switch.value após click: true');
+
+      // Checkbox
+      window.assert(logId, cb.checked === false, 'checkbox inicia false');
+      window.assert(logId, cb.value === false, 'checkbox.value inicia false');
+      cb.shadowRoot.querySelector('.lmcb').click();
+      window.assert(logId, cb.checked === true, 'checkbox após click: true');
+
+      // Radio group
+      window.assert(logId, radio.value === 'free', 'radio value inicial: "free"');
+      // Click on "pro"
+      const buttons = radio.querySelectorAll('button[data-value]');
+      const proBtn = Array.from(buttons).find(b => b.getAttribute('data-value') === 'pro');
+      proBtn.click();
+      window.assert(logId, radio.value === 'pro', 'radio após click "pro": "' + radio.value + '"');
+    };
+
+    // ===== TEST 5: select/autocomplete =====
+    window.runTest5 = async function() {
+      const logId = 'log-5';
+      await window.waitForComponents();
+      const select = document.getElementById('test-select');
+      const ac = document.getElementById('test-autocomplete');
+
+      // Select
+      window.assert(logId, select.value === '', 'select value inicial vazio');
+      // Set value via JS
+      select.value = 'br';
+      window.assert(logId, select.value === 'br', 'select após set "br": "' + select.value + '"');
+
+      // Autocomplete multi
+      window.assert(logId, Array.isArray(ac.value) && ac.value.length === 0, 'autocomplete multi inicia como array vazio');
+      // Set value
+      ac.value = ['ts', 'js'];
+      window.assert(logId, Array.isArray(ac.value) && ac.value.length === 2, 'autocomplete após set 2 valores: length=' + ac.value.length);
+      window.assert(logId, ac.value[0] === 'ts', 'autocomplete primeiro valor: "' + ac.value[0] + '"');
+    };
+
+    // ===== TEST 6: form-list =====
+    window.runTest6 = async function() {
+      const logId = 'log-6';
+      await window.waitForComponents();
+      const list = document.getElementById('test-formlist');
+
+      window.assert(logId, list.length === 1, 'form-list inicia com 1 item (got ' + list.length + ')');
+
+      // Add item
+      const added = list.addItem('<div data-lfl-item style="display:flex;gap:8px;align-items:center;"><lumina-input placeholder="email@exemplo.com" style="flex:1;"></lumina-input></div>');
+      window.assert(logId, added !== null, 'addItem retornou elemento');
+      window.assert(logId, list.length === 2, 'form-list após add: 2 items (got ' + list.length + ')');
+
+      // Add another
+      list.addItem('<div data-lfl-item style="display:flex;gap:8px;align-items:center;"><lumina-input placeholder="email@exemplo.com" style="flex:1;"></lumina-input></div>');
+      window.assert(logId, list.length === 3, 'form-list após add 2: 3 items (got ' + list.length + ')');
+
+      // Try to add beyond max=3
+      const overflow = list.addItem('<div data-lfl-item></div>');
+      window.assert(logId, overflow === null, 'addItem além do max retorna null');
+      window.assert(logId, list.length === 3, 'form-list respeita max=3 (got ' + list.length + ')');
+
+      // Remove item
+      list.removeItem(0);
+      await new Promise(r => setTimeout(r, 700)); // wait for leave animation
+      window.assert(logId, list.length === 2, 'form-list após remove: 2 items (got ' + list.length + ')');
+    };
+
+    // ===== TEST 7: floating label =====
+    window.runTest7 = async function() {
+      const logId = 'log-7';
+      await window.waitForComponents();
+      const input = document.getElementById('test-floating');
+      const mask = document.getElementById('test-floating-mask');
+
+      // Check floating-label attribute reflected
+      window.assert(logId, input.hasAttribute('floating-label'), 'lumina-input tem floating-label attr');
+      window.assert(logId, mask.hasAttribute('floating-label'), 'lumina-masked-input tem floating-label attr');
+
+      // Check floating class applied
+      const inputRoot = input.shadowRoot.querySelector('.lumina-input');
+      window.assert(logId, inputRoot.classList.contains('lumina-input--floating'), 'lumina-input tem class --floating');
+
+      // Type and check has-value
+      const inner = input.shadowRoot.querySelector('input');
+      inner.value = 'test@example.com';
+      inner.dispatchEvent(new Event('input', { bubbles: true }));
+      window.assert(logId, inputRoot.classList.contains('lumina-input--has-value'), 'lumina-input tem --has-value após digitar');
+
+      // Same for masked
+      mask.value = '12345678900';
+      const maskRoot = mask.shadowRoot.querySelector('.lmf');
+      window.assert(logId, maskRoot.classList.contains('lmf--has-value') || mask.hasAttribute('data-has-value'),
+        'masked-input tem has-value após set value');
+    };
+
+    // Auto-run all tests after load
+    window.addEventListener('load', async () => {
+      await window.waitForComponents();
+      window.log('log-1', 'Componentes carregados. Clique nos botões para rodar os testes.', 'info');
+    });
+  </script>
+</body>
+</html>

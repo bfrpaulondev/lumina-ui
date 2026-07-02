@@ -8,7 +8,7 @@ export default defineConfig({
       entry: resolve(__dirname, 'src/index.ts'),
       name: 'LuminaUI',
       fileName: 'lumina-ui',
-      formats: ['es'],
+      formats: ['es', 'umd'],
     },
     outDir: 'dist-lib',
     emptyOutDir: true,
