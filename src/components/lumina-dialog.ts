@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class Dialog extends LuminaElement {
   static tagName = 'lumina-dialog';
@@ -46,6 +47,11 @@ export class Dialog extends LuminaElement {
       .lmdg__confirm:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgb(var(--lumina-accent-rgb) / 0.6); }
       .lmdg__confirm:focus-visible, .lmdg__cancel:focus-visible { outline: 2px solid var(--lumina-accent); outline-offset: 2px; }
       :host([variant="minimal"]) .lmdg__bg { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmdg, .lmdg__dialog { transition: none !important; } }
     `;
   }

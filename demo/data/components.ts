@@ -4982,9 +4982,9 @@ customElements.define(Modal.tagName, Modal);
   speed="0.5"
   close-on-backdrop
 >
-  <span slot="title">Título</span>
+  <span slot="title">Título do Modal</span>
   <p>Conteúdo do modal.</p>
-  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
+  <div slot="footer"><lumina-button variant="glass">Cancelar</lumina-button><lumina-button>Confirmar</lumina-button></div>
 </lumina-modal>
 <script type="module">
   const el = document.querySelector('lumina-modal');
@@ -4998,7 +4998,7 @@ export function ModalExample() {
   return (
     <lumina-modal variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} close-on-backdrop
       onLuminaOpen={(e) => console.log(e.detail)}>
-      Conteúdo
+      <span slot="title">Título</span><p>Conteúdo.</p><div slot="footer"><lumina-button>OK</lumina-button></div>
     </lumina-modal>
   );
 }`,
@@ -5044,9 +5044,9 @@ customElements.define(DrawerModal.tagName, DrawerModal);
   side="right"
   size="md"
 >
-  <span slot="title">Título</span>
+  <span slot="title">Título do Modal</span>
   <p>Conteúdo do modal.</p>
-  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
+  <div slot="footer"><lumina-button variant="glass">Cancelar</lumina-button><lumina-button>Confirmar</lumina-button></div>
 </lumina-drawer-modal>
 <script type="module">
   const el = document.querySelector('lumina-drawer-modal');
@@ -5060,7 +5060,7 @@ export function DrawerModalExample() {
   return (
     <lumina-drawer-modal variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} side="right" size="md"
       onLuminaOpen={(e) => console.log(e.detail)}>
-      Conteúdo
+      <span slot="title">Título</span><p>Conteúdo.</p><div slot="footer"><lumina-button>OK</lumina-button></div>
     </lumina-drawer-modal>
   );
 }`,
@@ -5107,9 +5107,9 @@ customElements.define(Dialog.tagName, Dialog);
   confirm-label="Confirmar"
   cancel-label="Cancelar"
 >
-  <span slot="title">Título</span>
+  <span slot="title">Título do Modal</span>
   <p>Conteúdo do modal.</p>
-  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
+  <div slot="footer"><lumina-button variant="glass">Cancelar</lumina-button><lumina-button>Confirmar</lumina-button></div>
 </lumina-dialog>
 <script type="module">
   const el = document.querySelector('lumina-dialog');
@@ -5123,7 +5123,7 @@ export function DialogExample() {
   return (
     <lumina-dialog variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} confirm-label="Confirmar" cancel-label="Cancelar"
       onLuminaOpen={(e) => console.log(e.detail)}>
-      Conteúdo
+      <span slot="title">Título</span><p>Conteúdo.</p><div slot="footer"><lumina-button>OK</lumina-button></div>
     </lumina-dialog>
   );
 }`,
@@ -5167,7 +5167,8 @@ customElements.define(Popover.tagName, Popover);
   speed="0.5"
   placement="top"
 >
-  Hover me
+  <span>Hover me</span>
+  <div slot="content"><p>Conteúdo rico do popover.</p></div>
 </lumina-popover>
 <script type="module">
   const el = document.querySelector('lumina-popover');
@@ -5181,7 +5182,7 @@ export function PopoverExample() {
   return (
     <lumina-popover variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} placement="top"
       onLuminaShow={(e) => console.log(e.detail)}>
-      Conteúdo
+      <span>Hover me</span><div slot="content"><p>Popover.</p></div>
     </lumina-popover>
   );
 }`,
@@ -5227,7 +5228,8 @@ customElements.define(Tooltip.tagName, Tooltip);
   side="top"
   delay="200"
 >
-  Hover me
+  <span>Hover me</span>
+  <span slot="content">Texto do tooltip</span>
 </lumina-tooltip>
 <script type="module">
   const el = document.querySelector('lumina-tooltip');
@@ -5241,7 +5243,7 @@ export function TooltipExample() {
   return (
     <lumina-tooltip variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} side="top" delay={200}
       onLuminaShow={(e) => console.log(e.detail)}>
-      Conteúdo
+      <span>Hover me</span><span slot="content">Tooltip</span>
     </lumina-tooltip>
   );
 }`,
@@ -5283,7 +5285,7 @@ customElements.define(ContextMenu.tagName, ContextMenu);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo
+  <p>Clique com botão direito aqui</p>
 </lumina-context-menu>
 <script type="module">
   const el = document.querySelector('lumina-context-menu');
@@ -5340,7 +5342,8 @@ customElements.define(Lightbox.tagName, Lightbox);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo
+  <img src="https://picsum.photos/200/120" alt="thumb" />
+  <div slot="caption">Legenda da imagem</div>
 </lumina-lightbox>
 <script type="module">
   const el = document.querySelector('lumina-lightbox');
@@ -5400,7 +5403,7 @@ customElements.define(ImageZoom.tagName, ImageZoom);
   zoom="1"
   max-zoom="5"
 >
-  Conteúdo
+  Trigger
 </lumina-image-zoom>
 <script type="module">
   const el = document.querySelector('lumina-image-zoom');
@@ -5456,7 +5459,8 @@ customElements.define(FullscreenOverlay.tagName, FullscreenOverlay);
   accent-color="#78f0ff"
   speed="0.5"
 >
-  Conteúdo
+  <h2>Overlay em tela cheia</h2>
+  <p>Conteúdo do overlay.</p>
 </lumina-fullscreen-overlay>
 <script type="module">
   const el = document.querySelector('lumina-fullscreen-overlay');
@@ -5470,7 +5474,7 @@ export function FullscreenOverlayExample() {
   return (
     <lumina-fullscreen-overlay variant="void" intensity="intense" accent-color="#78f0ff" speed={0.5}
       onLuminaOpen={(e) => console.log(e.detail)}>
-      Conteúdo
+      <h2>Overlay</h2><p>Conteúdo.</p>
     </lumina-fullscreen-overlay>
   );
 }`,
@@ -5519,9 +5523,9 @@ customElements.define(ConfirmationDialog.tagName, ConfirmationDialog);
   confirm-label="Confirmar"
   cancel-label="Cancelar"
 >
-  <span slot="title">Título</span>
+  <span slot="title">Título do Modal</span>
   <p>Conteúdo do modal.</p>
-  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>
+  <div slot="footer"><lumina-button variant="glass">Cancelar</lumina-button><lumina-button>Confirmar</lumina-button></div>
 </lumina-confirmation-dialog>
 <script type="module">
   const el = document.querySelector('lumina-confirmation-dialog');
@@ -5535,7 +5539,7 @@ export function ConfirmationDialogExample() {
   return (
     <lumina-confirmation-dialog variant="glass" intensity="intense" accent-color="#ff5577" speed={0.5} confirm-label="Confirmar" cancel-label="Cancelar"
       onLuminaConfirm={(e) => console.log(e.detail)}>
-      Conteúdo
+      <span slot="title">Título</span><p>Conteúdo.</p><div slot="footer"><lumina-button>OK</lumina-button></div>
     </lumina-confirmation-dialog>
   );
 }`,
@@ -5577,7 +5581,8 @@ customElements.define(Table.tagName, Table);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <table><thead><tr><th>Nome</th><th>Email</th></tr></thead>
+  <tbody><tr><td>João</td><td>joao@ex.com</td></tr><tr><td>Maria</td><td>maria@ex.com</td></tr></tbody></table>
 </lumina-table>
 <script type="module">
   const el = document.querySelector('lumina-table');
@@ -5591,7 +5596,7 @@ export function TableExample() {
   return (
     <lumina-table variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaSort={(e) => console.log(e.detail)}>
-      Conteúdo
+      <table><thead><tr><th>Nome</th></tr></thead><tbody><tr><td>João</td></tr></tbody></table>
     </lumina-table>
   );
 }`,
@@ -5633,7 +5638,7 @@ customElements.define(DataGrid.tagName, DataGrid);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  
 </lumina-data-grid>
 <script type="module">
   const el = document.querySelector('lumina-data-grid');
@@ -5647,7 +5652,7 @@ export function DataGridExample() {
   return (
     <lumina-data-grid variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaSelect={(e) => console.log(e.detail)}>
-      Conteúdo
+      
     </lumina-data-grid>
   );
 }`,
@@ -5689,7 +5694,9 @@ customElements.define(List.tagName, List);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <div>Item 1</div>
+  <div>Item 2</div>
+  <div>Item 3</div>
 </lumina-list>
 <script type="module">
   const el = document.querySelector('lumina-list');
@@ -5703,7 +5710,7 @@ export function ListExample() {
   return (
     <lumina-list variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaSelect={(e) => console.log(e.detail)}>
-      Conteúdo
+      <div>Item 1</div><div>Item 2</div>
     </lumina-list>
   );
 }`,
@@ -5745,14 +5752,17 @@ customElements.define(Grid.tagName, Grid);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <div>Card 1</div>
+  <div>Card 2</div>
+  <div>Card 3</div>
+  <div>Card 4</div>
 </lumina-grid>`,
     react: `import 'lumina-ui';
 
 export function GridExample() {
   return (
     <lumina-grid variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}>
-      Conteúdo
+      <div>Card 1</div><div>Card 2</div>
     </lumina-grid>
   );
 }`,
@@ -5799,7 +5809,7 @@ customElements.define(Avatar.tagName, Avatar);
   speed="0.5"
   size="md"
 >
-  Conteúdo de exemplo
+  
 </lumina-avatar>
 <script type="module">
   const el = document.querySelector('lumina-avatar');
@@ -5813,7 +5823,7 @@ export function AvatarExample() {
   return (
     <lumina-avatar variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} size="md"
       onLuminaClick={(e) => console.log(e.detail)}>
-      Conteúdo
+      
     </lumina-avatar>
   );
 }`,
@@ -5856,14 +5866,16 @@ customElements.define(AvatarGroup.tagName, AvatarGroup);
   speed="0.5"
   max="5"
 >
-  Conteúdo de exemplo
+  <lumina-avatar name="John Doe"></lumina-avatar>
+  <lumina-avatar name="Jane Doe"></lumina-avatar>
+  <lumina-avatar name="Bob"></lumina-avatar>
 </lumina-avatar-group>`,
     react: `import 'lumina-ui';
 
 export function AvatarGroupExample() {
   return (
     <lumina-avatar-group variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max={5}>
-      Conteúdo
+      <lumina-avatar name="John" /><lumina-avatar name="Jane" />
     </lumina-avatar-group>
   );
 }`,
@@ -5905,7 +5917,8 @@ customElements.define(Timeline.tagName, Timeline);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <div data-time="2024-01"><h4>Evento 1</h4><p>Descrição</p></div>
+  <div data-time="2024-02"><h4>Evento 2</h4><p>Descrição</p></div>
 </lumina-timeline>
 <script type="module">
   const el = document.querySelector('lumina-timeline');
@@ -5919,7 +5932,7 @@ export function TimelineExample() {
   return (
     <lumina-timeline variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaSelect={(e) => console.log(e.detail)}>
-      Conteúdo
+      <div data-time="2024"><h4>Evento</h4></div>
     </lumina-timeline>
   );
 }`,
@@ -5961,7 +5974,10 @@ customElements.define(TreeView.tagName, TreeView);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <div data-node="root">Raiz
+    <div data-node="child1">Filho 1</div>
+    <div data-node="child2">Filho 2</div>
+  </div>
 </lumina-tree-view>
 <script type="module">
   const el = document.querySelector('lumina-tree-view');
@@ -5975,7 +5991,7 @@ export function TreeViewExample() {
   return (
     <lumina-tree-view variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaExpand={(e) => console.log(e.detail)}>
-      Conteúdo
+      <div data-node="root">Raiz</div>
     </lumina-tree-view>
   );
 }`,
@@ -6017,7 +6033,7 @@ customElements.define(MorphLab.tagName, MorphLab);
   accent-color="#ff6ec7"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <p>Lab de morphing interativo</p>
 </lumina-morph-lab>
 <script type="module">
   const el = document.querySelector('lumina-morph-lab');
@@ -6031,7 +6047,7 @@ export function MorphLabExample() {
   return (
     <lumina-morph-lab variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
       onLuminaMorph={(e) => console.log(e.detail)}>
-      Conteúdo
+      <p>Lab de morphing</p>
     </lumina-morph-lab>
   );
 }`,
@@ -6076,7 +6092,7 @@ customElements.define(ParticleSystem.tagName, ParticleSystem);
   count="60"
   mode="plain"
 >
-  Conteúdo de exemplo
+  
 </lumina-particle-system>
 <script type="module">
   const el = document.querySelector('lumina-particle-system');
@@ -6090,7 +6106,7 @@ export function ParticleSystemExample() {
   return (
     <lumina-particle-system variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} count={60} mode="plain"
       onLuminaParticleBurst={(e) => console.log(e.detail)}>
-      Conteúdo
+      
     </lumina-particle-system>
   );
 }`,
@@ -6132,7 +6148,7 @@ customElements.define(DepthController.tagName, DepthController);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <p>Controla profundidade 3D global</p>
 </lumina-depth-controller>
 <script type="module">
   const el = document.querySelector('lumina-depth-controller');
@@ -6146,7 +6162,7 @@ export function DepthControllerExample() {
   return (
     <lumina-depth-controller variant="flat" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaDepthChange={(e) => console.log(e.detail)}>
-      Conteúdo
+      <p>Controla profundidade</p>
     </lumina-depth-controller>
   );
 }`,
@@ -6188,7 +6204,7 @@ customElements.define(ContextAware.tagName, ContextAware);
   accent-color="#ffd166"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <p>Detecta contexto da página</p>
 </lumina-context-aware>
 <script type="module">
   const el = document.querySelector('lumina-context-aware');
@@ -6202,7 +6218,7 @@ export function ContextAwareExample() {
   return (
     <lumina-context-aware variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5}
       onLuminaContextChange={(e) => console.log(e.detail)}>
-      Conteúdo
+      <p>Detecta contexto</p>
     </lumina-context-aware>
   );
 }`,
@@ -6244,7 +6260,7 @@ customElements.define(EchoSystem.tagName, EchoSystem);
   accent-color="#7c5cff"
   speed="0.5"
 >
-  Conteúdo de exemplo
+  <p>Sistema de ecos visuais</p>
 </lumina-echo-system>
 <script type="module">
   const el = document.querySelector('lumina-echo-system');
@@ -6258,7 +6274,7 @@ export function EchoSystemExample() {
   return (
     <lumina-echo-system variant="aura" intensity="intense" accent-color="#7c5cff" speed={0.5}
       onLuminaEcho={(e) => console.log(e.detail)}>
-      Conteúdo
+      <p>Ecos visuais</p>
     </lumina-echo-system>
   );
 }`,

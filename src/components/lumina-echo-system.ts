@@ -4,6 +4,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { prefersReducedMotion } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class EchoSystem extends LuminaElement {
   static tagName = 'lumina-echo-system';
@@ -62,7 +63,12 @@ export class EchoSystem extends LuminaElement {
     for (const e of this.echoes) {
       e.life += 1; e.radius = (e.life / e.maxLife) * Math.max(w, h) * 0.5;
       const a = (1 - e.life / e.maxLife) * 0.3 * (this.getAttribute("variant") === "intense" ? 1.5 : this.getAttribute("variant") === "subtle" ? 0.5 : 1);
-      this.ctx.strokeStyle = `rgba(${rgb} / ${a})`;
+      this.ctx.strokeStyle = `rgba(${rgb} / ${a})
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
+`;
       this.ctx.lineWidth = 2;
       this.ctx.beginPath(); this.ctx.arc(e.x, e.y, e.radius, 0, Math.PI * 2); this.ctx.stroke();
     }

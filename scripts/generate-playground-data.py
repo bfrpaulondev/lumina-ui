@@ -427,6 +427,90 @@ def _feedback_react_content(tag):
     return 'Conteúdo'
 
 
+def _overlays_vanilla_content(tag):
+    if tag in ('lumina-modal', 'lumina-dialog', 'lumina-drawer-modal', 'lumina-confirmation-dialog'):
+        return '<span slot="title">Título do Modal</span>\n  <p>Conteúdo do modal.</p>\n  <div slot="footer"><lumina-button variant="glass">Cancelar</lumina-button><lumina-button>Confirmar</lumina-button></div>'
+    if tag == 'lumina-popover':
+        return '<span>Hover me</span>\n  <div slot="content"><p>Conteúdo rico do popover.</p></div>'
+    if tag == 'lumina-tooltip':
+        return '<span>Hover me</span>\n  <span slot="content">Texto do tooltip</span>'
+    if tag == 'lumina-context-menu':
+        return '<p>Clique com botão direito aqui</p>'
+    if tag == 'lumina-lightbox':
+        return '<img src="https://picsum.photos/200/120" alt="thumb" />\n  <div slot="caption">Legenda da imagem</div>'
+    if tag == 'lumina-fullscreen-overlay':
+        return '<h2>Overlay em tela cheia</h2>\n  <p>Conteúdo do overlay.</p>'
+    return 'Trigger'
+
+
+def _overlays_react_content(tag):
+    if tag in ('lumina-modal', 'lumina-dialog', 'lumina-drawer-modal', 'lumina-confirmation-dialog'):
+        return '<span slot="title">Título</span><p>Conteúdo.</p><div slot="footer"><lumina-button>OK</lumina-button></div>'
+    if tag == 'lumina-popover':
+        return '<span>Hover me</span><div slot="content"><p>Popover.</p></div>'
+    if tag == 'lumina-tooltip':
+        return '<span>Hover me</span><span slot="content">Tooltip</span>'
+    if tag == 'lumina-fullscreen-overlay':
+        return '<h2>Overlay</h2><p>Conteúdo.</p>'
+    return 'Conteúdo'
+
+
+def _data_vanilla_content(tag):
+    if tag == 'lumina-table':
+        return '<table><thead><tr><th>Nome</th><th>Email</th></tr></thead>\n  <tbody><tr><td>João</td><td>joao@ex.com</td></tr><tr><td>Maria</td><td>maria@ex.com</td></tr></tbody></table>'
+    if tag == 'lumina-list':
+        return '<div>Item 1</div>\n  <div>Item 2</div>\n  <div>Item 3</div>'
+    if tag == 'lumina-grid':
+        return '<div>Card 1</div>\n  <div>Card 2</div>\n  <div>Card 3</div>\n  <div>Card 4</div>'
+    if tag == 'lumina-avatar-group':
+        return '<lumina-avatar name="John Doe"></lumina-avatar>\n  <lumina-avatar name="Jane Doe"></lumina-avatar>\n  <lumina-avatar name="Bob"></lumina-avatar>'
+    if tag == 'lumina-timeline':
+        return '<div data-time="2024-01"><h4>Evento 1</h4><p>Descrição</p></div>\n  <div data-time="2024-02"><h4>Evento 2</h4><p>Descrição</p></div>'
+    if tag == 'lumina-tree-view':
+        return '<div data-node="root">Raiz\n    <div data-node="child1">Filho 1</div>\n    <div data-node="child2">Filho 2</div>\n  </div>'
+    return ''
+
+
+def _data_react_content(tag):
+    if tag == 'lumina-table':
+        return '<table><thead><tr><th>Nome</th></tr></thead><tbody><tr><td>João</td></tr></tbody></table>'
+    if tag == 'lumina-list':
+        return '<div>Item 1</div><div>Item 2</div>'
+    if tag == 'lumina-grid':
+        return '<div>Card 1</div><div>Card 2</div>'
+    if tag == 'lumina-avatar-group':
+        return '<lumina-avatar name="John" /><lumina-avatar name="Jane" />'
+    if tag == 'lumina-timeline':
+        return '<div data-time="2024"><h4>Evento</h4></div>'
+    if tag == 'lumina-tree-view':
+        return '<div data-node="root">Raiz</div>'
+    return ''
+
+
+def _unique_vanilla_content(tag):
+    if tag == 'lumina-morph-lab':
+        return '<p>Lab de morphing interativo</p>'
+    if tag == 'lumina-depth-controller':
+        return '<p>Controla profundidade 3D global</p>'
+    if tag == 'lumina-context-aware':
+        return '<p>Detecta contexto da página</p>'
+    if tag == 'lumina-echo-system':
+        return '<p>Sistema de ecos visuais</p>'
+    return ''
+
+
+def _unique_react_content(tag):
+    if tag == 'lumina-morph-lab':
+        return '<p>Lab de morphing</p>'
+    if tag == 'lumina-depth-controller':
+        return '<p>Controla profundidade</p>'
+    if tag == 'lumina-context-aware':
+        return '<p>Detecta contexto</p>'
+    if tag == 'lumina-echo-system':
+        return '<p>Ecos visuais</p>'
+    return ''
+
+
 def _card_vanilla_content(tag):
     if tag == 'lumina-card':
         # Real slots: header, default, media, footer
@@ -687,14 +771,11 @@ def gen_vanilla_snippet(spec):
     elif cat == 'feedback':
         content = _feedback_vanilla_content(tag)
     elif cat == 'overlays':
-        if tag in ('lumina-modal', 'lumina-dialog', 'lumina-drawer-modal', 'lumina-confirmation-dialog'):
-            content = '<span slot="title">Título</span>\n  <p>Conteúdo do modal.</p>\n  <div slot="footer"><lumina-button variant="glass">OK</lumina-button></div>'
-        elif tag == 'lumina-drawer':
-            content = '<h2 slot="header">Filtros</h2>\n  <p>Conteúdo do drawer.</p>'
-        elif tag in ('lumina-tooltip', 'lumina-popover'):
-            content = 'Hover me'
-        else:
-            content = 'Conteúdo'
+        content = _overlays_vanilla_content(tag)
+    elif cat == 'data':
+        content = _data_vanilla_content(tag)
+    elif cat == 'unique':
+        content = _unique_vanilla_content(tag)
     else:
         content = 'Conteúdo de exemplo'
 
@@ -785,6 +866,12 @@ def gen_react_snippet(spec):
         content = _navigation_react_content(tag)
     elif cat == 'feedback':
         content = _feedback_react_content(tag)
+    elif cat == 'overlays':
+        content = _overlays_react_content(tag)
+    elif cat == 'data':
+        content = _data_react_content(tag)
+    elif cat == 'unique':
+        content = _unique_react_content(tag)
 
     # Event handler
     event_handler = ''

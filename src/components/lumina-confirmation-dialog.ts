@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class ConfirmationDialog extends LuminaElement {
   static tagName = 'lumina-confirmation-dialog';
@@ -53,6 +54,11 @@ export class ConfirmationDialog extends LuminaElement {
       :host([destructive]) .lmcd__confirm:hover { box-shadow: 0 8px 24px rgb(239 68 68 / 0.6); }
       .lmcd__confirm:active, .lmcd__cancel:active { transform: scale(0.96); }
       .lmcd__confirm:focus-visible, .lmcd__cancel:focus-visible { outline: 2px solid var(--lumina-accent); outline-offset: 2px; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmcd, .lmcd__dialog { transition: none !important; } }
     `;
   }

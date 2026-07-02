@@ -5,6 +5,7 @@ import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { ParticleField } from '../core/ParticleField';
 import { intensityToMultiplier, prefersReducedMotion } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class ParticleSystem extends LuminaElement {
   static tagName = 'lumina-particle-system';
@@ -23,6 +24,11 @@ export class ParticleSystem extends LuminaElement {
       .lmps__content { position: relative; z-index: 2; padding: 24px; }
       :host([variant="cosmic"]) .lmps__bg { background: radial-gradient(ellipse at center, #0a0420, #000); }
       :host([variant="void"]) .lmps__bg { background: rgb(0 0 0 / 0.7); }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmps__canvas { opacity: 0.3; } }
     `;
   }

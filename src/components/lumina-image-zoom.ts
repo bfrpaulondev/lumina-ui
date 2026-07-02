@@ -4,6 +4,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { clamp } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class ImageZoom extends LuminaElement {
   static tagName = 'lumina-image-zoom';
@@ -41,6 +42,11 @@ export class ImageZoom extends LuminaElement {
       .lmiz__btn { appearance: none; border: 0; background: transparent; color: var(--lumina-text); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 16px; display: inline-flex; align-items: center; justify-content: center; transition: background 0.2s; }
       .lmiz__btn:hover { background: rgb(var(--lumina-accent-rgb) / 0.2); }
       .lmiz__level { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 600; color: var(--lumina-text-muted); min-width: 36px; text-align: center; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmiz__img { transition: none !important; } }
     `;
   }

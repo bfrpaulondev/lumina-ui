@@ -4,6 +4,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 const MORPHABLE = ['lumina-button','lumina-card','lumina-badge','lumina-chip','lumina-input','lumina-toggle-button'];
 
@@ -41,6 +42,11 @@ export class MorphLab extends LuminaElement {
       .lmml__timeline { display: flex; gap: 4px; }
       .lmml__dot { flex: 1; height: 3px; border-radius: 2px; background: var(--lumina-border); transition: background 0.3s; cursor: pointer; }
       .lmml__dot[data-active] { background: var(--lumina-accent); box-shadow: 0 0 6px var(--lumina-accent); }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmml__stage > * { animation: none !important; } }
     `;
   }

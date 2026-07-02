@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class LuminaTable extends LuminaElement {
   static tagName = 'lumina-table';
@@ -29,6 +30,11 @@ export class LuminaTable extends LuminaElement {
       ::slotted(tr:last-child td) { border-bottom: 0; }
       :host([variant="compact"]) ::slotted(td), :host([variant="compact"]) ::slotted(th) { padding: 8px 12px; font-size: 12px; }
       :host([variant="neural"]) .lmtb { border-color: rgb(var(--lumina-accent-rgb) / 0.25); }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { ::slotted(tr), ::slotted(td) { transition: none !important; } }
     `;
   }

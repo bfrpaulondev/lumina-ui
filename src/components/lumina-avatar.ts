@@ -20,6 +20,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { coerceAttr } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 const SIZES = ['sm', 'md', 'lg', 'xl'] as const;
 type Size = (typeof SIZES)[number];
@@ -285,6 +286,11 @@ export class LuminaAvatar extends LuminaElement {
 
       @keyframes lmav-spin { to { transform: rotate(360deg); } }
 
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) {
         .lmav, .lmav__ring, .lmav__status, .lmav__holo {
           animation: none !important;

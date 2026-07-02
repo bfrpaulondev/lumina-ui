@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class TreeView extends LuminaElement {
   static tagName = 'lumina-tree-view';
@@ -25,6 +26,11 @@ export class TreeView extends LuminaElement {
       ::slotted([data-expanded][data-expandable])::after { transform: translateY(-50%) rotate(90deg); }
       :host([variant="minimal"]) ::slotted(li), :host([variant="minimal"]) ::slotted([data-tree-node]) { padding-left: 16px; }
       :host([variant="minimal"]) ::slotted(li::before), :host([variant="minimal"]) ::slotted([data-tree-node])::before { display: none; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { ::slotted(ul), ::slotted(.lmtv__children), ::slotted(li), ::slotted([data-tree-node]) { transition: none !important; animation: none !important; } }
     `;
   }

@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 const PLACEMENTS = ['top','bottom','left','right'] as const;
 type Placement = (typeof PLACEMENTS)[number];
@@ -37,6 +38,11 @@ export class Popover extends LuminaElement {
       .lmpo__pop[data-placement="left"] .lmpo__arrow { right: -5px; top: 50%; margin-top: -5px; border-left: none; border-bottom: none; }
       .lmpo__pop[data-placement="right"] .lmpo__arrow { left: -5px; top: 50%; margin-top: -5px; border-right: none; border-top: none; }
       ::slotted([slot="content"]) { font-size: 13px; line-height: 1.5; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmpo__pop { transition: none !important; } }
     `;
   }

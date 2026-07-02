@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class LuminaGrid extends LuminaElement {
   static tagName = 'lumina-grid';
@@ -23,6 +24,11 @@ export class LuminaGrid extends LuminaElement {
       :host([variant="neural"]) ::slotted(*:hover) { border-color: rgb(var(--lumina-accent-rgb) / 0.4); box-shadow: 0 20px 40px -12px rgb(var(--lumina-accent-rgb) / 0.4), 0 0 0 1px rgb(var(--lumina-accent-rgb) / 0.2); }
       @media (max-width: 768px) { :host { --lmgr-cols: 2; } }
       @media (max-width: 480px) { :host { --lmgr-cols: 1; } }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { ::slotted(*) { animation: none !important; transition: none !important; } }
     `;
   }

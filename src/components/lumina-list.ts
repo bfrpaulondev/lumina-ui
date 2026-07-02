@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class LuminaList extends LuminaElement {
   static tagName = 'lumina-list';
@@ -22,6 +23,11 @@ export class LuminaList extends LuminaElement {
       :host([variant="neural"]) .lmls { gap: 6px; }
       :host([variant="neural"]) ::slotted(li), :host([variant="neural"]) ::slotted([data-list-item]) { border-color: rgb(var(--lumina-accent-rgb) / 0.15); }
       :host([variant="minimal"]) ::slotted(li), :host([variant="minimal"]) ::slotted([data-list-item]) { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; border: 0; border-bottom: 1px solid var(--lumina-border); border-radius: 0; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { ::slotted(li), ::slotted([data-list-item]) { animation: none !important; transition: none !important; } }
     `;
   }

@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 interface MenuItem { label: string; icon?: string; shortcut?: string; value?: string; submenu?: MenuItem[]; separator?: boolean; disabled?: boolean; }
 
@@ -29,6 +30,11 @@ export class ContextMenu extends LuminaElement {
       .lmcm__separator { height: 1px; background: var(--lumina-border); margin: 4px 8px; }
       .lmcm__submenu { position: absolute; left: 100%; top: 0; min-width: 160px; padding: 6px; border-radius: var(--lumina-radius-md); background: rgb(var(--lumina-surface) / calc(var(--lumina-surface-alpha) + 0.2)); backdrop-filter: blur(20px) saturate(1.6); -webkit-backdrop-filter: blur(20px) saturate(1.6); border: 1px solid var(--lumina-border); box-shadow: 0 16px 48px -12px rgb(0 0 0 / 0.6); opacity: 0; transform: translateX(-4px); pointer-events: none; transition: opacity 0.2s, transform 0.2s; }
       .lmcm__item:hover .lmcm__submenu { opacity: 1; transform: translateX(0); pointer-events: auto; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmcm, .lmcm__submenu { transition: none !important; } }
     `;
   }

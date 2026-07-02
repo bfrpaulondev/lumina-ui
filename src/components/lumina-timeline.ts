@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class Timeline extends LuminaElement {
   static tagName = 'lumina-timeline';
@@ -19,6 +20,11 @@ export class Timeline extends LuminaElement {
       ::slotted(li::before), ::slotted([data-timeline-item])::before { content: ''; position: absolute; left: -27px; top: 20px; width: 12px; height: 12px; border-radius: 50%; background: var(--lumina-accent); box-shadow: 0 0 0 3px var(--lumina-bg, #06060c), 0 0 12px var(--lumina-accent); z-index: 1; }
       ::slotted(li:hover), ::slotted([data-timeline-item]:hover) { border-color: rgb(var(--lumina-accent-rgb) / 0.3); transform: translateX(4px); }
       :host([variant="neural"]) ::slotted(li), :host([variant="neural"]) ::slotted([data-timeline-item]) { border-color: rgb(var(--lumina-accent-rgb) / 0.2); }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { ::slotted(li), ::slotted([data-timeline-item]) { animation: none !important; } }
     `;
   }

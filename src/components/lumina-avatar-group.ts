@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class AvatarGroup extends LuminaElement {
   static tagName = 'lumina-avatar-group';
@@ -22,6 +23,11 @@ export class AvatarGroup extends LuminaElement {
       .lmag__overflow:hover { background: rgb(var(--lumina-accent-rgb) / 0.2); color: var(--lumina-accent); transform: translateY(-2px) scale(1.05); }
       .lmag__overflow:empty { display: none; }
       :host([variant="compact"]) ::slotted(lumina-avatar), :host([variant="compact"]) ::slotted(*) { margin-left: -14px; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { ::slotted(*), .lmag__overflow { transition: none !important; } }
     `;
   }

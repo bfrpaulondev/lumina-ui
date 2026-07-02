@@ -277,6 +277,11 @@ function buildGalleryHTML(meta: ComponentMeta, state: { variant: string; intensi
     return buildFeedbackGallery(tag, meta, state, a);
   }
 
+  // ===== OVERLAYS / DATA / UNIQUE: rich gallery =====
+  if (cat === 'overlays' || cat === 'data' || cat === 'unique') {
+    return buildGenericGallery(tag, meta, state, a);
+  }
+
   // ===== Default: single preview =====
   return `<div class="playground__gallery-row">
     <div class="playground__gallery-label">Preview</div>
@@ -1751,6 +1756,100 @@ function _feedbackPreviewContent(tag: string): string {
   if (tag === 'lumina-status-indicator') return `Online`;
   if (tag === 'lumina-notification-badge') return `5`;
   return `Conteúdo`;
+}
+
+/**
+ * Generic gallery for overlays, data, and unique components.
+ * Shows all variants + real content + custom colors.
+ */
+function buildGenericGallery(tag: string, meta: ComponentMeta, state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = meta.variants;
+  const cat = meta.category;
+  const content = _genericPreviewContent(tag, cat);
+
+  // Self-closing components (no slot content)
+  const selfClosing = ['lumina-particle-system', 'lumina-image-zoom', 'lumina-data-grid', 'lumina-avatar'].includes(tag) || !content;
+
+  if (selfClosing) {
+    const variantRow = variants.length > 1 ? `
+      <div class="playground__gallery-row">
+        <div class="playground__gallery-label">Todas as variantes (${variants.length})</div>
+        <div class="playground__gallery-items" style="align-items:center;min-height:80px;">
+          ${variants.map((v: string, i: number) => `<${tag} id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark"></${tag}>`).join('')}
+        </div>
+      </div>
+    ` : '';
+    const usageRow = `
+      <div class="playground__gallery-row">
+        <div class="playground__gallery-label">Exemplo de uso</div>
+        <div class="playground__gallery-items">
+          <${tag} id="demo-usage" ${attrs}></${tag}>
+        </div>
+      </div>
+    `;
+    return variantRow + usageRow;
+  }
+
+  // Content components
+  const variantRow = variants.length > 1 ? `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes (${variants.length})</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <${tag} id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" style="min-width:200px;">
+            ${content}
+          </${tag}>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  const usageRow = `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Exemplo de uso</div>
+      <div class="playground__gallery-items">
+        <${tag} id="demo-usage" ${attrs} style="min-width:300px;max-width:500px;">
+          ${content}
+        </${tag}>
+      </div>
+    </div>
+  `;
+
+  return variantRow + usageRow;
+}
+
+function _genericPreviewContent(tag: string, cat: string): string {
+  // Overlays
+  if (cat === 'overlays') {
+    if (tag === 'lumina-modal' || tag === 'lumina-dialog' || tag === 'lumina-drawer-modal' || tag === 'lumina-confirmation-dialog') {
+      return '<span slot="title">Título</span><p>Conteúdo do modal.</p><div slot="footer"><lumina-button size="sm" variant="glass">Cancelar</lumina-button><lumina-button size="sm">OK</lumina-button></div>';
+    }
+    if (tag === 'lumina-popover') return '<span>Hover me</span><span slot="content">Conteúdo do popover</span>';
+    if (tag === 'lumina-tooltip') return '<span>Hover me</span><span slot="content">Tooltip text</span>';
+    if (tag === 'lumina-context-menu') return '<p>Clique com botão direito</p>';
+    if (tag === 'lumina-lightbox') return '<img src="https://picsum.photos/200/120" alt="thumb" /><span slot="caption">Legenda</span>';
+    if (tag === 'lumina-fullscreen-overlay') return '<h2>Overlay</h2><p>Conteúdo em tela cheia.</p>';
+    return 'Trigger';
+  }
+  // Data
+  if (cat === 'data') {
+    if (tag === 'lumina-table') return '<table><thead><tr><th>Nome</th><th>Email</th></tr></thead><tbody><tr><td>João</td><td>joao@ex.com</td></tr><tr><td>Maria</td><td>maria@ex.com</td></tr></tbody></table>';
+    if (tag === 'lumina-list') return '<div>Item 1</div><div>Item 2</div><div>Item 3</div>';
+    if (tag === 'lumina-grid') return '<div>Card 1</div><div>Card 2</div><div>Card 3</div><div>Card 4</div>';
+    if (tag === 'lumina-avatar-group') return '<lumina-avatar name="John"></lumina-avatar><lumina-avatar name="Jane"></lumina-avatar><lumina-avatar name="Bob"></lumina-avatar>';
+    if (tag === 'lumina-timeline') return '<div data-time="2024"><h4>Evento 1</h4></div><div data-time="2024"><h4>Evento 2</h4></div>';
+    if (tag === 'lumina-tree-view') return '<div data-node="root">Raiz<div data-node="c1">Filho 1</div><div data-node="c2">Filho 2</div></div>';
+    return 'Conteúdo';
+  }
+  // Unique
+  if (cat === 'unique') {
+    if (tag === 'lumina-morph-lab') return '<p>Lab de morphing interativo</p>';
+    if (tag === 'lumina-depth-controller') return '<p>Controla profundidade 3D global</p>';
+    if (tag === 'lumina-context-aware') return '<p>Detecta contexto da página</p>';
+    if (tag === 'lumina-echo-system') return '<p>Sistema de ecos visuais</p>';
+    return 'Conteúdo';
+  }
+  return 'Conteúdo';
 }
 
 function buildSinglePreview(tag: string, attrs: string, meta: ComponentMeta): string {

@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 interface GalleryImage { src: string; caption?: string; }
 
@@ -47,6 +48,11 @@ export class Lightbox extends LuminaElement {
       .lmlb__thumb img { width: 100%; height: 100%; object-fit: cover; }
       .lmlb__thumb[data-active] { border-color: var(--lumina-accent); }
       .lmlb__thumb:hover { transform: scale(1.1); }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmlb, .lmlb__img { transition: none !important; } }
     `;
   }

@@ -6,6 +6,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { coerceAttr, prefersReducedMotion } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 const SIDES = ['left','right','bottom'] as const;
 type Side = (typeof SIDES)[number];
@@ -52,6 +53,11 @@ export class DrawerModal extends LuminaElement {
       .lmdm__close:hover { transform: rotate(90deg); background: rgb(var(--lumina-accent-rgb) / 0.3); }
       .lmdm__content { flex: 1; overflow-y: auto; padding: 20px; }
       :host([variant="void"]) .lmdm__panel { background: rgb(0 0 0 / 0.85); border-color: rgb(var(--lumina-accent-rgb) / 0.2); }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmdm, .lmdm__panel { transition: none !important; } }
     `;
   }

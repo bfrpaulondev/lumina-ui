@@ -3,6 +3,7 @@
  */
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class DataGrid extends LuminaElement {
   static tagName = 'lumina-data-grid';
@@ -29,6 +30,11 @@ export class DataGrid extends LuminaElement {
       .lmdg__checkbox { width: 32px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
       .lmdg__checkbox input { accent-color: var(--lumina-accent); cursor: pointer; }
       :host([variant="dense"]) .lmdg__cell, :host([variant="dense"]) .lmdg__header-cell { padding: 6px 10px; font-size: 12px; }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmdg__row { animation: none !important; } }
     `;
   }

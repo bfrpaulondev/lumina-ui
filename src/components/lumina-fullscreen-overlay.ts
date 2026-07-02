@@ -4,6 +4,7 @@
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { prefersReducedMotion, randRange } from '../core/utils';
+import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 export class FullscreenOverlay extends LuminaElement {
   static tagName = 'lumina-fullscreen-overlay';
@@ -40,6 +41,11 @@ export class FullscreenOverlay extends LuminaElement {
       .lmfo__content { position: relative; z-index: 2; padding: 40px; text-align: center; max-width: 600px; }
       :host([variant="cosmic"]) .lmfo__backdrop { background: radial-gradient(ellipse at center, #0a0420 0%, #000 70%); }
       :host([variant="dimensional"]) .lmfo__backdrop { background: radial-gradient(ellipse at center, #06060c 0%, #000 70%); }
+
+      :host([disabled]) { opacity: 0.5; cursor: not-allowed; pointer-events: none; }
+      :host([invalid]) [part="bg"], :host([invalid]) [part="control"], :host([invalid]) [part="track"] { border-color: rgb(255 70 90 / 0.6) !important; box-shadow: 0 0 0 4px rgb(255 70 90 / 0.10) !important; }
+      :host([valid]) [part="bg"], :host([valid]) [part="control"], :host([valid]) [part="track"] { border-color: rgb(34 197 94 / 0.5) !important; }
+      ${formFieldSharedStyles}
       @media (prefers-reduced-motion: reduce) { .lmfo, .lmfo__portal { transition: none !important; animation: none !important; } }
     `;
   }
