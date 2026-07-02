@@ -579,24 +579,38 @@ body {
 .home__docs-grid a:hover { background: rgba(124, 92, 255, 0.15); transform: translateY(-2px); }
 
 /* ----------------------------------------------------------------- */
-/* Playground                                                        */
+/* Playground — clean 2-zone layout (sidebar + vertical main)        */
+/* All blocks are explicit, fixed-height where needed, no nested     */
+/* grids, no sticky-inside-grid, no fragile max-height chains.       */
 /* ----------------------------------------------------------------- */
 
+/* Root: 2 columns — sidebar (260px) | main (1fr). No nesting. */
 .playground__layout {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 260px minmax(0, 1fr);
   gap: 24px;
   align-items: start;
 }
+
+/* ---------- Sidebar ---------- */
 .playground__sidebar {
   position: sticky;
   top: 24px;
   max-height: calc(100vh - 48px);
   overflow-y: auto;
-  background: rgba(255, 255, 255, 0.025);
+  overflow-x: hidden;
+  background: rgba(20, 20, 32, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 14px;
   padding: 12px;
+  /* Custom scrollbar */
+  scrollbar-width: thin;
+  scrollbar-color: rgba(124, 92, 255, 0.4) transparent;
+}
+.playground__sidebar::-webkit-scrollbar { width: 6px; }
+.playground__sidebar::-webkit-scrollbar-thumb {
+  background: rgba(124, 92, 255, 0.3);
+  border-radius: 3px;
 }
 .playground__sidebar-label {
   font-size: 10px;
@@ -604,9 +618,9 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgba(245, 245, 255, 0.4);
-  padding: 4px 8px 8px;
+  padding: 4px 8px 10px;
 }
-.playground__sidebar-group { margin-bottom: 12px; }
+.playground__sidebar-group { margin-bottom: 14px; }
 .playground__sidebar-cat {
   display: flex;
   align-items: center;
@@ -650,26 +664,40 @@ body {
   display: block;
 }
 
+/* ---------- Main: vertical stack, no inner grid ---------- */
+.playground__main {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0; /* critical: prevents flex children from overflowing */
+}
+
+/* ---------- Head (title + desc + meta + controls) ---------- */
 .playground__head {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 20px;
-  margin-bottom: 20px;
   flex-wrap: wrap;
+  padding: 16px 20px;
+  background: rgba(20, 20, 32, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
 }
+.playground__head-info { min-width: 0; flex: 1 1 320px; }
 .playground__title {
   margin: 0;
   font-size: 22px;
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-weight: 700;
   color: #fff;
+  word-break: break-all;
 }
 .playground__desc {
-  margin: 4px 0 8px;
+  margin: 6px 0 10px;
   font-size: 14px;
   color: rgba(245, 245, 255, 0.6);
-  max-width: 520px;
+  max-width: 640px;
   line-height: 1.5;
 }
 .playground__meta {
@@ -695,65 +723,128 @@ body {
 }
 .playground__controls {
   display: flex;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
+  align-items: center;
 }
 
-.playground__split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  height: 540px;
-}
-.playground__preview {
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.025);
+/* ---------- Event Console ---------- */
+.playground__console {
+  border-radius: 12px;
+  background: rgba(8, 8, 16, 0.7);
   border: 1px solid rgba(255, 255, 255, 0.06);
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  justify-content: center;
-  padding: 24px;
-  overflow: auto;
-  min-height: 0;
+  overflow: hidden;
 }
-.playground__preview-inner {
-  flex: 1 1 auto;
+.playground__console-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.playground__console-title {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: rgba(245, 245, 255, 0.7);
+}
+.playground__console-clear {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(245, 245, 255, 0.6);
+  padding: 3px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: 600 11px 'Inter', sans-serif;
+  transition: all 0.2s;
+}
+.playground__console-clear:hover {
+  background: rgba(124, 92, 255, 0.2);
+  color: #fff;
+}
+.playground__console-body {
+  padding: 12px 14px;
+  height: 140px;
+  overflow-y: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11.5px;
+  line-height: 1.6;
+  /* Explicit dark background to prevent any white bleed-through */
+  background: #06060c;
+}
+.playground__console-body:empty::before {
+  content: 'Clique, dê duplo clique, ou interaja com os componentes abaixo. Os eventos aparecem aqui em tempo real.';
+  color: rgba(245, 245, 255, 0.3);
+  font-style: italic;
+}
+.playground__console-entry {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* ---------- Gallery (vertical stack of rows) ---------- */
+.playground__gallery {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  width: 100%;
-  max-width: 100%;
+  gap: 12px;
   min-width: 0;
 }
-.playground__preview-inner > * { width: 100%; max-width: 100%; }
-.playground__preview-inner > * { width: 100%; max-width: 100%; }
-.playground__code {
-  height: 500px !important;
-  min-height: 0;
-  overflow: hidden;
-  display: flex;
+.playground__gallery-row {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(20, 20, 32, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
-.playground__code lumina-code-viewer {
-  flex: 1;
+.playground__gallery-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(245, 245, 255, 0.55);
+  margin-bottom: 12px;
+}
+.playground__gallery-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
   min-height: 0;
-  overflow: hidden;
+}
+.playground__gallery-items > * {
+  min-width: 0;
 }
 
-.playground__info {
-  margin-top: 20px;
-  padding: 12px;
+/* ---------- Code viewer (Monaco) — fixed height, no flex tricks ---------- */
+.playground__code {
+  height: 480px;
+  min-height: 480px;
+  background: #0b0b14;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
+  overflow: hidden;
+  /* Use position relative so children can't escape */
+  position: relative;
+}
+.playground__code lumina-code-viewer {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- Info grid (events / parts / slots / props) ---------- */
+.playground__info {
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: rgba(20, 20, 32, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 .playground__info-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 18px;
 }
-.playground__info-grid > div { font-size: 13px; }
+.playground__info-grid > div { font-size: 13px; min-width: 0; }
 .playground__info-grid strong {
   display: block;
   font-size: 10px;
@@ -761,7 +852,7 @@ body {
   letter-spacing: 0.1em;
   text-transform: uppercase;
   color: rgba(245, 245, 255, 0.4);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
 .playground__info-list code {
   font-family: 'JetBrains Mono', monospace;
@@ -772,6 +863,35 @@ body {
   border-radius: 4px;
   margin: 2px;
   display: inline-block;
+}
+
+/* ---------- Responsive: stack sidebar above main on small screens ---------- */
+@media (max-width: 1100px) {
+  .playground__layout {
+    grid-template-columns: 1fr;
+  }
+  .playground__sidebar {
+    position: relative;
+    top: 0;
+    max-height: 320px;
+  }
+  .playground__code {
+    height: 380px;
+    min-height: 380px;
+  }
+}
+
+@media (max-width: 720px) {
+  .playground__head {
+    flex-direction: column;
+  }
+  .playground__controls {
+    width: 100%;
+  }
+  .playground__code {
+    height: 320px;
+    min-height: 320px;
+  }
 }
 
 /* ----------------------------------------------------------------- */
@@ -1555,9 +1675,6 @@ kbd {
 /* ----------------------------------------------------------------- */
 
 @media (max-width: 1100px) {
-  .playground__split { grid-template-columns: 1fr; height: auto; }
-  .playground__preview, .playground__preview-inner > * { width: 100%; max-width: 100%; }
-.playground__code { min-height: 320px; }
   .studio__layout { grid-template-columns: 1fr; }
   .particle-physics__layout, .depth-explorer__layout { grid-template-columns: 1fr; }
   .a11y__layout { grid-template-columns: 1fr; }
@@ -1572,11 +1689,6 @@ kbd {
     overflow-y: auto;
   }
   .app-main { padding: 24px 20px 60px; }
-  .playground__layout { grid-template-columns: 1fr !important; }
-  .playground__sidebar { position: relative !important; top: 0; max-height: 40vh; overflow-y: auto; }
-  .playground__split { grid-template-columns: 1fr !important; height: auto !important; }
-  .playground__preview, .playground__preview-inner > * { width: 100%; max-width: 100%; }
-.playground__code { min-height: 320px; }
   .morph-lab__controls { grid-template-columns: 1fr !important; }
   .studio__layout { grid-template-columns: 1fr !important; }
   .particle-physics__layout, .depth-explorer__layout { grid-template-columns: 1fr !important; }
@@ -1591,7 +1703,6 @@ kbd {
   
   body { background: #fff !important; color: #000 !important; }
   .app-main { padding: 0 !important; max-width: 100% !important; }
-  .playground__preview { background: #fff !important; border: 1px solid #ccc !important; }
   .section-head__title, h1, h2, h3 { color: #000 !important; }
   .section-head__sub, p { color: #333 !important; }
   .gradient-text { -webkit-text-fill-color: #000 !important; color: #000 !important; }
@@ -1848,104 +1959,3 @@ kbd {
   transition: opacity 0.2s;
 }
 .variant-detail__playground-link:hover { opacity: 0.7; }
-
-/* ===== Playground Event Console ===== */
-.playground__console {
-  margin-bottom: 20px;
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  overflow: hidden;
-}
-.playground__console-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 8px 14px;
-  background: rgba(255, 255, 255, 0.04);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-.playground__console-title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: rgba(245, 245, 255, 0.7);
-}
-.playground__console-clear {
-  appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(245, 245, 255, 0.6);
-  padding: 3px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-  font: 600 11px 'Inter', sans-serif;
-  transition: all 0.2s;
-}
-.playground__console-clear:hover {
-  background: rgba(124, 92, 255, 0.2);
-  color: #fff;
-}
-.playground__console-body {
-  padding: 12px 14px;
-  max-height: 160px;
-  overflow-y: auto;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 11.5px;
-  line-height: 1.6;
-}
-.playground__console-body:empty::before {
-  content: '💡 Clique, dê duplo clique, ou interaja com os botões abaixo. Os eventos aparecem aqui em tempo real.';
-  color: rgba(245, 245, 255, 0.3);
-  font-style: italic;
-}
-.playground__console-entry {
-  white-space: pre-wrap;
-  word-break: break-all;
-}
-
-/* ===== Playground Gallery ===== */
-.playground__gallery {
-  margin-bottom: 20px;
-}
-.playground__gallery-row {
-  margin-bottom: 16px;
-  padding: 12px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-}
-.playground__gallery-label {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  color: rgba(245, 245, 255, 0.5);
-  margin-bottom: 12px;
-}
-.playground__gallery-items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-.playground__gallery-items > * {
-  min-width: 0;
-}
-/* ===== Playground Main — 2-column layout (gallery + code side-by-side) ===== */
-.playground__main {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  align-items: start;
-}
-.playground__head { grid-column: 1 / -1; }
-.playground__console { grid-column: 1 / -1; }
-.playground__gallery { grid-column: 1; max-height: 700px; overflow-y: auto; padding-right: 8px; }
-.playground__code { grid-column: 2; height: 700px !important; position: sticky; top: 24px; }
-.playground__info { grid-column: 1 / -1; }
-
-@media (max-width: 1100px) {
-  .playground__main { grid-template-columns: 1fr !important; }
-  .playground__gallery, .playground__code { grid-column: 1 !important; max-height: none !important; }
-  .playground__code { height: 500px !important; position: relative !important; top: 0 !important; }
-}

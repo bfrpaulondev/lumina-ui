@@ -1,11 +1,11 @@
 /**
- * LuminaUI — Playground section (v2)
+ * LuminaUI — Playground section (v3 — clean rebuild)
  *
- * Redesigned with:
- * - Rich multi-variant previews for buttons (semantic types + states + variants)
- * - Live event console showing all lumina-* and native events
- * - Code that mirrors exactly what's in the preview
- * - Interactive controls for variant/intensity/accent
+ * Layout: 2-zone grid (sidebar | main), no nested grids.
+ *   - Sidebar: sticky, scrollable list of all 100 components grouped by category.
+ *   - Main: vertical stack — head, console, gallery, code, info.
+ *
+ * No fragile sticky-inside-grid, no max-height chains, no white ghost boxes.
  */
 
 import type { Route } from '../app';
@@ -48,8 +48,9 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
       </aside>
 
       <div class="playground__main">
+        <!-- HEAD: title + meta + controls -->
         <div class="playground__head">
-          <div>
+          <div class="playground__head-info">
             <h2 class="playground__title">&lt;${current.tag}&gt;</h2>
             <p class="playground__desc">${current.description}</p>
             <div class="playground__meta">
@@ -77,24 +78,24 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
           </div>
         </div>
 
-        <!-- Event Console (always visible) -->
-        <div class="playground__console" data-console>
+        <!-- EVENT CONSOLE -->
+        <div class="playground__console">
           <div class="playground__console-head">
-            <span class="playground__console-title">📡 Event Console</span>
+            <span class="playground__console-title">Event Console</span>
             <button class="playground__console-clear" data-console-clear>Limpar</button>
           </div>
           <div class="playground__console-body" data-console-body></div>
         </div>
 
-        <!-- Preview Gallery -->
+        <!-- GALLERY: vertical stack of preview rows -->
         <div class="playground__gallery" data-gallery></div>
 
-        <!-- Code Viewer -->
+        <!-- CODE: Monaco editor, fixed height -->
         <div class="playground__code">
           <lumina-code-viewer data-viewer></lumina-code-viewer>
         </div>
 
-        <!-- Info Grid -->
+        <!-- INFO: events / parts / slots / props -->
         <div class="playground__info" data-info></div>
       </div>
     </div>
@@ -148,7 +149,7 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
         'lumina-menu-select', 'lumina-morph-start', 'lumina-morph-end',
         'lumina-card-select', 'lumina-stack-change', 'lumina-reveal',
         'lumina-parallax', 'lumina-hover', 'lumina-interact',
-        'lumina-particle-interact', 'lumina-memory-update', 'lumina-echo',
+        'lumina-particle-interact', 'lumina-memory-update',
         'lumina-context-change', 'lumina-sentiment-change', 'lumina-input',
         'lumina-file-add', 'lumina-file-remove', 'lumina-upload-progress',
         'lumina-color-change', 'lumina-date-change', 'lumina-time-change',
@@ -158,15 +159,15 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
         'lumina-page-change', 'lumina-toggle', 'lumina-step-change',
         'lumina-show', 'lumina-hide', 'lumina-select', 'lumina-confirm',
         'lumina-cancel', 'lumina-open', 'lumina-close', 'lumina-dismiss',
-        'lumina-close', 'lumina-strength-change', 'lumina-visibility-toggle',
+        'lumina-strength-change', 'lumina-visibility-toggle',
         'lumina-suggestion-select', 'lumina-suggestion-highlight',
         'lumina-progress', 'lumina-progress-complete',
         'lumina-status-change', 'lumina-clear', 'lumina-pulse',
         'lumina-depth-change', 'lumina-particle-burst',
-        'lumina-backdrop-click', 'lumina-zoom-change', 'lumina-navigate',
+        'lumina-backdrop-click', 'lumina-zoom-change',
         'lumina-expand', 'lumina-collapse', 'lumina-reveal-start',
         'lumina-reveal-complete', 'lumina-morph', 'lumina-tilt-start',
-        'lumina-tilt-end', 'lumina-press',
+        'lumina-tilt-end',
       ];
       events.forEach((evt) => {
         el.addEventListener(evt, (e: Event) => {
@@ -186,7 +187,7 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
           }
           logEvent(`native:${nativeEvt}`);
           if (nativeEvt === 'dblclick') {
-            logEvent('💡 Double-click detectado! Use addEventListener("dblclick", ...) para capturar.');
+            logEvent('Double-click detectado! Use addEventListener("dblclick", ...) para capturar.');
           }
         });
       });
@@ -231,6 +232,13 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
   renderViewer();
   renderInfo();
 
+  // Re-layout Monaco after the section is in the DOM and visible
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      try { viewer?.relayout?.(); } catch { /* noop */ }
+    });
+  });
+
   return root;
 }
 
@@ -266,24 +274,23 @@ function buildButtonGallery(tag: string, state: { variant: string; intensity: st
         <div class="playground__gallery-row">
           <div class="playground__gallery-label">Sizes (sm / md / lg)</div>
           <div class="playground__gallery-items">
-            <lumina-icon-button id="demo-1" ${attrs} size="sm">⚙</lumina-icon-button>
-            <lumina-icon-button id="demo-2" ${attrs} size="md">★</lumina-icon-button>
-            <lumina-icon-button id="demo-3" ${attrs} size="lg">♥</lumina-icon-button>
+            <lumina-icon-button id="demo-1" ${attrs} size="sm">A</lumina-icon-button>
+            <lumina-icon-button id="demo-2" ${attrs} size="md">B</lumina-icon-button>
+            <lumina-icon-button id="demo-3" ${attrs} size="lg">C</lumina-icon-button>
           </div>
         </div>
         <div class="playground__gallery-row">
           <div class="playground__gallery-label">Variants</div>
           <div class="playground__gallery-items">
-            <lumina-icon-button id="demo-4" variant="glass" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">⚙</lumina-icon-button>
-            <lumina-icon-button id="demo-5" variant="neural" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">⚙</lumina-icon-button>
-            <lumina-icon-button id="demo-6" variant="aura" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">⚙</lumina-icon-button>
-            <lumina-icon-button id="demo-7" variant="minimal" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">⚙</lumina-icon-button>
+            <lumina-icon-button id="demo-4" variant="glass" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">A</lumina-icon-button>
+            <lumina-icon-button id="demo-5" variant="neural" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">B</lumina-icon-button>
+            <lumina-icon-button id="demo-6" variant="aura" intensity="${state.intensity}" accent-color="${state.accent}" size="md" theme="dark">C</lumina-icon-button>
           </div>
         </div>
         <div class="playground__gallery-row">
           <div class="playground__gallery-label">Disabled</div>
           <div class="playground__gallery-items">
-            <lumina-icon-button id="demo-8" ${attrs} size="md" disabled>⚙</lumina-icon-button>
+            <lumina-icon-button id="demo-7" ${attrs} size="md" disabled>X</lumina-icon-button>
           </div>
         </div>
       `;
@@ -293,8 +300,8 @@ function buildButtonGallery(tag: string, state: { variant: string; intensity: st
           <div class="playground__gallery-label">Variants</div>
           <div class="playground__gallery-items" style="min-height:80px;">
             <lumina-fab id="demo-1" variant="glass" accent-color="${state.accent}" theme="dark">+</lumina-fab>
-            <lumina-fab id="demo-2" variant="neural" accent-color="${state.accent}" theme="dark">★</lumina-fab>
-            <lumina-fab id="demo-3" variant="aura" accent-color="${state.accent}" theme="dark">♥</lumina-fab>
+            <lumina-fab id="demo-2" variant="neural" accent-color="${state.accent}" theme="dark">*</lumina-fab>
+            <lumina-fab id="demo-3" variant="aura" accent-color="${state.accent}" theme="dark">+</lumina-fab>
           </div>
         </div>
         <div class="playground__gallery-row">
@@ -310,7 +317,7 @@ function buildButtonGallery(tag: string, state: { variant: string; intensity: st
           <div class="playground__gallery-label">Split Button (clique na seta para o menu)</div>
           <div class="playground__gallery-items">
             <lumina-split-button id="demo-1" ${attrs}
-              menu-items='[{"label":"Editar","icon":"✎","value":"edit"},{"label":"Duplicar","icon":"⧉","value":"dup"},{"label":"Excluir","icon":"✕","value":"del"}]'
+              menu-items='[{"label":"Editar","icon":"E","value":"edit"},{"label":"Duplicar","icon":"D","value":"dup"},{"label":"Excluir","icon":"X","value":"del"}]'
             >Salvar</lumina-split-button>
           </div>
         </div>
@@ -344,7 +351,7 @@ function buildButtonGallery(tag: string, state: { variant: string; intensity: st
         <div class="playground__gallery-row">
           <div class="playground__gallery-label">Command Button (tente Ctrl+S!)</div>
           <div class="playground__gallery-items">
-            <lumina-command-button id="demo-1" ${attrs} shortcut="⌘K">Buscar comandos</lumina-command-button>
+            <lumina-command-button id="demo-1" ${attrs} shortcut="Ctrl+K">Buscar comandos</lumina-command-button>
             <lumina-command-button id="demo-2" variant="neural" intensity="${state.intensity}" accent-color="#ff6ec7" shortcut="Ctrl+S" theme="dark">Salvar</lumina-command-button>
           </div>
         </div>
@@ -370,9 +377,9 @@ function buildButtonGallery(tag: string, state: { variant: string; intensity: st
     case 'lumina-gesture-button':
       return `
         <div class="playground__gallery-row">
-          <div class="playground__gallery-label">Gesture (toque • segure 0.5s • arraste • 2x clique)</div>
+          <div class="playground__gallery-label">Gesture (toque, segure 0.5s, arraste, 2x clique)</div>
           <div class="playground__gallery-items">
-            <lumina-gesture-button id="demo-1" ${attrs} gestures="hold,swipe,double-tap">Toque • segure • arraste</lumina-gesture-button>
+            <lumina-gesture-button id="demo-1" ${attrs} gestures="hold,swipe,double-tap">Toque, segure, arraste</lumina-gesture-button>
           </div>
         </div>
       `;
@@ -393,14 +400,14 @@ function buildLuminaButtonGallery(state: { variant: string; intensity: string; a
   return `
     <!-- Semantic Types -->
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">🔵 Primary (ação principal)</div>
+      <div class="playground__gallery-label">Primary (ação principal)</div>
       <div class="playground__gallery-items">
         <lumina-button id="demo-primary" ${attrs} speed="0.45">Confirmar</lumina-button>
       </div>
     </div>
 
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">⚪️ Default (sem prioridade)</div>
+      <div class="playground__gallery-label">Default (sem prioridade)</div>
       <div class="playground__gallery-items">
         <lumina-button id="demo-default" ${attrs} intensity="medium">Cancelar</lumina-button>
         <lumina-button id="demo-default2" ${attrs} intensity="medium">Voltar</lumina-button>
@@ -408,43 +415,43 @@ function buildLuminaButtonGallery(state: { variant: string; intensity: string; a
     </div>
 
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">🔤 Text (ação secundária)</div>
+      <div class="playground__gallery-label">Text (ação secundária)</div>
       <div class="playground__gallery-items">
         <lumina-button id="demo-text" variant="glass" intensity="subtle" accent-color="${state.accent}" speed="0.3" theme="dark">Saiba mais</lumina-button>
       </div>
     </div>
 
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">🔗 Link (link externo)</div>
+      <div class="playground__gallery-label">Link (link externo)</div>
       <div class="playground__gallery-items">
-        <lumina-button id="demo-link" variant="glass" intensity="subtle" accent-color="#78f0ff" speed="0.3" theme="dark">Abrir documentação →</lumina-button>
+        <lumina-button id="demo-link" variant="glass" intensity="subtle" accent-color="#78f0ff" speed="0.3" theme="dark">Abrir documentação</lumina-button>
       </div>
     </div>
 
     <!-- States -->
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">🔴 Danger (ação de risco)</div>
+      <div class="playground__gallery-label">Danger (ação de risco)</div>
       <div class="playground__gallery-items">
         <lumina-button id="demo-danger" variant="void" intensity="extreme" accent-color="#ff5577" speed="0.4" theme="dark">Excluir permanentemente</lumina-button>
       </div>
     </div>
 
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">👻 Ghost (fundo complexo)</div>
+      <div class="playground__gallery-label">Ghost (fundo complexo)</div>
       <div class="playground__gallery-items">
         <lumina-button id="demo-ghost" variant="glass" intensity="subtle" accent-color="${state.accent}" speed="0.3" theme="dark">Ghost button</lumina-button>
       </div>
     </div>
 
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">🚫 Disabled (indisponível)</div>
+      <div class="playground__gallery-label">Disabled (indisponível)</div>
       <div class="playground__gallery-items">
         <lumina-button id="demo-disabled" ${attrs} disabled>Disabled</lumina-button>
       </div>
     </div>
 
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">🔃 Loading (carregando)</div>
+      <div class="playground__gallery-label">Loading (carregando)</div>
       <div class="playground__gallery-items">
         <lumina-button id="demo-loading" ${attrs} disabled>Carregando...</lumina-button>
       </div>
@@ -452,7 +459,7 @@ function buildLuminaButtonGallery(state: { variant: string; intensity: string; a
 
     <!-- Block -->
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">⬛ Block (largura total)</div>
+      <div class="playground__gallery-label">Block (largura total)</div>
       <div class="playground__gallery-items" style="max-width:300px;">
         <lumina-button id="demo-block" ${attrs} style="width:100%;display:block;">Botão em bloco</lumina-button>
       </div>
@@ -460,7 +467,7 @@ function buildLuminaButtonGallery(state: { variant: string; intensity: string; a
 
     <!-- All Variants -->
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">🎨 Todas as variantes</div>
+      <div class="playground__gallery-label">Todas as variantes</div>
       <div class="playground__gallery-items">
         <lumina-button id="demo-v1" variant="glass" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark">Glass</lumina-button>
         <lumina-button id="demo-v2" variant="morph" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark">Morph</lumina-button>
@@ -473,18 +480,18 @@ function buildLuminaButtonGallery(state: { variant: string; intensity: string; a
 
     <!-- Icon + Text -->
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">🔤 Ícone + Texto</div>
+      <div class="playground__gallery-label">Ícone + Texto</div>
       <div class="playground__gallery-items">
-        <lumina-button id="demo-icon1" ${attrs}>✓ Salvar</lumina-button>
-        <lumina-button id="demo-icon2" ${attrs}>🗑 Excluir</lumina-button>
-        <lumina-button id="demo-icon3" ${attrs}>⬇ Download</lumina-button>
-        <lumina-button id="demo-icon4" ${attrs}>⚡ Ação rápida</lumina-button>
+        <lumina-button id="demo-icon1" ${attrs}>Salvar</lumina-button>
+        <lumina-button id="demo-icon2" ${attrs}>Excluir</lumina-button>
+        <lumina-button id="demo-icon3" ${attrs}>Download</lumina-button>
+        <lumina-button id="demo-icon4" ${attrs}>Ação rápida</lumina-button>
       </div>
     </div>
 
     <!-- Custom Colors -->
     <div class="playground__gallery-row">
-      <div class="playground__gallery-label">🌈 Cores customizadas</div>
+      <div class="playground__gallery-label">Cores customizadas</div>
       <div class="playground__gallery-items">
         <lumina-button id="demo-c1" variant="aura" intensity="extreme" accent-color="#ff6ec7" theme="dark">Pink</lumina-button>
         <lumina-button id="demo-c2" variant="dimensional" intensity="extreme" accent-color="#22c55e" depth="extrude" theme="dark">Green 3D</lumina-button>
@@ -505,7 +512,7 @@ function buildSinglePreview(tag: string, attrs: string, meta: ComponentMeta): st
       </${tag}>`;
     case 'inputs':
       if (tag === 'lumina-select') {
-        return `<${tag} id="demo-1" ${attrs} searchable placeholder="Escolha..." options='[{"value":"br","label":"Brasil","icon":"🇧🇷"},{"value":"us","label":"EUA","icon":"🇺🇸"}]'></${tag}>`;
+        return `<${tag} id="demo-1" ${attrs} searchable placeholder="Escolha..." options='[{"value":"br","label":"Brasil","icon":"BR"},{"value":"us","label":"EUA","icon":"US"}]'></${tag}>`;
       }
       if (tag === 'lumina-slider') {
         return `<${tag} id="demo-1" ${attrs} min="0" max="100" value="50" step="5"></${tag}>`;
@@ -521,8 +528,8 @@ function buildSinglePreview(tag: string, attrs: string, meta: ComponentMeta): st
     case 'navigation':
       if (tag === 'lumina-tabs') {
         return `<${tag} id="demo-1" ${attrs} active-tab="t2">
-          <lumina-tab id="t1" label="Geral" icon="⚙">Conteúdo Geral</lumina-tab>
-          <lumina-tab id="t2" label="Conta" icon="👤" badge="3">Conteúdo Conta</lumina-tab>
+          <lumina-tab id="t1" label="Geral" icon="*">Conteúdo Geral</lumina-tab>
+          <lumina-tab id="t2" label="Conta" icon="A" badge="3">Conteúdo Conta</lumina-tab>
           <lumina-tab id="t3" label="Ajuda" icon="?">Conteúdo Ajuda</lumina-tab>
         </${tag}>`;
       }

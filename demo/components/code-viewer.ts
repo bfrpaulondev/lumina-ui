@@ -1,13 +1,11 @@
 /**
- * LuminaUI — CodeViewer with Monaco.
+ * LuminaUI — CodeViewer with Monaco (v2 — robust layout, no white flash).
  *
- * Renders a Monaco editor inside a Shadow DOM container. Supports:
- *  - language switching
- *  - read-only toggle
- *  - copy-to-clipboard
- *  - onChange callback for live editing
- *
- * Monaco is loaded lazily from CDN the first time any CodeViewer mounts.
+ * Improvements:
+ *  - Dark placeholder that matches the editor background (no white flash).
+ *  - ResizeObserver to call editor.layout() when container resizes.
+ *  - Exposes `editor` so parent can call layout() after route changes.
+ *  - Stricter container styling (no flex bleed-through).
  */
 
 import { loadMonaco } from '../monaco';
@@ -16,21 +14,22 @@ const styles = `
 :host {
   display: block;
   position: relative;
+  width: 100%;
   height: 100%;
-  min-height: 0;
-  max-height: 100%;
   background: #0b0b14;
   border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  /* No border on host — parent .playground__code already has one */
 }
 .code-viewer__head {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
+  gap: 4px;
+  padding: 6px 8px;
   background: rgba(255, 255, 255, 0.04);
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  height: 38px;
+  box-sizing: border-box;
 }
 .code-viewer__tab {
   appearance: none;
@@ -69,10 +68,14 @@ const styles = `
   border-color: rgba(34, 197, 94, 0.4);
   color: #4ade80;
 }
+/* Container is the editor mount point — explicit dark bg, no white flash */
 .code-viewer__container {
-  height: calc(100% - 40px);
-  min-height: 0;
-  max-height: 100%;
+  position: absolute;
+  top: 38px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #0b0b14;
   overflow: hidden;
 }
 .code-viewer__loading {
@@ -80,9 +83,11 @@ const styles = `
   align-items: center;
   justify-content: center;
   height: 100%;
+  width: 100%;
   color: rgba(245, 245, 255, 0.4);
   font: 500 13px 'JetBrains Mono', monospace;
   font-style: italic;
+  background: #0b0b14;
 }
 `;
 
@@ -101,6 +106,8 @@ export class CodeViewer extends HTMLElement {
   private tabs: CodeViewerTab[] = [];
   private activeTabId = '';
   private onChangeCb: ((code: string, tabId: string) => void) | null = null;
+  private resizeObserver: ResizeObserver | null = null;
+  private containerEl: HTMLElement | null = null;
 
   constructor() {
     super();
@@ -110,12 +117,11 @@ export class CodeViewer extends HTMLElement {
     this.shadow.adoptedStyleSheets = [sheet];
   }
 
+  /** Expose editor so parent can call .layout() if needed. */
+  get monacoEditor(): any { return this.editor; }
+
   setTabs(tabs: CodeViewerTab[], activeId?: string): void {
     this.tabs = tabs;
-    // Force Monaco to recalculate layout
-    if (this.editor) {
-      setTimeout(() => this.editor?.layout(), 100);
-    }
     this.activeTabId = activeId ?? tabs[0]?.id ?? '';
     this.renderShell();
     this.initEditor();
@@ -126,11 +132,22 @@ export class CodeViewer extends HTMLElement {
   }
 
   getCode(): string {
-    return this.editor?.getValue() ?? '';
+    return this.editor?.getValue?.() ?? '';
   }
 
   setCode(code: string): void {
     if (this.editor) this.editor.setValue(code);
+  }
+
+  /** Force Monaco to recompute its layout. Call after the host becomes visible. */
+  relayout(): void {
+    if (this.editor && this.containerEl) {
+      try {
+        this.editor.layout({ width: this.containerEl.clientWidth, height: this.containerEl.clientHeight });
+      } catch {
+        /* noop */
+      }
+    }
   }
 
   private renderShell(): void {
@@ -148,7 +165,7 @@ export class CodeViewer extends HTMLElement {
         <button class="code-viewer__action" data-action="reset">Reset</button>
       </div>
       <div class="code-viewer__container">
-        <div class="code-viewer__loading">Carregando Monaco…</div>
+        <div class="code-viewer__loading">Carregando editor…</div>
       </div>
     `;
     this.shadow.querySelectorAll('.code-viewer__tab').forEach((btn) => {
@@ -160,14 +177,24 @@ export class CodeViewer extends HTMLElement {
     this.shadow.querySelector('[data-action="copy"]')?.addEventListener('click', (e) => {
       const btn = e.currentTarget as HTMLButtonElement;
       const code = this.getCode();
-      navigator.clipboard.writeText(code).then(() => {
+      const onDone = () => {
         btn.setAttribute('data-copied', '');
         btn.textContent = 'Copiado!';
         setTimeout(() => {
           btn.removeAttribute('data-copied');
           btn.textContent = 'Copiar';
         }, 1500);
-      });
+      };
+      // Prefer Clipboard API, fallback to execCommand
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(code).then(onDone).catch(() => {
+          this._legacyCopy(code);
+          onDone();
+        });
+      } else {
+        this._legacyCopy(code);
+        onDone();
+      }
     });
     this.shadow.querySelector('[data-action="reset"]')?.addEventListener('click', () => {
       const tab = this.tabs.find((t) => t.id === this.activeTabId);
@@ -175,10 +202,25 @@ export class CodeViewer extends HTMLElement {
     });
   }
 
+  private _legacyCopy(text: string): void {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    } catch { /* noop */ }
+  }
+
   private async initEditor(): Promise<void> {
     const container = this.shadow.querySelector('.code-viewer__container') as HTMLElement;
     if (!container) return;
+    this.containerEl = container;
     const monaco = await loadMonaco();
+    // Clear the loading placeholder
     container.innerHTML = '';
 
     const tab = this.tabs.find((t) => t.id === this.activeTabId) ?? this.tabs[0];
@@ -188,26 +230,50 @@ export class CodeViewer extends HTMLElement {
     if (!monaco) {
       const textarea = document.createElement("textarea");
       textarea.value = tab.code;
-      textarea.style.width = "100%";
-      textarea.style.height = "100%";
-      textarea.style.border = "0";
-      textarea.style.background = "#0b0b14";
-      textarea.style.color = "#e8e8f5";
-      textarea.style.fontFamily = "'JetBrains Mono', monospace";
-      textarea.style.fontSize = "12.5px";
-      textarea.style.padding = "12px";
-      textarea.style.outline = "none";
-      textarea.style.resize = "none";
+      Object.assign(textarea.style, {
+        width: "100%",
+        height: "100%",
+        border: "0",
+        background: "#0b0b14",
+        color: "#e8e8f5",
+        fontFamily: "'JetBrains Mono', monospace",
+        fontSize: "12.5px",
+        padding: "12px",
+        outline: "none",
+        resize: "none",
+        boxSizing: "border-box",
+      } as CSSStyleDeclaration);
       container.appendChild(textarea);
-      this.editor = { getValue: () => textarea.value, setValue: (v: string) => { textarea.value = v; }, onDidChangeModelContent: () => {} } as any;
+      this.editor = {
+        getValue: () => textarea.value,
+        setValue: (v: string) => { textarea.value = v; },
+        onDidChangeModelContent: () => {},
+        layout: () => {},
+      } as any;
       return;
     }
+
+    // Define custom theme BEFORE creating the editor (prevents white flash from vs-dark default)
+    monaco.editor.defineTheme('lumina-dark', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [],
+      colors: {
+        'editor.background': '#0b0b14',
+        'editor.foreground': '#e8e8f5',
+        'editor.lineHighlightBackground': '#15152a',
+        'editorLineNumber.foreground': '#3a3a55',
+        'editorLineNumber.activeForeground': '#7c5cff',
+        'editor.selectionBackground': '#7c5cff44',
+        'editorCursor.foreground': '#7c5cff',
+      },
+    });
 
     this.editor = monaco.editor.create(container, {
       value: tab.code,
       language: tab.language,
-      theme: 'vs-dark',
-      automaticLayout: true,
+      theme: 'lumina-dark',
+      automaticLayout: false, // we use ResizeObserver instead (more reliable)
       fontSize: 12.5,
       fontFamily: "'JetBrains Mono', ui-monospace, monospace",
       fontLigatures: true,
@@ -225,22 +291,23 @@ export class CodeViewer extends HTMLElement {
       if (this.onChangeCb) this.onChangeCb(this.getCode(), this.activeTabId);
     });
 
-    // Custom theme so it matches the playground
-    monaco.editor.defineTheme('lumina-dark', {
-      base: 'vs-dark',
-      inherit: true,
-      rules: [],
-      colors: {
-        'editor.background': '#0b0b14',
-        'editor.foreground': '#e8e8f5',
-        'editor.lineHighlightBackground': '#15152a',
-        'editorLineNumber.foreground': '#3a3a55',
-        'editorLineNumber.activeForeground': '#7c5cff',
-        'editor.selectionBackground': '#7c5cff44',
-        'editorCursor.foreground': '#7c5cff',
-      },
-    });
-    monaco.editor.setTheme('lumina-dark');
+    // Reliable layout via ResizeObserver — fires when container size changes
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => {
+        if (this.editor && this.containerEl) {
+          try {
+            this.editor.layout({
+              width: this.containerEl.clientWidth,
+              height: this.containerEl.clientHeight,
+            });
+          } catch { /* noop */ }
+        }
+      });
+      this.resizeObserver.observe(container);
+    }
+
+    // Initial layout (after a microtask to ensure DOM is settled)
+    requestAnimationFrame(() => this.relayout());
   }
 
   private switchTab(id: string): void {
@@ -251,13 +318,27 @@ export class CodeViewer extends HTMLElement {
     });
     const tab = this.tabs.find((t) => t.id === id);
     if (tab) {
-      const monacoModel = (window as any).monaco?.editor?.getModels?.();
-      // Simpler: just dispose and recreate value
       this.editor.setValue(tab.code);
-      // Update language via monaco.languages
-      const monacoNs = (this.editor as any).getModel?.()?.getLanguageId?.();
-      // For a clean approach, re-create model:
-      // (kept simple — Monaco handles language inference from extension)
+      // Update language by creating a new model
+      try {
+        const monacoNs = (window as any).monaco;
+        if (monacoNs) {
+          const newModel = monacoNs.editor.createModel(tab.code, tab.language);
+          this.editor.setModel(newModel);
+        }
+      } catch { /* noop */ }
+      this.relayout();
+    }
+  }
+
+  disconnectedCallback(): void {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+      this.resizeObserver = null;
+    }
+    if (this.editor) {
+      try { this.editor.dispose(); } catch { /* noop */ }
+      this.editor = null;
     }
   }
 }
