@@ -177,7 +177,13 @@ export default async function playgroundSection(route: Route): Promise<HTMLEleme
 
       // Native events
       ['click', 'dblclick'].forEach((nativeEvt) => {
-        el.addEventListener(nativeEvt, () => {
+        el.addEventListener(nativeEvt, (e: Event) => {
+          // Don't log native events if element is disabled
+          if ((el as HTMLElement).hasAttribute('disabled') || (el as HTMLElement).getAttribute('aria-disabled') === 'true') {
+            e.preventDefault();
+            e.stopPropagation();
+            return;
+          }
           logEvent(`native:${nativeEvt}`);
           if (nativeEvt === 'dblclick') {
             logEvent('💡 Double-click detectado! Use addEventListener("dblclick", ...) para capturar.');
