@@ -10,10 +10,10 @@ permissions:
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
+# Do NOT cancel in-progress deploys — that was causing "Deployment cancelled"
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
@@ -38,8 +38,14 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Setup Pages
+      # configure-pages with explicit enablement ensures the repo's Pages
+      # source is set to "GitHub Actions" (not "Deploy from a branch").
+      # Without this, GitHub cancels the Actions deployment.
+      - name: Setup Pages (force Actions source)
+        id: pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
@@ -49,14 +55,14 @@ jobs:
   deploy:
     needs: build
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy to GitHub Pages (with retry)
         id: deployment
         uses: actions/deploy-pages@v4
         with:
-          timeout: 600000  # 10 minutes in milliseconds
-          error_count: 10  # max error retries
+          timeout: 900000    # 15 min internal timeout
+          error_count: 10    # max retries
