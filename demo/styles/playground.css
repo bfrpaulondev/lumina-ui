@@ -1931,3 +1931,21 @@ kbd {
 .playground__gallery-items > * {
   min-width: 0;
 }
+/* ===== Playground Main — 2-column layout (gallery + code side-by-side) ===== */
+.playground__main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
+}
+.playground__head { grid-column: 1 / -1; }
+.playground__console { grid-column: 1 / -1; }
+.playground__gallery { grid-column: 1; max-height: 700px; overflow-y: auto; padding-right: 8px; }
+.playground__code { grid-column: 2; height: 700px !important; position: sticky; top: 24px; }
+.playground__info { grid-column: 1 / -1; }
+
+@media (max-width: 1100px) {
+  .playground__main { grid-template-columns: 1fr !important; }
+  .playground__gallery, .playground__code { grid-column: 1 !important; max-height: none !important; }
+  .playground__code { height: 500px !important; position: relative !important; top: 0 !important; }
+}
