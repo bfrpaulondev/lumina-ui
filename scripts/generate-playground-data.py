@@ -60,6 +60,140 @@ def parse_manifest():
     return parsed
 
 
+# Per-input content for vanilla HTML snippets.
+# Returns (content_html, extra_attrs) — extra_attrs are added to the open tag.
+# Most inputs are self-closing (no content); only those with slots or children
+# need content (lumina-input with icon slots, lumina-radio-group with buttons).
+def _input_vanilla_content(tag):
+    if tag == 'lumina-input':
+        # Real slots: left-icon, right-icon, label
+        return (
+            '<span slot="label">Email</span>\n'
+            '  <span slot="left-icon">@</span>\n'
+            '  <span slot="right-icon">✓</span>',
+            ['value="usuario@exemplo.com"', 'placeholder="Digite seu email"']
+        )
+    if tag == 'lumina-radio-group':
+        # Has default slot for radio buttons
+        return (
+            '<button data-value="a">Opção A</button>\n'
+            '  <button data-value="b">Opção B</button>\n'
+            '  <button data-value="c">Opção C</button>',
+            ['value="b"']
+        )
+    # Self-closing inputs — just add proper attributes
+    if tag == 'lumina-textarea':
+        return ('', ['placeholder="Digite sua mensagem..."', 'value="Texto inicial"'])
+    if tag == 'lumina-search-input':
+        return ('', ['placeholder="Buscar..."', 'suggestions=\'["TypeScript","JavaScript","Python","Rust","Go"]\''])
+    if tag == 'lumina-password-input':
+        return ('', ['placeholder="Digite sua senha"', 'value="secret123"'])
+    if tag == 'lumina-select':
+        return ('', [
+            'placeholder="Escolha um país"',
+            'searchable',
+            'options=\'[{"value":"br","label":"Brasil","icon":"BR"},{"value":"us","label":"Estados Unidos","icon":"US"},{"value":"pt","label":"Portugal","icon":"PT"},{"value":"fr","label":"França","icon":"FR"}]\'',
+        ])
+    if tag == 'lumina-multi-select':
+        return ('', [
+            'placeholder="Selecione..."',
+            'options=\'[{"value":"ts","label":"TypeScript"},{"value":"js","label":"JavaScript"},{"value":"py","label":"Python"},{"value":"rust","label":"Rust"}]\'',
+            'value=\'["ts","js"]\'',
+        ])
+    if tag == 'lumina-autocomplete':
+        return ('', [
+            'placeholder="Comece a digitar..."',
+            'suggestions=\'["TypeScript","JavaScript","Python","Rust","Go","Kotlin","Swift"]\'',
+        ])
+    if tag == 'lumina-slider':
+        return ('', ['min="0"', 'max="100"', 'value="50"', 'step="5"'])
+    if tag == 'lumina-range-slider':
+        return ('', ['min="0"', 'max="100"', 'min-value="25"', 'max-value="75"', 'step="5"'])
+    if tag == 'lumina-switch':
+        return ('', ['checked'])
+    if tag == 'lumina-checkbox':
+        return ('', ['checked'])
+    if tag == 'lumina-file-upload':
+        return ('', ['accept="image/*"', 'multiple', 'max-size="5242880"'])
+    if tag == 'lumina-color-picker':
+        return ('', ['value="#7c5cff"'])
+    if tag == 'lumina-date-picker':
+        return ('', ['value="2025-01-15"'])
+    if tag == 'lumina-time-picker':
+        return ('', ['value="14:30"', 'format="24h"'])
+    if tag == 'lumina-signature-pad':
+        return ('', [])
+    if tag == 'lumina-voice-input':
+        return ('', [])
+    if tag == 'lumina-neural-input':
+        return ('', ['placeholder="Digite algo positivo ou negativo..."'])
+    if tag == 'lumina-context-input':
+        return ('', ['placeholder="Detecta contexto automaticamente..."'])
+    return ('', [])
+
+
+# React version — JSX-compatible
+def _input_react_content(tag):
+    if tag == 'lumina-input':
+        return (
+            '<span slot="label">Email</span>\n'
+            '        <span slot="left-icon">@</span>\n'
+            '        <span slot="right-icon">✓</span>',
+            ['value="usuario@exemplo.com"', 'placeholder="Digite seu email"']
+        )
+    if tag == 'lumina-radio-group':
+        return (
+            '<button data-value="a">Opção A</button>\n'
+            '        <button data-value="b">Opção B</button>\n'
+            '        <button data-value="c">Opção C</button>',
+            ['value="b"']
+        )
+    if tag == 'lumina-textarea':
+        return ('', ['placeholder="Digite sua mensagem..."', 'value="Texto inicial"'])
+    if tag == 'lumina-search-input':
+        return ('', ['placeholder="Buscar..."', 'suggestions=\'["TypeScript","JavaScript","Python"]\''])
+    if tag == 'lumina-password-input':
+        return ('', ['placeholder="Digite sua senha"', 'value="secret123"'])
+    if tag == 'lumina-select':
+        return ('', [
+            'placeholder="Escolha um país"',
+            'searchable',
+            'options=\'[{"value":"br","label":"Brasil"},{"value":"us","label":"EUA"}]\'',
+        ])
+    if tag == 'lumina-multi-select':
+        return ('', [
+            'placeholder="Selecione..."',
+            'options=\'[{"value":"ts","label":"TypeScript"},{"value":"js","label":"JavaScript"}]\'',
+            'value=\'["ts"]\'',
+        ])
+    if tag == 'lumina-autocomplete':
+        return ('', [
+            'placeholder="Comece a digitar..."',
+            'suggestions=\'["TypeScript","JavaScript","Python"]\'',
+        ])
+    if tag == 'lumina-slider':
+        return ('', ['min={0}', 'max={100}', 'value={50}', 'step={5}'])
+    if tag == 'lumina-range-slider':
+        return ('', ['min={0}', 'max={100}', 'min-value={25}', 'max-value={75}', 'step={5}'])
+    if tag == 'lumina-switch':
+        return ('', ['checked'])
+    if tag == 'lumina-checkbox':
+        return ('', ['checked'])
+    if tag == 'lumina-file-upload':
+        return ('', ['accept="image/*"', 'multiple', 'max-size="5242880"'])
+    if tag == 'lumina-color-picker':
+        return ('', ['value="#7c5cff"'])
+    if tag == 'lumina-date-picker':
+        return ('', ['value="2025-01-15"'])
+    if tag == 'lumina-time-picker':
+        return ('', ['value="14:30"', 'format="24h"'])
+    if tag == 'lumina-neural-input':
+        return ('', ['placeholder="Digite algo positivo ou negativo..."'])
+    if tag == 'lumina-context-input':
+        return ('', ['placeholder="Detecta contexto automaticamente..."'])
+    return ('', [])
+
+
 # Per-card slot content for vanilla HTML snippets.
 # Uses REAL slots from the manifest — not invented 'title'/'subtitle' slots.
 # Each entry shows the proper way to populate that card.
@@ -279,7 +413,7 @@ def gen_vanilla_snippet(spec):
                 val = str(default).strip('"').strip("'")
                 attrs.append(f'{pname}="{val}"')
 
-    attr_str = '\n  '.join(attrs)
+    # NOTE: attr_str is built AFTER content (which may add extra_attrs for inputs)
 
     # Build content / slots
     content = ''
@@ -314,8 +448,10 @@ def gen_vanilla_snippet(spec):
     elif cat == 'cards':
         content = _card_vanilla_content(tag)
     elif cat == 'inputs':
-        # self-closing
-        pass
+        content, extra_attrs = _input_vanilla_content(tag)
+        if extra_attrs:
+            attrs.extend(extra_attrs)
+        # inputs are usually self-closing unless they have slot content (radio-group, input with icons)
     elif cat == 'feedback':
         if tag == 'lumina-progress':
             content = ''
@@ -344,7 +480,12 @@ def gen_vanilla_snippet(spec):
         content = 'Conteúdo de exemplo'
 
     # Self-closing for inputs without content
-    is_self_closing = cat == 'inputs' or tag in ('lumina-progress', 'lumina-skeleton', 'lumina-spinner', 'lumina-loading', 'lumina-status-indicator', 'lumina-pulse-indicator', 'lumina-neural-loader')
+    # Inputs WITH slot content (radio-group, input with icons) need open/close tags
+    has_input_content = cat == 'inputs' and content
+    is_self_closing = (cat == 'inputs' and not has_input_content) or tag in ('lumina-progress', 'lumina-skeleton', 'lumina-spinner', 'lumina-loading', 'lumina-status-indicator', 'lumina-pulse-indicator', 'lumina-neural-loader')
+
+    # Build attr_str NOW (after extra_attrs from input content have been merged)
+    attr_str = '\n  '.join(attrs)
 
     if is_self_closing:
         open_tag = f'<{tag}\n  {attr_str}\n></{tag}>'
@@ -418,7 +559,9 @@ def gen_react_snippet(spec):
     elif cat == 'cards':
         content = _card_react_content(tag)
     elif cat == 'inputs':
-        content = ''
+        content, extra_attrs = _input_react_content(tag)
+        if extra_attrs:
+            attrs.extend(extra_attrs)
     elif cat == 'feedback':
         if tag == 'lumina-progress':
             content = ''
@@ -434,7 +577,11 @@ def gen_react_snippet(spec):
         event_handler = f'\n      {camel}={{(e) => console.log(e.detail)}}'
 
     # Self-closing?
-    is_self_closing = cat == 'inputs' or tag in ('lumina-progress', 'lumina-skeleton', 'lumina-spinner', 'lumina-loading')
+    has_input_content = cat == 'inputs' and content
+    is_self_closing = (cat == 'inputs' and not has_input_content) or tag in ('lumina-progress', 'lumina-skeleton', 'lumina-spinner', 'lumina-loading')
+
+    # Rebuild attr_str after extra_attrs merged in
+    attr_str = ' '.join(attrs)
 
     if is_self_closing:
         jsx = f"    <{tag} {attr_str}{event_handler} />"

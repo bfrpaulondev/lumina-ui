@@ -262,6 +262,11 @@ function buildGalleryHTML(meta: ComponentMeta, state: { variant: string; intensi
     return buildCardGallery(tag, meta, state, a);
   }
 
+  // ===== INPUTS: rich gallery with variants + states + props =====
+  if (cat === 'inputs') {
+    return buildInputGallery(tag, meta, state, a);
+  }
+
   // ===== Default: single preview =====
   return `<div class="playground__gallery-row">
     <div class="playground__gallery-label">Preview</div>
@@ -502,6 +507,628 @@ function buildLuminaButtonGallery(state: { variant: string; intensity: string; a
         <lumina-button id="demo-c2" variant="dimensional" intensity="extreme" accent-color="#22c55e" depth="extrude" theme="dark">Green 3D</lumina-button>
         <lumina-button id="demo-c3" variant="neural" intensity="extreme" accent-color="#f59e0b" theme="dark">Amber</lumina-button>
         <lumina-button id="demo-c4" variant="void" intensity="extreme" accent-color="#ef4444" theme="dark">Red Void</lumina-button>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Build the input gallery — shows all variants, real attributes, states (disabled/invalid/focused), and custom colors.
+ * Each input type gets a tailored gallery that demonstrates its real capabilities.
+ */
+function buildInputGallery(tag: string, meta: ComponentMeta, state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = meta.variants;
+  const accent = state.accent;
+  const intensity = state.intensity;
+
+  // === Special galleries for inputs with unique behavior ===
+  if (tag === 'lumina-input') return buildInputTextGallery(state, attrs);
+  if (tag === 'lumina-select') return buildSelectGallery(state, attrs);
+  if (tag === 'lumina-multi-select') return buildMultiSelectGallery(state, attrs);
+  if (tag === 'lumina-autocomplete') return buildAutocompleteGallery(state, attrs);
+  if (tag === 'lumina-search-input') return buildSearchInputGallery(state, attrs);
+  if (tag === 'lumina-slider') return buildSliderGallery(state, attrs);
+  if (tag === 'lumina-range-slider') return buildRangeSliderGallery(state, attrs);
+  if (tag === 'lumina-switch') return buildSwitchGallery(state, attrs);
+  if (tag === 'lumina-checkbox') return buildCheckboxGallery(state, attrs);
+  if (tag === 'lumina-radio-group') return buildRadioGroupGallery(state, attrs);
+  if (tag === 'lumina-color-picker') return buildColorPickerGallery(state, attrs);
+  if (tag === 'lumina-date-picker') return buildDatePickerGallery(state, attrs);
+  if (tag === 'lumina-time-picker') return buildTimePickerGallery(state, attrs);
+  if (tag === 'lumina-file-upload') return buildFileUploadGallery(state, attrs);
+  if (tag === 'lumina-signature-pad') return buildSignaturePadGallery(state, attrs);
+  if (tag === 'lumina-voice-input') return buildVoiceInputGallery(state, attrs);
+  if (tag === 'lumina-password-input') return buildPasswordInputGallery(state, attrs);
+  if (tag === 'lumina-textarea') return buildTextareaGallery(state, attrs);
+  if (tag === 'lumina-neural-input') return buildNeuralInputGallery(state, attrs);
+  if (tag === 'lumina-context-input') return buildContextInputGallery(state, attrs);
+
+  // === Fallback: variants + states + colors ===
+  return buildGenericInputGallery(tag, meta, state, attrs);
+}
+
+/**
+ * Generic input gallery — for any input without a specialized gallery.
+ */
+function buildGenericInputGallery(tag: string, meta: ComponentMeta, state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = meta.variants;
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes (${variants.length})</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <${tag} id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" style="min-width:200px;"></${tag}>
+        `).join('')}
+      </div>
+    </div>
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Exemplo de uso</div>
+      <div class="playground__gallery-items">
+        <${tag} id="demo-usage" ${attrs} style="min-width:280px;"></${tag}>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-input — text field with icon slots and label.
+ */
+function buildInputTextGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'echo', 'void'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Input com slots — label, left-icon, right-icon</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-input id="demo-1" ${attrs} placeholder="usuario@exemplo.com" value="john@doe.com" style="min-width:260px;">
+          <span slot="label">Email</span>
+          <span slot="left-icon">@</span>
+          <span slot="right-icon">✓</span>
+        </lumina-input>
+        <lumina-input id="demo-2" ${attrs} placeholder="(11) 99999-9999" style="min-width:260px;">
+          <span slot="label">Telefone</span>
+          <span slot="left-icon">📞</span>
+        </lumina-input>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes (4)</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-input id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" placeholder="Variante ${v}" style="min-width:180px;"></lumina-input>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Cores customizadas</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-input id="demo-c1" variant="neural" intensity="extreme" accent-color="#ff6ec7" theme="dark" placeholder="Pink" style="min-width:160px;"></lumina-input>
+        <lumina-input id="demo-c2" variant="void" intensity="extreme" accent-color="#22c55e" theme="dark" placeholder="Green" style="min-width:160px;"></lumina-input>
+        <lumina-input id="demo-c3" variant="echo" intensity="extreme" accent-color="#f59e0b" theme="dark" placeholder="Amber" style="min-width:160px;"></lumina-input>
+        <lumina-input id="demo-c4" variant="glass" intensity="extreme" accent-color="#78f0ff" theme="dark" placeholder="Cyan" style="min-width:160px;"></lumina-input>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Interatividade — digite nos campos. Eventos: lumina-input · lumina-change · lumina-focus · lumina-blur · lumina-submit</div>
+      <div class="playground__gallery-items"></div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-select — dropdown with search.
+ */
+function buildSelectGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'morph'];
+  const options = '[{"value":"br","label":"Brasil","icon":"BR"},{"value":"us","label":"Estados Unidos","icon":"US"},{"value":"pt","label":"Portugal","icon":"PT"},{"value":"fr","label":"França","icon":"FR"},{"value":"jp","label":"Japão","icon":"JP"}]';
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Select com busca (clique para abrir)</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-select id="demo-1" ${attrs} searchable placeholder="Escolha um país" options='${options}' style="min-width:240px;"></lumina-select>
+        <lumina-select id="demo-2" ${attrs} placeholder="Sem busca" options='${options}' value="br" style="min-width:240px;"></lumina-select>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-select id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" searchable placeholder="Variante ${v}" options='${options}' style="min-width:200px;"></lumina-select>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Cores customizadas</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-select id="demo-c1" variant="neural" intensity="extreme" accent-color="#ff6ec7" theme="dark" searchable placeholder="Pink" options='${options}' style="min-width:180px;"></lumina-select>
+        <lumina-select id="demo-c2" variant="morph" intensity="extreme" accent-color="#22c55e" theme="dark" searchable placeholder="Green" options='${options}' style="min-width:180px;"></lumina-select>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-multi-select — multi-select with chips.
+ */
+function buildMultiSelectGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'compact'];
+  const options = '[{"value":"ts","label":"TypeScript"},{"value":"js","label":"JavaScript"},{"value":"py","label":"Python"},{"value":"rust","label":"Rust"},{"value":"go","label":"Go"},{"value":"kt","label":"Kotlin"}]';
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Multi-select com chips (selecione vários)</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-multi-select id="demo-1" ${attrs} placeholder="Selecione linguagens" options='${options}' value='["ts","js"]' style="min-width:280px;"></lumina-multi-select>
+        <lumina-multi-select id="demo-2" variant="neural" intensity="${state.intensity}" accent-color="#ff6ec7" theme="dark" placeholder="Outra cor" options='${options}' style="min-width:240px;"></lumina-multi-select>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-multi-select id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" placeholder="Variante ${v}" options='${options}' style="min-width:200px;"></lumina-multi-select>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-autocomplete — typed input with suggestions.
+ */
+function buildAutocompleteGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['neural', 'glass', 'contextual'];
+  const suggestions = '["TypeScript","JavaScript","Python","Rust","Go","Kotlin","Swift","Java","C#","Ruby"]';
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Autocomplete — digite para ver sugestões</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-autocomplete id="demo-1" ${attrs} placeholder="Digite uma linguagem..." suggestions='${suggestions}' style="min-width:280px;"></lumina-autocomplete>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-autocomplete id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" placeholder="Variante ${v}" suggestions='${suggestions}' style="min-width:200px;"></lumina-autocomplete>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-search-input — search with suggestions.
+ */
+function buildSearchInputGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'minimal'];
+  const suggestions = '["TypeScript","JavaScript","Python","Rust","Go"]';
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Busca com sugestões (digite para ver)</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-search-input id="demo-1" ${attrs} placeholder="Buscar..." suggestions='${suggestions}' style="min-width:280px;"></lumina-search-input>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-search-input id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" placeholder="Variante ${v}" suggestions='${suggestions}' style="min-width:200px;"></lumina-search-input>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-slider — single-value slider.
+ */
+function buildSliderGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'aura'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Slider — arraste o thumb</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:20px;">
+        <lumina-slider id="demo-1" ${attrs} min="0" max="100" value="50" step="5" style="width:100%;"></lumina-slider>
+        <lumina-slider id="demo-2" ${attrs} min="0" max="1000" value="250" step="50" style="width:100%;"></lumina-slider>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:20px;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-slider id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" min="0" max="100" value="${25 + i * 25}" step="5" style="width:100%;"></lumina-slider>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Cores customizadas</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:20px;">
+        <lumina-slider id="demo-c1" variant="neural" intensity="extreme" accent-color="#ff6ec7" theme="dark" min="0" max="100" value="70" style="width:100%;"></lumina-slider>
+        <lumina-slider id="demo-c2" variant="aura" intensity="extreme" accent-color="#22c55e" theme="dark" min="0" max="100" value="30" style="width:100%;"></lumina-slider>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-range-slider — dual-handle range slider.
+ */
+function buildRangeSliderGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'dimensional'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Range Slider — intervalo com 2 handles</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:20px;">
+        <lumina-range-slider id="demo-1" ${attrs} min="0" max="100" min-value="25" max-value="75" step="5" style="width:100%;"></lumina-range-slider>
+        <lumina-range-slider id="demo-2" ${attrs} min="0" max="1000" min-value="200" max-value="800" step="50" style="width:100%;"></lumina-range-slider>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:20px;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-range-slider id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" min="0" max="100" min-value="${10 + i * 20}" max-value="${70 + i * 10}" style="width:100%;"></lumina-range-slider>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-switch — toggle.
+ */
+function buildSwitchGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'aura', 'void'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Switch — clique para alternar</div>
+      <div class="playground__gallery-items">
+        <lumina-switch id="demo-1" ${attrs} checked></lumina-switch>
+        <lumina-switch id="demo-2" ${attrs}></lumina-switch>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes (4)</div>
+      <div class="playground__gallery-items">
+        ${variants.map((v: string, i: number) => `
+          <lumina-switch id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" ${i % 2 === 0 ? 'checked' : ''}></lumina-switch>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Cores customizadas</div>
+      <div class="playground__gallery-items">
+        <lumina-switch id="demo-c1" variant="neural" intensity="extreme" accent-color="#ff6ec7" theme="dark" checked></lumina-switch>
+        <lumina-switch id="demo-c2" variant="aura" intensity="extreme" accent-color="#22c55e" theme="dark" checked></lumina-switch>
+        <lumina-switch id="demo-c3" variant="void" intensity="extreme" accent-color="#f59e0b" theme="dark" checked></lumina-switch>
+        <lumina-switch id="demo-c4" variant="glass" intensity="extreme" accent-color="#78f0ff" theme="dark" checked></lumina-switch>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-checkbox — checkbox with morphing check icon.
+ */
+function buildCheckboxGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'morph'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Checkbox — clique para alternar</div>
+      <div class="playground__gallery-items">
+        <lumina-checkbox id="demo-1" ${attrs} checked></lumina-checkbox>
+        <lumina-checkbox id="demo-2" ${attrs}></lumina-checkbox>
+        <lumina-checkbox id="demo-3" ${attrs} indeterminate></lumina-checkbox>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items">
+        ${variants.map((v: string, i: number) => `
+          <lumina-checkbox id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" ${i === 0 ? 'checked' : ''}></lumina-checkbox>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Cores customizadas</div>
+      <div class="playground__gallery-items">
+        <lumina-checkbox id="demo-c1" variant="neural" intensity="extreme" accent-color="#ff6ec7" theme="dark" checked></lumina-checkbox>
+        <lumina-checkbox id="demo-c2" variant="morph" intensity="extreme" accent-color="#22c55e" theme="dark" checked></lumina-checkbox>
+        <lumina-checkbox id="demo-c3" variant="glass" intensity="extreme" accent-color="#f59e0b" theme="dark" checked></lumina-checkbox>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-radio-group — radio buttons with traveling indicator.
+ */
+function buildRadioGroupGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'segmented'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Radio Group — clique para selecionar</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:16px;">
+        <lumina-radio-group id="demo-1" ${attrs} value="b">
+          <button data-value="a">Opção A</button>
+          <button data-value="b">Opção B (selecionada)</button>
+          <button data-value="c">Opção C</button>
+          <button data-value="d">Opção D</button>
+        </lumina-radio-group>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="flex-direction:column;align-items:stretch;gap:16px;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-radio-group id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" value="${['a','b','c'][i]}">
+            <button data-value="a">A</button>
+            <button data-value="b">B</button>
+            <button data-value="c">C</button>
+          </lumina-radio-group>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-color-picker — color picker.
+ */
+function buildColorPickerGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'holo'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Color Picker — clique para abrir</div>
+      <div class="playground__gallery-items">
+        <lumina-color-picker id="demo-1" ${attrs} value="#7c5cff"></lumina-color-picker>
+        <lumina-color-picker id="demo-2" ${attrs} value="#ff6ec7"></lumina-color-picker>
+        <lumina-color-picker id="demo-3" ${attrs} value="#22c55e"></lumina-color-picker>
+        <lumina-color-picker id="demo-4" ${attrs} value="#f59e0b"></lumina-color-picker>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items">
+        ${variants.map((v: string, i: number) => `
+          <lumina-color-picker id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" value="#7c5cff"></lumina-color-picker>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-date-picker — calendar.
+ */
+function buildDatePickerGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'minimal'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Date Picker — clique para abrir o calendário</div>
+      <div class="playground__gallery-items">
+        <lumina-date-picker id="demo-1" ${attrs} value="2025-01-15"></lumina-date-picker>
+        <lumina-date-picker id="demo-2" ${attrs} value="2025-07-04"></lumina-date-picker>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items">
+        ${variants.map((v: string, i: number) => `
+          <lumina-date-picker id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" value="2025-01-15"></lumina-date-picker>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-time-picker — time selector.
+ */
+function buildTimePickerGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'circular'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Time Picker — clique para abrir</div>
+      <div class="playground__gallery-items">
+        <lumina-time-picker id="demo-1" ${attrs} value="14:30" format="24h"></lumina-time-picker>
+        <lumina-time-picker id="demo-2" ${attrs} value="09:15" format="12h"></lumina-time-picker>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items">
+        ${variants.map((v: string, i: number) => `
+          <lumina-time-picker id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" value="14:30" format="24h"></lumina-time-picker>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-file-upload — drag & drop file upload.
+ */
+function buildFileUploadGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'drag'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">File Upload — arraste arquivos ou clique</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-file-upload id="demo-1" ${attrs} accept="image/*" multiple style="min-width:280px;"></lumina-file-upload>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-file-upload id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" accept="image/*" multiple style="min-width:220px;"></lumina-file-upload>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-signature-pad — canvas for digital signature.
+ */
+function buildSignaturePadGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'minimal'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Signature Pad — desenhe sua assinatura</div>
+      <div class="playground__gallery-items">
+        <lumina-signature-pad id="demo-1" ${attrs} style="width:400px;height:200px;"></lumina-signature-pad>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-signature-pad id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" style="width:300px;height:180px;"></lumina-signature-pad>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-voice-input — voice input with waveform.
+ */
+function buildVoiceInputGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['neural', 'aura', 'glass'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Voice Input — clique no microfone para falar</div>
+      <div class="playground__gallery-items">
+        <lumina-voice-input id="demo-1" ${attrs} style="min-width:280px;"></lumina-voice-input>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-voice-input id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" style="min-width:220px;"></lumina-voice-input>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-password-input — password with strength meter.
+ */
+function buildPasswordInputGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'secure'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Password Input — digite para ver o medidor de força</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-password-input id="demo-1" ${attrs} placeholder="Digite uma senha forte" value="MyStr0ng!Pass" style="min-width:260px;"></lumina-password-input>
+        <lumina-password-input id="demo-2" ${attrs} placeholder="Senha fraca" value="123" style="min-width:260px;"></lumina-password-input>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-password-input id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" placeholder="Variante ${v}" style="min-width:180px;"></lumina-password-input>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-textarea — auto-growing textarea with counter.
+ */
+function buildTextareaGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'neural', 'adaptive'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Textarea — digite para ver o contador e auto-resize</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-textarea id="demo-1" ${attrs} placeholder="Digite sua mensagem..." rows="4" max-length="200" value="Texto inicial." style="min-width:300px;"></lumina-textarea>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-textarea id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" placeholder="Variante ${v}" rows="3" style="min-width:220px;"></lumina-textarea>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-neural-input — input that reacts to text sentiment.
+ */
+function buildNeuralInputGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['neural', 'echo', 'adaptive'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Neural Input — digite algo positivo ou negativo para ver a reação</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-neural-input id="demo-1" ${attrs} placeholder="Digite algo positivo ou negativo..." style="min-width:280px;"></lumina-neural-input>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-neural-input id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" placeholder="Variante ${v}" style="min-width:200px;"></lumina-neural-input>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-context-input — input that adapts to page context.
+ */
+function buildContextInputGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['adaptive', 'neural', 'glass'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Context Input — adapta estilo ao contexto</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-context-input id="demo-1" ${attrs} placeholder="Detecta contexto automaticamente..." style="min-width:280px;"></lumina-context-input>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-context-input id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" placeholder="Variante ${v}" style="min-width:200px;"></lumina-context-input>
+        `).join('')}
       </div>
     </div>
   `;

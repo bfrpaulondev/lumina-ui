@@ -2203,7 +2203,13 @@ customElements.define(Input.tagName, Input);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
-></lumina-input>
+  value="usuario@exemplo.com"
+  placeholder="Digite seu email"
+>
+  <span slot="label">Email</span>
+  <span slot="left-icon">@</span>
+  <span slot="right-icon">✓</span>
+</lumina-input>
 <script type="module">
   const el = document.querySelector('lumina-input');
   el.addEventListener('lumina-input', (e) => {
@@ -2214,8 +2220,12 @@ customElements.define(Input.tagName, Input);
 
 export function InputExample() {
   return (
-    <lumina-input variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-      onLuminaInput={(e) => console.log(e.detail)} />
+    <lumina-input variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5} value="usuario@exemplo.com" placeholder="Digite seu email"
+      onLuminaInput={(e) => console.log(e.detail)}>
+      <span slot="label">Email</span>
+        <span slot="left-icon">@</span>
+        <span slot="right-icon">✓</span>
+    </lumina-input>
   );
 }`,
   },
@@ -2261,6 +2271,8 @@ customElements.define(Textarea.tagName, Textarea);
   rows="4"
   max-length="0"
   auto-grow
+  placeholder="Digite sua mensagem..."
+  value="Texto inicial"
 ></lumina-textarea>
 <script type="module">
   const el = document.querySelector('lumina-textarea');
@@ -2272,7 +2284,7 @@ customElements.define(Textarea.tagName, Textarea);
 
 export function TextareaExample() {
   return (
-    <lumina-textarea variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} rows={4} max-length={0} auto-grow
+    <lumina-textarea variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} rows={4} max-length={0} auto-grow placeholder="Digite sua mensagem..." value="Texto inicial"
       onLuminaInput={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2315,6 +2327,8 @@ customElements.define(SearchInput.tagName, SearchInput);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  placeholder="Buscar..."
+  suggestions='["TypeScript","JavaScript","Python","Rust","Go"]'
 ></lumina-search-input>
 <script type="module">
   const el = document.querySelector('lumina-search-input');
@@ -2326,7 +2340,7 @@ customElements.define(SearchInput.tagName, SearchInput);
 
 export function SearchInputExample() {
   return (
-    <lumina-search-input variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+    <lumina-search-input variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} placeholder="Buscar..." suggestions='["TypeScript","JavaScript","Python"]'
       onLuminaSearch={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2367,6 +2381,8 @@ customElements.define(PasswordInput.tagName, PasswordInput);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
+  placeholder="Digite sua senha"
+  value="secret123"
 ></lumina-password-input>
 <script type="module">
   const el = document.querySelector('lumina-password-input');
@@ -2378,7 +2394,7 @@ customElements.define(PasswordInput.tagName, PasswordInput);
 
 export function PasswordInputExample() {
   return (
-    <lumina-password-input variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+    <lumina-password-input variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5} placeholder="Digite sua senha" value="secret123"
       onLuminaVisibilityToggle={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2422,6 +2438,9 @@ customElements.define(Select.tagName, Select);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  placeholder="Escolha um país"
+  searchable
+  options='[{"value":"br","label":"Brasil","icon":"BR"},{"value":"us","label":"Estados Unidos","icon":"US"},{"value":"pt","label":"Portugal","icon":"PT"},{"value":"fr","label":"França","icon":"FR"}]'
 ></lumina-select>
 <script type="module">
   const el = document.querySelector('lumina-select');
@@ -2433,7 +2452,7 @@ customElements.define(Select.tagName, Select);
 
 export function SelectExample() {
   return (
-    <lumina-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+    <lumina-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} placeholder="Escolha um país" searchable options='[{"value":"br","label":"Brasil"},{"value":"us","label":"EUA"}]'
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2477,6 +2496,9 @@ customElements.define(MultiSelect.tagName, MultiSelect);
   accent-color="#7c5cff"
   speed="0.5"
   max="0"
+  placeholder="Selecione..."
+  options='[{"value":"ts","label":"TypeScript"},{"value":"js","label":"JavaScript"},{"value":"py","label":"Python"},{"value":"rust","label":"Rust"}]'
+  value='["ts","js"]'
 ></lumina-multi-select>
 <script type="module">
   const el = document.querySelector('lumina-multi-select');
@@ -2488,7 +2510,7 @@ customElements.define(MultiSelect.tagName, MultiSelect);
 
 export function MultiSelectExample() {
   return (
-    <lumina-multi-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max={0}
+    <lumina-multi-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max={0} placeholder="Selecione..." options='[{"value":"ts","label":"TypeScript"},{"value":"js","label":"JavaScript"}]' value='["ts"]'
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2530,6 +2552,8 @@ customElements.define(Autocomplete.tagName, Autocomplete);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
+  placeholder="Comece a digitar..."
+  suggestions='["TypeScript","JavaScript","Python","Rust","Go","Kotlin","Swift"]'
 ></lumina-autocomplete>
 <script type="module">
   const el = document.querySelector('lumina-autocomplete');
@@ -2541,7 +2565,7 @@ customElements.define(Autocomplete.tagName, Autocomplete);
 
 export function AutocompleteExample() {
   return (
-    <lumina-autocomplete variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+    <lumina-autocomplete variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} placeholder="Comece a digitar..." suggestions='["TypeScript","JavaScript","Python"]'
       onLuminaSelect={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2590,6 +2614,10 @@ customElements.define(Slider.tagName, Slider);
   min="0"
   max="100"
   step="1"
+  min="0"
+  max="100"
+  value="50"
+  step="5"
 ></lumina-slider>
 <script type="module">
   const el = document.querySelector('lumina-slider');
@@ -2601,7 +2629,7 @@ customElements.define(Slider.tagName, Slider);
 
 export function SliderExample() {
   return (
-    <lumina-slider variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} value={50} min={0} max={100} step={1}
+    <lumina-slider variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} value={50} min={0} max={100} step={1} min={0} max={100} value={50} step={5}
       onLuminaInput={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2649,6 +2677,11 @@ customElements.define(RangeSlider.tagName, RangeSlider);
   max-value="0"
   min="0"
   max="100"
+  min="0"
+  max="100"
+  min-value="25"
+  max-value="75"
+  step="5"
 ></lumina-range-slider>
 <script type="module">
   const el = document.querySelector('lumina-range-slider');
@@ -2660,7 +2693,7 @@ customElements.define(RangeSlider.tagName, RangeSlider);
 
 export function RangeSliderExample() {
   return (
-    <lumina-range-slider variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} min-value={0} max-value={0} min={0} max={100}
+    <lumina-range-slider variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} min-value={0} max-value={0} min={0} max={100} min={0} max={100} min-value={25} max-value={75} step={5}
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2701,6 +2734,7 @@ customElements.define(Switch.tagName, Switch);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  checked
 ></lumina-switch>
 <script type="module">
   const el = document.querySelector('lumina-switch');
@@ -2712,7 +2746,7 @@ customElements.define(Switch.tagName, Switch);
 
 export function SwitchExample() {
   return (
-    <lumina-switch variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+    <lumina-switch variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} checked
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2754,6 +2788,7 @@ customElements.define(Checkbox.tagName, Checkbox);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  checked
 ></lumina-checkbox>
 <script type="module">
   const el = document.querySelector('lumina-checkbox');
@@ -2765,7 +2800,7 @@ customElements.define(Checkbox.tagName, Checkbox);
 
 export function CheckboxExample() {
   return (
-    <lumina-checkbox variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+    <lumina-checkbox variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} checked
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2806,7 +2841,12 @@ customElements.define(RadioGroup.tagName, RadioGroup);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
-></lumina-radio-group>
+  value="b"
+>
+  <button data-value="a">Opção A</button>
+  <button data-value="b">Opção B</button>
+  <button data-value="c">Opção C</button>
+</lumina-radio-group>
 <script type="module">
   const el = document.querySelector('lumina-radio-group');
   el.addEventListener('lumina-change', (e) => {
@@ -2817,8 +2857,12 @@ customElements.define(RadioGroup.tagName, RadioGroup);
 
 export function RadioGroupExample() {
   return (
-    <lumina-radio-group variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-      onLuminaChange={(e) => console.log(e.detail)} />
+    <lumina-radio-group variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} value="b"
+      onLuminaChange={(e) => console.log(e.detail)}>
+      <button data-value="a">Opção A</button>
+        <button data-value="b">Opção B</button>
+        <button data-value="c">Opção C</button>
+    </lumina-radio-group>
   );
 }`,
   },
@@ -2861,6 +2905,9 @@ customElements.define(FileUpload.tagName, FileUpload);
   accent-color="#7c5cff"
   speed="0.5"
   max-size="0"
+  accept="image/*"
+  multiple
+  max-size="5242880"
 ></lumina-file-upload>
 <script type="module">
   const el = document.querySelector('lumina-file-upload');
@@ -2872,7 +2919,7 @@ customElements.define(FileUpload.tagName, FileUpload);
 
 export function FileUploadExample() {
   return (
-    <lumina-file-upload variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max-size={0}
+    <lumina-file-upload variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max-size={0} accept="image/*" multiple max-size="5242880"
       onLuminaFileAdd={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2914,6 +2961,7 @@ customElements.define(ColorPicker.tagName, ColorPicker);
   accent-color="#ff6ec7"
   speed="0.5"
   value="#7c5cff"
+  value="#7c5cff"
 ></lumina-color-picker>
 <script type="module">
   const el = document.querySelector('lumina-color-picker');
@@ -2925,7 +2973,7 @@ customElements.define(ColorPicker.tagName, ColorPicker);
 
 export function ColorPickerExample() {
   return (
-    <lumina-color-picker variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5} value="#7c5cff"
+    <lumina-color-picker variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5} value="#7c5cff" value="#7c5cff"
       onLuminaColorChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2966,6 +3014,7 @@ customElements.define(DatePicker.tagName, DatePicker);
   intensity="intense"
   accent-color="#7c5cff"
   speed="0.5"
+  value="2025-01-15"
 ></lumina-date-picker>
 <script type="module">
   const el = document.querySelector('lumina-date-picker');
@@ -2977,7 +3026,7 @@ customElements.define(DatePicker.tagName, DatePicker);
 
 export function DatePickerExample() {
   return (
-    <lumina-date-picker variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+    <lumina-date-picker variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} value="2025-01-15"
       onLuminaDateChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -3020,6 +3069,8 @@ customElements.define(TimePicker.tagName, TimePicker);
   accent-color="#78f0ff"
   speed="0.5"
   format="24h"
+  value="14:30"
+  format="24h"
 ></lumina-time-picker>
 <script type="module">
   const el = document.querySelector('lumina-time-picker');
@@ -3031,7 +3082,7 @@ customElements.define(TimePicker.tagName, TimePicker);
 
 export function TimePickerExample() {
   return (
-    <lumina-time-picker variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} format="24h"
+    <lumina-time-picker variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} format="24h" value="14:30" format="24h"
       onLuminaTimeChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -3176,6 +3227,7 @@ customElements.define(NeuralInput.tagName, NeuralInput);
   intensity="intense"
   accent-color="#ff6ec7"
   speed="0.5"
+  placeholder="Digite algo positivo ou negativo..."
 ></lumina-neural-input>
 <script type="module">
   const el = document.querySelector('lumina-neural-input');
@@ -3187,7 +3239,7 @@ customElements.define(NeuralInput.tagName, NeuralInput);
 
 export function NeuralInputExample() {
   return (
-    <lumina-neural-input variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
+    <lumina-neural-input variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} placeholder="Digite algo positivo ou negativo..."
       onLuminaInput={(e) => console.log(e.detail)} />
   );
 }`,
@@ -3228,6 +3280,7 @@ customElements.define(ContextInput.tagName, ContextInput);
   intensity="intense"
   accent-color="#ffd166"
   speed="0.5"
+  placeholder="Detecta contexto automaticamente..."
 ></lumina-context-input>
 <script type="module">
   const el = document.querySelector('lumina-context-input');
@@ -3239,7 +3292,7 @@ customElements.define(ContextInput.tagName, ContextInput);
 
 export function ContextInputExample() {
   return (
-    <lumina-context-input variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5}
+    <lumina-context-input variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5} placeholder="Detecta contexto automaticamente..."
       onLuminaContextChange={(e) => console.log(e.detail)} />
   );
 }`,
