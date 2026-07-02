@@ -37,6 +37,7 @@ export class MaskedInput extends LuminaElement {
       'invalid',
       'valid',
       'type',
+      'floating-label',
     ];
   }
 
@@ -45,6 +46,15 @@ export class MaskedInput extends LuminaElement {
   private _mask = '';
   private _cleanValue = '';
   private _formatter: FormatterParser | null = null;
+  private _floatingLabel = false;
+
+  /** Enable floating label animation (label shrinks to top when field has value/focus). */
+  get floatingLabel(): boolean { return this._floatingLabel; }
+  set floatingLabel(v: boolean) {
+    this._floatingLabel = v;
+    v ? this.setAttribute('floating-label', '') : this.removeAttribute('floating-label');
+    this._updateFloatingState();
+  }
 
   /** The clean (unmasked) value — what you'd send to a server. */
   get value(): string {
@@ -93,8 +103,9 @@ export class MaskedInput extends LuminaElement {
   }
 
   protected render(): string {
+    const placeholderAttr = this._floatingLabel ? '' : `placeholder="${this.getAttribute('placeholder') ?? ''}"`;
     return `
-      <label class="lmf" part="field">
+      <label class="lmf${this._floatingLabel ? ' lmf--floating' : ''}" part="field">
         <span class="lmf__label" part="label"><slot name="label"></slot></span>
         <span class="lmf__shell" part="control">
           <span class="lmf__bg" aria-hidden="true"></span>
@@ -104,7 +115,7 @@ export class MaskedInput extends LuminaElement {
             class="lmf__el"
             part="input"
             type="${this.getAttribute('type') ?? 'text'}"
-            placeholder="${this.getAttribute('placeholder') ?? ''}"
+            ${placeholderAttr}
             name="${this.getAttribute('name') ?? ''}"
             ${this.hasAttribute('disabled') ? 'disabled' : ''}
             ${this.hasAttribute('required') ? 'required' : ''}
@@ -126,6 +137,39 @@ export class MaskedInput extends LuminaElement {
       .lmf { display: flex; flex-direction: column; gap: 6px; cursor: text; }
       .lmf__label { font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--lumina-text-muted); }
       .lmf__label:empty { display: none; }
+
+      /* Floating label mode: label sits inside the shell and floats up on focus/value */
+      .lmf--floating { gap: 0; }
+      .lmf--floating .lmf__label {
+        position: absolute;
+        top: 50%;
+        left: 14px;
+        transform: translateY(-50%);
+        z-index: 4;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+        color: var(--lumina-text-muted);
+        pointer-events: none;
+        transition: top var(--lumina-speed) var(--lumina-ease-spring),
+                    font-size var(--lumina-speed) var(--lumina-ease-spring),
+                    color var(--lumina-speed) var(--lumina-ease-out);
+        background: transparent;
+        padding: 0 4px;
+      }
+      .lmf--floating .lmf__shell:focus-within .lmf__label,
+      .lmf--floating.lmf--has-value .lmf__label,
+      .lmf--floating[data-has-value] .lmf__label {
+        top: 0;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--lumina-accent);
+        transform: translateY(-50%) translateX(-2px);
+      }
+
       .lmf__shell { position: relative; display: flex; align-items: center; height: var(--lmf-h); border-radius: var(--lumina-radius-md); overflow: hidden; }
       .lmf__bg { position: absolute; inset: 0; border-radius: inherit; background: rgb(var(--lumina-surface) / var(--lumina-surface-alpha)); backdrop-filter: blur(12px) saturate(1.3); -webkit-backdrop-filter: blur(12px) saturate(1.3); border: 1px solid var(--lumina-border); transition: border-color var(--lumina-speed) var(--lumina-ease-out), box-shadow var(--lumina-speed) var(--lumina-ease-out); }
       .lmf__bar { position: absolute; left: 50%; bottom: 0; width: 0; height: 2px; background: var(--lumina-accent); box-shadow: 0 0 8px var(--lumina-accent); transform: translateX(-50%); transition: width var(--lumina-speed) var(--lumina-ease-spring); z-index: 4; }
@@ -166,12 +210,24 @@ export class MaskedInput extends LuminaElement {
     this.input = this.$$('.lmf__el') as HTMLInputElement | null;
     this._mask = this.getAttribute('mask') ?? '';
     this.tokens = this._mask ? compileMask(this._mask) : [];
+    this._floatingLabel = this.hasAttribute('floating-label');
     const initial = this.getAttribute('value');
     if (initial !== null) this._setCleanValue(initial, false);
     this.input?.addEventListener('input', this.onInput);
     this.input?.addEventListener('keydown', this.onKeydown);
     this.input?.addEventListener('focus', this.onFocus);
     this.input?.addEventListener('blur', this.onBlur);
+    this._updateFloatingState();
+  }
+
+  /** Update the floating-label "has value" state. */
+  private _updateFloatingState(): void {
+    if (!this.input) return;
+    const hasValue = this.input.value.length > 0;
+    const root = this.$$('.lmf');
+    if (root) {
+      root.classList.toggle('lmf--has-value', hasValue);
+    }
   }
 
   protected unmounted(): void {
@@ -190,6 +246,21 @@ export class MaskedInput extends LuminaElement {
       this._refreshFromInput();
     } else if (name === 'value' && value !== null) {
       this._setCleanValue(value, false);
+    } else if (name === 'floating-label') {
+      this._floatingLabel = value !== null;
+      // Re-render with new floating state (the simplest way to update the class + remove placeholder)
+      if (this._mounted) {
+        this.shadow.innerHTML = this.render();
+        this.input = this.$$('.lmf__el') as HTMLInputElement | null;
+        if (this.input) {
+          this.input.value = this.formattedValue || this._cleanValue;
+          this.input.addEventListener('input', this.onInput);
+          this.input.addEventListener('keydown', this.onKeydown);
+          this.input.addEventListener('focus', this.onFocus);
+          this.input.addEventListener('blur', this.onBlur);
+        }
+        this._updateFloatingState();
+      }
     }
   }
 
@@ -205,11 +276,13 @@ export class MaskedInput extends LuminaElement {
       const clean = this._formatter.parse(raw);
       this.input.value = formatted;
       this._cleanValue = clean;
+      this._updateFloatingState();
       this._emitChange(clean, formatted);
       return;
     }
     if (this.tokens.length === 0) {
       this._cleanValue = raw;
+      this._updateFloatingState();
       this._emitChange(raw, raw);
       return;
     }
@@ -217,6 +290,7 @@ export class MaskedInput extends LuminaElement {
     const result = applyMask(raw, this.tokens);
     this.input.value = result.formatted;
     this._cleanValue = result.clean;
+    this._updateFloatingState();
     // Place cursor at the next input slot after the last typed char
     const cursor = isBackspace ? this.input.selectionStart ?? 0 : result.cursor;
     this.input.setSelectionRange(cursor, cursor);
@@ -281,6 +355,7 @@ export class MaskedInput extends LuminaElement {
       }
     }
     this.setAttribute('value', clean);
+    this._updateFloatingState();
     if (emit) this._emitChange(clean, this.formattedValue);
   }
 

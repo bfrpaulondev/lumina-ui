@@ -55,6 +55,13 @@ const SECTIONS: SectionDef[] = [
     icon: '✦',
     loader: () => import('./sections/studio'),
   },
+  {
+    id: 'form-demo',
+    label: 'Form Demo (complexo)',
+    group: 'playground',
+    icon: '☰',
+    loader: () => import('./sections/form-demo'),
+  },
 
   // Labs
   {

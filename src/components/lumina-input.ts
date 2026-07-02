@@ -304,11 +304,25 @@ export class LuminaInput extends LuminaElement {
     if (this.variant === 'neural' || this.variant === 'aura') {
       this.spawnField();
     }
+    this.dispatchEvent(
+      new CustomEvent('lumina-focus', {
+        detail: { value: this.input?.value ?? '' },
+        bubbles: true,
+        composed: true,
+      }),
+    );
   };
 
   private onBlur = (): void => {
     this.field?.destroy();
     this.field = null;
+    this.dispatchEvent(
+      new CustomEvent('lumina-blur', {
+        detail: { value: this.input?.value ?? '' },
+        bubbles: true,
+        composed: true,
+      }),
+    );
   };
 
   private onKeyDown = (e: KeyboardEvent): void => {
