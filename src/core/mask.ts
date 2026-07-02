@@ -153,8 +153,9 @@ export function currencyFormatter(symbol = 'R$', decimal = ',', thousands = '.')
     },
     parse: (formatted) => {
       // Remove symbol, thousands; replace decimal with '.'
+      const symbolEsc = symbol.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const cleaned = formatted
-        .replace(new RegExp(`\\${symbol}\\s*`), '')
+        .replace(new RegExp(`${symbolEsc}\\s*`), '')
         .replace(new RegExp(`\\${thousands}`, 'g'), '')
         .replace(new RegExp(`\\${decimal}`), '.');
       return cleaned;

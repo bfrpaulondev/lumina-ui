@@ -29,6 +29,7 @@ export default async function formDemoSection(_route: Route): Promise<HTMLElemen
             <lumina-input
               slot="control"
               name="nome"
+              floating-label
               data-validate="required min:3"
               data-msg-required="Por favor, digite seu nome"
               data-msg-min="Nome muito curto (mínimo 3 caracteres)"
@@ -37,11 +38,12 @@ export default async function formDemoSection(_route: Route): Promise<HTMLElemen
             <span slot="error"></span>
           </lumina-form-field>
 
-          <lumina-form-field label="Email" required hint="Mandaremos confirmação">
+          <lumina-form-field label="Email" required hint="Mandaremos confirmação (async validation)">
             <lumina-input
               slot="control"
               name="email"
               type="email"
+              floating-label
               data-validate="required email"
               data-msg-required="Email é obrigatório"
               data-msg-email="Formato de email inválido"

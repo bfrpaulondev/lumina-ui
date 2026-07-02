@@ -16,6 +16,9 @@
     "build:lib": "vite build --config vite.lib.config.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.ts",
+    "test:mask": "tsx --test tests/mask.test.ts",
+    "test:validation": "tsx --test tests/validation.test.ts",
     "deploy": "vite build && gh-pages -d dist"
   },
   "keywords": [
@@ -32,6 +35,7 @@
   "license": "MIT",
   "devDependencies": {
     "monaco-editor": "^0.55.1",
+    "tsx": "^4.22.5",
     "typescript": "^5.4.5",
     "vite": "^5.2.0"
   },

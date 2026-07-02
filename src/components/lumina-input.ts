@@ -37,7 +37,18 @@ export class LuminaInput extends LuminaElement {
       'required',
       'invalid',
       'name',
+      'floating-label',
     ];
+  }
+
+  private _floatingLabel = false;
+
+  /** Enable floating label animation (label shrinks to top when field has value/focus). */
+  get floatingLabel(): boolean { return this._floatingLabel; }
+  set floatingLabel(v: boolean) {
+    this._floatingLabel = v;
+    v ? this.setAttribute('floating-label', '') : this.removeAttribute('floating-label');
+    this._updateFloatingState();
   }
 
   /* Typed accessors for input-specific properties */
@@ -47,11 +58,13 @@ export class LuminaInput extends LuminaElement {
   set value(v: string) {
     if (this.input) this.input.value = v;
     this.setAttribute('value', v);
+    this._updateFloatingState();
   }
 
   protected render(): string {
+    const placeholderAttr = this._floatingLabel ? '' : `placeholder="${this.getAttribute('placeholder') ?? ''}"`;
     return `
-      <label class="lumina-input" part="root">
+      <label class="lumina-input${this._floatingLabel ? ' lumina-input--floating' : ''}" part="root">
         <span class="lumina-input__label" part="label">
           <slot name="label"></slot>
         </span>
@@ -65,7 +78,7 @@ export class LuminaInput extends LuminaElement {
             class="lumina-input__el"
             part="input"
             type="${this.getAttribute('type') ?? 'text'}"
-            placeholder="${this.getAttribute('placeholder') ?? ''}"
+            ${placeholderAttr}
             name="${this.getAttribute('name') ?? ''}"
             ${this.hasAttribute('disabled') ? 'disabled' : ''}
             ${this.hasAttribute('required') ? 'required' : ''}
@@ -100,6 +113,37 @@ export class LuminaInput extends LuminaElement {
         color: var(--lumina-text-muted);
       }
       .lumina-input__label:empty { display: none; }
+
+      /* Floating label mode: label sits inside the shell and floats up on focus/value */
+      .lumina-input--floating { gap: 0; }
+      .lumina-input--floating .lumina-input__label {
+        position: absolute;
+        top: 50%;
+        left: 16px;
+        transform: translateY(-50%);
+        z-index: 4;
+        font-size: 14px;
+        font-weight: 500;
+        letter-spacing: 0;
+        text-transform: none;
+        color: var(--lumina-text-muted);
+        pointer-events: none;
+        transition: top var(--lumina-speed) var(--lumina-ease-spring),
+                    font-size var(--lumina-speed) var(--lumina-ease-spring),
+                    color var(--lumina-speed) var(--lumina-ease-out);
+        background: transparent;
+        padding: 0 4px;
+      }
+      .lumina-input--floating .lumina-input__shell:focus-within .lumina-input__label,
+      .lumina-input--floating.lumina-input--has-value .lumina-input__label {
+        top: 0;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--lumina-accent);
+        transform: translateY(-50%) translateX(-2px);
+      }
 
       .lumina-input__shell {
         position: relative;
@@ -259,6 +303,7 @@ export class LuminaInput extends LuminaElement {
     this.input = this.$$('.lumina-input__el') as HTMLInputElement | null;
     this.echo = this.$$('.lumina-input__echo') as HTMLCanvasElement | null;
     this.echoCtx = this.echo?.getContext('2d') ?? null;
+    this._floatingLabel = this.hasAttribute('floating-label');
 
     if (this.input) {
       this.input.addEventListener('input', this.onInput);
@@ -267,6 +312,17 @@ export class LuminaInput extends LuminaElement {
       this.input.addEventListener('keydown', this.onKeyDown);
       const initial = this.getAttribute('value');
       if (initial !== null) this.input.value = initial;
+    }
+    this._updateFloatingState();
+  }
+
+  /** Update the floating-label "has value" state. */
+  private _updateFloatingState(): void {
+    if (!this.input) return;
+    const hasValue = this.input.value.length > 0;
+    const root = this.$$('.lumina-input');
+    if (root) {
+      root.classList.toggle('lumina-input--has-value', hasValue);
     }
   }
 
@@ -288,9 +344,33 @@ export class LuminaInput extends LuminaElement {
     }
   }
 
+  attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
+    super.attributeChangedCallback(name, _old, value);
+    if (name === 'value' && value !== null && this.input) {
+      this.input.value = value;
+      this._updateFloatingState();
+    } else if (name === 'floating-label') {
+      this._floatingLabel = value !== null;
+      // Re-render with new floating state
+      if (this._mounted) {
+        this.shadow.innerHTML = this.render();
+        this.input = this.$$('.lumina-input__el') as HTMLInputElement | null;
+        if (this.input) {
+          this.input.value = this.getAttribute('value') ?? '';
+          this.input.addEventListener('input', this.onInput);
+          this.input.addEventListener('focus', this.onFocus);
+          this.input.addEventListener('blur', this.onBlur);
+          this.input.addEventListener('keydown', this.onKeyDown);
+        }
+        this._updateFloatingState();
+      }
+    }
+  }
+
   private onInput = (e: Event): void => {
     const target = e.target as HTMLInputElement;
     this.spawnEcho();
+    this._updateFloatingState();
     this.dispatchEvent(
       new CustomEvent('lumina-change', {
         detail: { value: target.value },

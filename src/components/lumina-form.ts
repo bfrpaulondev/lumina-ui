@@ -7,14 +7,27 @@
  *  - validate-on attribute: "submit" | "change" | "blur" (default: submit)
  *  - Custom error messages via data-msg-* attributes
  *  - Custom validator functions via setValidator(name, fn)
+ *  - Variant inheritance: setting variant/intensity/accent-color/theme/speed
+ *    on the form propagates to all child Lumina components (unless overridden)
  *
  * Validation rules (in data-validate attribute, space-separated):
  *   - required         → must have a non-empty value
  *   - email            → must match a basic email regex
+ *   - url              → must be a valid http(s) URL
  *   - min:N            → value length >= N (string) or value >= N (number)
  *   - max:N            → value length <= N (string) or value <= N (number)
  *   - pattern:regex    → value must match the regex
- *   - cpf              → CPF checksum (Brazilian ID) — uses unmasked value
+ *   - number           → must be a valid number
+ *   - integer          → must be a valid integer
+ *   - alpha            → only letters
+ *   - alnum            → only letters and numbers
+ *   - phone-intl       → E.164 format (+CC followed by 7-15 digits)
+ *   - phone-br         → Brazilian phone with valid DDD (11-99)
+ *   - cpf              → CPF checksum (Brazilian individual ID)
+ *   - cnpj             → CNPJ checksum (Brazilian company ID)
+ *   - credit-card      → Luhn algorithm check (Visa, Mastercard, Amex, etc.)
+ *   - date             → ISO (YYYY-MM-DD) or BR (DD/MM/YYYY) with calendar check
+ *   - hex-color        → #RGB, #RRGGBB, #RRGGBBAA
  *   - match:otherName → value must equal the value of field `otherName`
  *
  * Custom error messages: set data-msg-required, data-msg-email, etc.
@@ -34,11 +47,16 @@
  *   - "blur"             — validates each field on blur
  *   - "change"           — validates each field on every change (after first blur)
  *
+ * Variant inheritance: set variant/intensity/accent-color/theme/speed on the
+ * <lumina-form> and all child Lumina components inherit them (unless they set
+ * their own explicit value).
+ *
  * For lumina-masked-input, the validator uses the clean (unmasked) value.
  */
 
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
+import { parseRules, runRules } from '../core/validation';
 
 export interface FormValues { [name: string]: any; }
 export interface FormErrors { [name: string]: string; }
@@ -91,6 +109,60 @@ export class Form extends LuminaElement {
     this.addEventListener('lumina-blur', this.onFieldBlur);
     this.addEventListener('change', this.onNativeFieldChange);
     this.addEventListener('blur', this.onNativeFieldBlur, true);
+    // Propagate shared config (variant/intensity/accent/theme/speed) to all
+    // descendant Lumina components that don't already have an explicit value.
+    // This lets you set variant="neural" on <lumina-form> and have every field
+    // inside inherit it — unless a field sets its own variant explicitly.
+    this._propagateConfig();
+    // Watch for added/removed children (Form.List, dynamic fields) and
+    // propagate config to them as well.
+    this._childObserver = new MutationObserver(this._onChildMutation);
+    this._childObserver.observe(this, { childList: true, subtree: true });
+  }
+
+  private _childObserver: MutationObserver | null = null;
+
+  private _onChildMutation = (mutations: MutationRecord[]): void => {
+    let hasAdded = false;
+    for (const m of mutations) {
+      if (m.addedNodes.length > 0) { hasAdded = true; break; }
+    }
+    if (hasAdded) this._propagateConfig();
+  };
+
+  /**
+   * Push shared config (variant, intensity, accent-color, theme, speed) from
+   * this form to all descendant Lumina components — but ONLY if the child
+   * doesn't already have that attribute set explicitly. This way a field can
+   * override the form's defaults.
+   */
+  private _propagateConfig(): void {
+    const props: Array<[string, string]> = [];
+    const v = this.getAttribute('variant');
+    const i = this.getAttribute('intensity');
+    const a = this.getAttribute('accent-color');
+    const t = this.getAttribute('theme');
+    const s = this.getAttribute('speed');
+    if (v) props.push(['variant', v]);
+    if (i) props.push(['intensity', i]);
+    if (a) props.push(['accent-color', a]);
+    if (t) props.push(['theme', t]);
+    if (s) props.push(['speed', s]);
+    if (props.length === 0) return;
+    // Find all descendant Lumina custom elements (tag starts with "lumina-")
+    const descendants = this.querySelectorAll('*');
+    descendants.forEach((el) => {
+      const tag = el.tagName.toLowerCase();
+      if (!tag.startsWith('lumina-') || el === this) return;
+      // Skip lumina-form-field, lumina-form-list — they're containers, not visual
+      if (tag === 'lumina-form-field' || tag === 'lumina-form-list') return;
+      for (const [attr, value] of props) {
+        // Only set if the child doesn't have an explicit value
+        if (!el.hasAttribute(attr)) {
+          el.setAttribute(attr, value);
+        }
+      }
+    });
   }
 
   protected unmounted(): void {
@@ -101,9 +173,16 @@ export class Form extends LuminaElement {
     this.removeEventListener('lumina-blur', this.onFieldBlur);
     this.removeEventListener('change', this.onNativeFieldChange);
     this.removeEventListener('blur', this.onNativeFieldBlur, true);
+    this._childObserver?.disconnect();
+    this._childObserver = null;
   }
 
-  protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+  protected onConfigChange(changed: Partial<LuminaElementAttributes>): void {
+    // When the form's own config changes, re-propagate to children. We force
+    // the new value onto children that previously inherited (children that
+    // have an explicit override keep their own).
+    this._propagateConfig();
+  }
 
   attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
     super.attributeChangedCallback(name, _old, value);
@@ -251,68 +330,16 @@ export class Form extends LuminaElement {
   }
 
   private _runRules(value: any, rules: string, el: HTMLElement, allValues: FormValues): string | null {
-    const parts = rules.split(/\s+/).filter(Boolean);
-    for (const rule of parts) {
-      let error: string | null = null;
-      if (rule === 'required') {
-        if (!value || (typeof value === 'string' && !value.trim())) {
-          error = this._msg(el, 'required', 'Campo obrigatório');
-        }
-      } else if (rule === 'email') {
-        if (value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value))) {
-          error = this._msg(el, 'email', 'Email inválido');
-        }
-      } else if (rule.startsWith('min:')) {
-        const n = parseFloat(rule.slice(4));
-        if (typeof value === 'number' ? value < n : String(value).length < n) {
-          error = this._msg(el, 'min', `Mínimo: ${n}`);
-        }
-      } else if (rule.startsWith('max:')) {
-        const n = parseFloat(rule.slice(4));
-        if (typeof value === 'number' ? value > n : String(value).length > n) {
-          error = this._msg(el, 'max', `Máximo: ${n}`);
-        }
-      } else if (rule.startsWith('pattern:')) {
-        const re = new RegExp(rule.slice(8));
-        if (!re.test(String(value))) {
-          error = this._msg(el, 'pattern', 'Formato inválido');
-        }
-      } else if (rule === 'cpf') {
-        if (!this._validateCPF(String(value))) {
-          error = this._msg(el, 'cpf', 'CPF inválido');
-        }
-      } else if (rule.startsWith('match:')) {
-        // Cross-field validation — value must match another field's value
-        const otherName = rule.slice(6);
-        const otherValue = allValues[otherName];
-        if (value !== otherValue) {
-          error = this._msg(el, 'match', `Deve ser igual a ${otherName}`);
-        }
+    const parsed = parseRules(rules);
+    // Collect custom messages from data-msg-* attributes
+    const messages: Record<string, string> = {};
+    el.getAttributeNames().forEach((attr) => {
+      if (attr.startsWith('data-msg-')) {
+        const ruleName = attr.slice('data-msg-'.length);
+        messages[ruleName] = el.getAttribute(attr) ?? '';
       }
-      if (error) return error;
-    }
-    return null;
-  }
-
-  /** Get a custom error message from data-msg-* attributes, or use default. */
-  private _msg(el: HTMLElement, rule: string, defaultMsg: string): string {
-    return el.getAttribute(`data-msg-${rule}`) ?? defaultMsg;
-  }
-
-  private _validateCPF(cpf: string): boolean {
-    const clean = cpf.replace(/\D/g, '');
-    if (clean.length !== 11) return false;
-    if (/^(\d)\1{10}$/.test(clean)) return false;
-    let sum = 0;
-    for (let i = 0; i < 9; i++) sum += parseInt(clean[i], 10) * (10 - i);
-    let rev = 11 - (sum % 11);
-    if (rev >= 10) rev = 0;
-    if (rev !== parseInt(clean[9], 10)) return false;
-    sum = 0;
-    for (let i = 0; i < 10; i++) sum += parseInt(clean[i], 10) * (11 - i);
-    rev = 11 - (sum % 11);
-    if (rev >= 10) rev = 0;
-    return rev === parseInt(clean[10], 10);
+    });
+    return runRules(value, parsed, allValues, messages);
   }
 
   /** Set error on a single field. */
