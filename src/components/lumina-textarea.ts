@@ -11,11 +11,12 @@
  *   <lumina-textarea name="bio" data-validate="required min:10" max-length="500"></lumina-textarea>
  */
 
+import { LuminaFormElement } from '../core/LuminaFormElement';
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { formFieldSharedStyles } from '../core/form-field-mixin';
 
-export class Textarea extends LuminaElement {
+export class Textarea extends LuminaFormElement {
   static tagName = 'lumina-textarea';
   static get observedAttributes(): string[] {
     return [
@@ -106,6 +107,9 @@ export class Textarea extends LuminaElement {
     this.updateCounter();
     this.autoResize();
     this._updateFloatingState();
+    // Capture initial value for form reset and push it to the owner form.
+    this._initialValue = this._value;
+    this._setFormValue(this._value);
   }
   protected unmounted(): void {
     this.textarea?.removeEventListener('input', this.onInput);
@@ -114,6 +118,31 @@ export class Textarea extends LuminaElement {
     this.textarea?.removeEventListener('blur', this.onBlur);
   }
   protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+
+  /** Restore value on form reset. */
+  formResetCallback(): void {
+    super.formResetCallback();
+    this._value = this._initialValue ?? '';
+    if (this.textarea) this.textarea.value = this._value;
+    this.updateCounter();
+    this.autoResize();
+    this._updateFloatingState();
+  }
+
+  /** Restore value on browser back/forward. */
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    mode: 'restore' | 'autocomplete',
+  ): void {
+    super.formStateRestoreCallback(state, mode);
+    if (typeof state === 'string') {
+      this._value = state;
+      if (this.textarea) this.textarea.value = state;
+      this.updateCounter();
+      this.autoResize();
+      this._updateFloatingState();
+    }
+  }
   attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
     super.attributeChangedCallback(name, _old, value);
     if (name === 'value') { this._value = value ?? ''; if (this.textarea) this.textarea.value = this._value; this.updateCounter(); this.autoResize(); this._updateFloatingState(); }
@@ -128,6 +157,7 @@ export class Textarea extends LuminaElement {
     this.updateCounter();
     this.autoResize();
     this._updateFloatingState();
+    this._setFormValue(this._value);
     this.dispatchEvent(new CustomEvent('lumina-input', { bubbles: true, composed: true, detail: { value: this._value } }));
   };
   private onChange = (): void => { this.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, composed: true, detail: { value: this._value } })); };

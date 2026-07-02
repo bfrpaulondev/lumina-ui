@@ -6,12 +6,13 @@
  * perimeter. Invalid input shakes briefly and turns the accent red.
  */
 
+import { LuminaFormElement } from '../core/LuminaFormElement';
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { ParticleField } from '../core/ParticleField';
 import { intensityToMultiplier, prefersReducedMotion } from '../core/utils';
 
-export class LuminaInput extends LuminaElement {
+export class LuminaInput extends LuminaFormElement {
   static tagName = 'lumina-input';
 
   private field: ParticleField | null = null;
@@ -63,10 +64,14 @@ export class LuminaInput extends LuminaElement {
 
   protected render(): string {
     const placeholderAttr = this._floatingLabel ? '' : `placeholder="${this.getAttribute('placeholder') ?? ''}"`;
+    // Allow `label="..."` attribute as a shorthand for the label slot.
+    // If a <slot name="label"> child is provided, it takes precedence.
+    const labelAttr = this.getAttribute('label');
+    const labelContent = labelAttr !== null ? labelAttr : '';
     return `
       <label class="lumina-input${this._floatingLabel ? ' lumina-input--floating' : ''}" part="root">
         <span class="lumina-input__label" part="label">
-          <slot name="label"></slot>
+          <slot name="label">${labelContent}</slot>
         </span>
         <span class="lumina-input__shell" part="shell">
           <span class="lumina-input__field" part="field" aria-hidden="true"></span>
@@ -312,6 +317,11 @@ export class LuminaInput extends LuminaElement {
       this.input.addEventListener('keydown', this.onKeyDown);
       const initial = this.getAttribute('value');
       if (initial !== null) this.input.value = initial;
+      // Capture initial value for form reset, then push it to the form.
+      this._initialValue = initial ?? '';
+      this._setFormValue(this.input.value);
+      // Reflect disabled state to the inner input so the form knows.
+      if (this.hasAttribute('disabled')) this.input.disabled = true;
     }
     this._updateFloatingState();
   }
@@ -344,6 +354,27 @@ export class LuminaInput extends LuminaElement {
     }
   }
 
+  /** Restore value on form reset. */
+  formResetCallback(): void {
+    super.formResetCallback();
+    if (this.input) {
+      this.input.value = this._initialValue ?? '';
+      this._updateFloatingState();
+    }
+  }
+
+  /** Restore value on browser back/forward. */
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    mode: 'restore' | 'autocomplete',
+  ): void {
+    super.formStateRestoreCallback(state, mode);
+    if (typeof state === 'string' && this.input) {
+      this.input.value = state;
+      this._updateFloatingState();
+    }
+  }
+
   attributeChangedCallback(name: string, _old: string | null, value: string | null): void {
     super.attributeChangedCallback(name, _old, value);
     if (name === 'value' && value !== null && this.input) {
@@ -371,6 +402,8 @@ export class LuminaInput extends LuminaElement {
     const target = e.target as HTMLInputElement;
     this.spawnEcho();
     this._updateFloatingState();
+    // Propagate value to the owner <form> so FormData / form.submit() works.
+    this._setFormValue(target.value);
     this.dispatchEvent(
       new CustomEvent('lumina-change', {
         detail: { value: target.value },

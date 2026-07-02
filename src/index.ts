@@ -117,6 +117,7 @@ import './components/lumina-void-card';
 
 export { LuminaElement } from './core/LuminaElement';
 export type { LuminaElementAttributes } from './core/LuminaElement';
+export { LuminaFormElement } from './core/LuminaFormElement';
 export * from './core/types';
 export * from './core/tokens';
 export * from './core/utils';

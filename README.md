@@ -75,6 +75,73 @@ Every component accepts these attributes:
 | `speed`             | number (seconds)                                   | `0.5`       |
 | `depth`             | `flat` \| `medium` \| `deep` \| `extrude`          | `medium`    |
 
+## Form-associated components
+
+`lumina-input`, `lumina-textarea`, `lumina-checkbox`, `lumina-switch` and `lumina-select` extend a shared `LuminaFormElement` base class that implements the [Element Internals API](https://developer.mozilla.org/en-US/docs/Web/API/ElementInternals). They work inside native `<form>` elements out of the box:
+
+```html
+<form id="myform">
+  <lumina-input  name="email"    label="E-mail"    required></lumina-input>
+  <lumina-select name="country" value="BR"
+                options='[{"value":"BR","label":"Brasil"},{"value":"PT","label":"Portugal"}]'></lumina-select>
+  <lumina-checkbox name="accept" value="yes" checked></lumina-checkbox>
+  <lumina-switch   name="newsletter"></lumina-switch>
+  <button type="submit">Send</button>
+</form>
+
+<script>
+  document.getElementById('myform').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    console.log(Object.fromEntries(fd));
+    // → { email: '...', country: 'BR', accept: 'yes', newsletter: 'on' }
+  });
+</script>
+```
+
+`formResetCallback` and `formStateRestoreCallback` are wired, so `<button type="reset">` and browser back/forward navigation restore the initial values automatically.
+
+## Component API (MVP)
+
+Each component dispatches events prefixed with `lumina-` and exposes named slots where noted. All events bubble and cross shadow boundaries (`composed: true`).
+
+| Component           | Slots                                  | Events dispatched                              |
+|---------------------|----------------------------------------|------------------------------------------------|
+| `lumina-button`     | (default — button label)               | `lumina-click`                                 |
+| `lumina-card`       | (default — body), `header`, `footer`   | `lumina-hover` (proximity)                     |
+| `lumina-input`      | `label`                                | `lumina-focus`, `lumina-blur`, `lumina-change`, `lumina-submit` |
+| `lumina-textarea`   | `label`                                | `lumina-focus`, `lumina-blur`, `lumina-input`, `lumina-change`  |
+| `lumina-checkbox`   | (default — label text)                 | `lumina-focus`, `lumina-blur`, `lumina-change`  |
+| `lumina-switch`     | (default — label text)                 | `lumina-focus`, `lumina-blur`, `lumina-change`  |
+| `lumina-select`     | (default — trigger label)              | `lumina-focus`, `lumina-blur`, `lumina-change`, `lumina-open`, `lumina-close` |
+| `lumina-toggle`     | (default — label text)                 | `lumina-change`                                 |
+| `lumina-modal`      | (default — body), `title`, `footer`    | `lumina-open`, `lumina-close`                   |
+| `lumina-navigation` | `link` (repeated)                      | `lumina-navigate` (detail: `{ href }`)          |
+| `lumina-progress`   | (none)                                 | `lumina-complete` (when value reaches max)      |
+| `lumina-badge`      | (default — badge text)                 | (none)                                          |
+| `lumina-tooltip`    | (default — trigger element)            | `lumina-tooltip-show`, `lumina-tooltip-hide`    |
+| `lumina-container`  | (default — children)                   | `lumina-context` (broadcasts context to children) |
+
+### `lumina-modal` — boolean `open` attribute
+
+The `open` attribute is a [boolean HTML attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes#boolean_attributes): its **presence** means "open", regardless of the value string. To keep the modal closed on initial render, simply omit the attribute:
+
+```html
+<!-- Closed (default) -->
+<lumina-modal id="m"></lumina-modal>
+
+<!-- Open on load -->
+<lumina-modal open></lumina-modal>
+
+<!-- ALSO closed (treats literal "false" as closed, as a courtesy) -->
+<lumina-modal open="false"></lumina-modal>
+
+<script>
+  document.getElementById('m').showModal();    // open via JS
+  document.getElementById('m').close();         // close via JS
+</script>
+```
+
 ## Demo
 
 Live showcase: **https://bfrpaulondev.github.io/lumina-ui/**
@@ -88,11 +155,17 @@ src/
     tokens.ts           # Design tokens + constructible stylesheet
     utils.ts            # Color parsing, particle helpers, throttle
     LuminaElement.ts    # Base class — shadow DOM, attribute parsing
+    LuminaFormElement.ts # Form-associated base (ElementInternals)
     ParticleField.ts    # Reusable 2D particle renderer (rAF-driven)
+    form-field-mixin.ts # Shared CSS for invalid/valid/floating-label
   components/
     lumina-button.ts
     lumina-card.ts
     lumina-input.ts
+    lumina-textarea.ts
+    lumina-checkbox.ts
+    lumina-switch.ts
+    lumina-select.ts
     lumina-toggle.ts
     lumina-modal.ts
     lumina-navigation.ts
@@ -100,6 +173,7 @@ src/
     lumina-badge.ts
     lumina-tooltip.ts
     lumina-container.ts
+    … (100+ total)
   index.ts              # Public entry — registers all components
 demo/                   # Showcase site (deployed to GH Pages)
 index.html              # Demo entry HTML

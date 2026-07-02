@@ -18,6 +18,7 @@
  *   lumina-close  — disparado ao fechar o dropdown
  */
 
+import { LuminaFormElement } from '../core/LuminaFormElement';
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { prefersReducedMotion } from '../core/utils';
@@ -29,7 +30,7 @@ interface Option {
   icon?: string;
 }
 
-export class LuminaSelect extends LuminaElement {
+export class LuminaSelect extends LuminaFormElement {
   static tagName = 'lumina-select';
 
   static get observedAttributes(): string[] {
@@ -335,6 +336,10 @@ export class LuminaSelect extends LuminaElement {
     this.renderOptions();
     this.updateTrigger();
 
+    // Capture initial value for form reset; push it to the owner form.
+    this._initialValue = this._value;
+    this._setFormValue(this._value || null);
+
     this.trigger?.addEventListener('click', this.onTriggerClick);
     this.searchInput?.addEventListener('input', this.onSearchInput);
     this.trigger?.addEventListener('focus', () => this.dispatchEvent(new CustomEvent('lumina-focus', { bubbles: true, composed: true, detail: { value: this._value } })));
@@ -435,6 +440,8 @@ export class LuminaSelect extends LuminaElement {
     this.updateTrigger();
     this.renderOptions();
     this.close();
+    // Propagate to owner form so FormData / form.submit() works.
+    this._setFormValue(opt.value || null);
     this.dispatchEvent(
       new CustomEvent('lumina-change', {
         bubbles: true,

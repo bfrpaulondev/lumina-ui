@@ -3,6 +3,7 @@
  * Variants: glass | neural | aura | void
  */
 
+import { LuminaFormElement } from '../core/LuminaFormElement';
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { intensityToMultiplier, prefersReducedMotion, randRange } from '../core/utils';
@@ -10,7 +11,7 @@ import { formFieldSharedStyles } from '../core/form-field-mixin';
 
 interface Particle { x: number; y: number; vx: number; vy: number; life: number; maxLife: number; size: number; }
 
-export class Switch extends LuminaElement {
+export class Switch extends LuminaFormElement {
   static tagName = 'lumina-switch';
   static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'checked', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _checked = false;
@@ -70,12 +71,36 @@ export class Switch extends LuminaElement {
     this.ctx = this.canvas?.getContext('2d') ?? null;
     this.setAttribute('role', 'switch');
     this.setAttribute('aria-checked', String(this._checked));
+    // Capture initial state for form reset; push value to owner form.
+    this._initialValue = this._checked ? (this.getAttribute('value') ?? 'on') : null;
+    this._setFormValue(this._initialValue);
     this.button?.addEventListener('click', this.onClick);
     this.button?.addEventListener('focus', this.onFocus);
     this.button?.addEventListener('blur', this.onBlur);
   }
   protected unmounted(): void { cancelAnimationFrame(this.raf); this.button?.removeEventListener('focus', this.onFocus); this.button?.removeEventListener('blur', this.onBlur); }
   protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+
+  /** Restore checked state on form reset. */
+  formResetCallback(): void {
+    const initialChecked = this._initialValue !== null;
+    this._checked = initialChecked;
+    if (initialChecked) this.setAttribute('checked', ''); else this.removeAttribute('checked');
+    this.setAttribute('aria-checked', String(this._checked));
+    this._setFormValue(this._initialValue);
+  }
+
+  /** Restore checked state on browser back/forward. */
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    mode: 'restore' | 'autocomplete',
+  ): void {
+    super.formStateRestoreCallback(state, mode);
+    const wasChecked = state !== null && state !== '';
+    this._checked = wasChecked;
+    if (wasChecked) this.setAttribute('checked', ''); else this.removeAttribute('checked');
+    this.setAttribute('aria-checked', String(this._checked));
+  }
   attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
     super.attributeChangedCallback(name, _old, value);
     if (name === 'checked') { this._checked = value !== null; this.setAttribute('aria-checked', String(this._checked)); }
@@ -87,6 +112,9 @@ export class Switch extends LuminaElement {
     this._checked = !this._checked;
     if (this._checked) this.setAttribute('checked',''); else this.removeAttribute('checked');
     this.setAttribute('aria-checked', String(this._checked));
+    // Propagate to owner form: 'on' (or `value` attr) when checked, null when not.
+    const formValue = this._checked ? (this.getAttribute('value') ?? 'on') : null;
+    this._setFormValue(formValue);
     if (this._checked && !prefersReducedMotion()) this.burst();
     this.dispatchEvent(new CustomEvent('lumina-change', { bubbles: true, composed: true, detail: { checked: this._checked } }));
   };

@@ -3,12 +3,13 @@
  * Variants: glass | neural | morph
  */
 
+import { LuminaFormElement } from '../core/LuminaFormElement';
 import { LuminaElement } from '../core/LuminaElement';
 import type { LuminaElementAttributes } from '../core/LuminaElement';
 import { prefersReducedMotion } from '../core/utils';
 import { formFieldSharedStyles } from '../core/form-field-mixin';
 
-export class Checkbox extends LuminaElement {
+export class Checkbox extends LuminaFormElement {
   static tagName = 'lumina-checkbox';
   static get observedAttributes(): string[] { return [...LuminaElement.observedAttributes, 'checked', 'indeterminate', 'name', 'disabled', 'required', 'invalid', 'valid']; }
   private _checked = false;
@@ -70,6 +71,11 @@ export class Checkbox extends LuminaElement {
     this.setAttribute('role', 'checkbox');
     this.setAttribute('tabindex', '0');
     this.updateState();
+    // Capture initial state for form reset; push value to owner form.
+    // Standard checkbox: submits 'on' (or the `value` attribute) when checked,
+    // null when unchecked.
+    this._initialValue = this._checked ? (this.getAttribute('value') ?? 'on') : null;
+    this._setFormValue(this._initialValue);
     this.$$('.lmcb')?.addEventListener('click', this.onClick);
     this.addEventListener('keydown', this.onKeydown);
     this.addEventListener('focus', this.onFocus);
@@ -77,6 +83,27 @@ export class Checkbox extends LuminaElement {
   }
   protected unmounted(): void { this.removeEventListener('keydown', this.onKeydown); this.removeEventListener('focus', this.onFocus); this.removeEventListener('blur', this.onBlur); }
   protected onConfigChange(_c: Partial<LuminaElementAttributes>): void {}
+
+  /** Restore checked state on form reset. */
+  formResetCallback(): void {
+    const initialChecked = this._initialValue !== null;
+    this._checked = initialChecked;
+    if (initialChecked) this.setAttribute('checked', ''); else this.removeAttribute('checked');
+    this.updateState();
+    this._setFormValue(this._initialValue);
+  }
+
+  /** Restore checked state on browser back/forward. */
+  formStateRestoreCallback(
+    state: string | File | FormData | null,
+    mode: 'restore' | 'autocomplete',
+  ): void {
+    super.formStateRestoreCallback(state, mode);
+    const wasChecked = state !== null && state !== '';
+    this._checked = wasChecked;
+    if (wasChecked) this.setAttribute('checked', ''); else this.removeAttribute('checked');
+    this.updateState();
+  }
   attributeChangedCallback(name: string, _old: string|null, value: string|null): void {
     super.attributeChangedCallback(name, _old, value);
     if (name === 'checked') { this._checked = value !== null; this.updateState(); }
@@ -91,6 +118,9 @@ export class Checkbox extends LuminaElement {
     if (this._indeterminate) { this._indeterminate = false; this.removeAttribute('indeterminate'); this._checked = true; this.setAttribute('checked',''); }
     else { this._checked = !this._checked; if (this._checked) this.setAttribute('checked',''); else this.removeAttribute('checked'); }
     this.updateState();
+    // Propagate to owner form: 'on' (or `value` attr) when checked, null when not.
+    const formValue = this._checked ? (this.getAttribute('value') ?? 'on') : null;
+    this._setFormValue(formValue);
     if (!prefersReducedMotion()) {
       this.box?.setAttribute('data-ripple', '');
       setTimeout(() => this.box?.removeAttribute('data-ripple'), 600);
