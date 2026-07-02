@@ -59,6 +59,140 @@ def parse_manifest():
         parsed.append(json.loads(s))
     return parsed
 
+
+# Per-card slot content for vanilla HTML snippets.
+# Uses REAL slots from the manifest — not invented 'title'/'subtitle' slots.
+# Each entry shows the proper way to populate that card.
+def _card_vanilla_content(tag):
+    if tag == 'lumina-card':
+        # Real slots: header, default, media, footer
+        return (
+            '<header slot="header">\n'
+            '    <h3>Card Title</h3>\n'
+            '    <span class="badge">NEW</span>\n'
+            '  </header>\n'
+            '  <div slot="media" style="height:120px;background:linear-gradient(135deg,#7c5cff,#78f0ff);border-radius:8px;"></div>\n'
+            '  <p>Conteúdo principal do card. Pode conter texto, imagens, ou qualquer elemento HTML.</p>\n'
+            '  <footer slot="footer">\n'
+            '    <lumina-button variant="glass" size="sm">Cancelar</lumina-button>\n'
+            '    <lumina-button size="sm">Confirmar</lumina-button>\n'
+            '  </footer>'
+        )
+    if tag == 'lumina-hover-card':
+        # Real slots: preview (always visible), default (revealed on hover)
+        return (
+            '<div slot="preview" style="padding:8px 0;">\n'
+            '    <h3 style="margin:0;font-size:18px;color:#fff;">Passe o mouse</h3>\n'
+            '    <p style="margin:4px 0 0;color:rgba(245,245,255,0.6);font-size:13px;">Hover para revelar mais</p>\n'
+            '  </div>\n'
+            '  <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:8px;">\n'
+            '    <p style="margin:0 0 8px;">Conteúdo revelado ao hover! Use para ações secundárias, detalhes, ou atalhos.</p>\n'
+            '    <lumina-button size="sm" variant="glass">Ver detalhes</lumina-button>\n'
+            '  </div>'
+        )
+    if tag == 'lumina-stack-card':
+        # Children become individual cards in the stack
+        return (
+            '<div data-card="0" style="padding:24px;text-align:center;">\n'
+            '    <h3 style="margin:0 0 8px;">Card 1</h3>\n'
+            '    <p style="margin:0;color:rgba(245,245,255,0.6);">Arraste para o lado</p>\n'
+            '  </div>\n'
+            '  <div data-card="1" style="padding:24px;text-align:center;">\n'
+            '    <h3 style="margin:0 0 8px;">Card 2</h3>\n'
+            '    <p style="margin:0;color:rgba(245,245,255,0.6);">Segundo card</p>\n'
+            '  </div>\n'
+            '  <div data-card="2" style="padding:24px;text-align:center;">\n'
+            '    <h3 style="margin:0 0 8px;">Card 3</h3>\n'
+            '    <p style="margin:0;color:rgba(245,245,255,0.6);">Terceiro card</p>\n'
+            '  </div>'
+        )
+    if tag == 'lumina-parallax-card':
+        # 3 layers — back/mid/front via slots (the card has parts layer-back/mid/layer-front)
+        return (
+            '<div slot="back" style="height:100%;background:radial-gradient(circle at 30% 30%,#7c5cff 0%,transparent 60%);"></div>\n'
+            '  <div slot="mid" style="height:100%;display:flex;align-items:center;justify-content:center;">\n'
+            '    <div style="width:80px;height:80px;border-radius:50%;background:rgba(120,240,255,0.4);backdrop-filter:blur(8px);"></div>\n'
+            '  </div>\n'
+            '  <div slot="front" style="padding:20px;">\n'
+            '    <h3 style="margin:0;color:#fff;">Parallax 3D</h3>\n'
+            '    <p style="margin:4px 0 0;color:rgba(245,245,255,0.7);">3 camadas com velocidades diferentes</p>\n'
+            '  </div>'
+        )
+    # Default cards (glass, morph, neural, void, dimensional, breath, glow,
+    # particle, liquid, holo, memory, echo, context, reveal) — just default slot
+    return (
+        '<h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>\n'
+        '  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">\n'
+        '    Conteúdo principal. Use este card para destacar informações, imagens ou ações.\n'
+        '  </p>\n'
+        '  <div style="display:flex;gap:8px;">\n'
+        '    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>\n'
+        '    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>\n'
+        '  </div>'
+    )
+
+
+# React version — same content but JSX-compatible (self-closing tags, etc.)
+def _card_react_content(tag):
+    if tag == 'lumina-card':
+        return (
+            '<header slot="header">\n'
+            '        <h3>Card Title</h3>\n'
+            '        <span className="badge">NEW</span>\n'
+            '      </header>\n'
+            '      <div slot="media" style={{height:"120px",background:"linear-gradient(135deg,#7c5cff,#78f0ff)",borderRadius:"8px"}} />\n'
+            '      <p>Conteúdo principal do card.</p>\n'
+            '      <footer slot="footer">\n'
+            '        <lumina-button variant="glass" size="sm">Cancelar</lumina-button>\n'
+            '        <lumina-button size="sm">Confirmar</lumina-button>\n'
+            '      </footer>'
+        )
+    if tag == 'lumina-hover-card':
+        return (
+            '<div slot="preview" style={{padding:"8px 0"}}>\n'
+            '        <h3 style={{margin:0,color:"#fff"}}>Passe o mouse</h3>\n'
+            '        <p style={{margin:"4px 0 0",color:"rgba(245,245,255,0.6)"}}>Hover para revelar mais</p>\n'
+            '      </div>\n'
+            '      <div style={{borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:"12px"}}>\n'
+            '        <p>Conteúdo revelado ao hover!</p>\n'
+            '        <lumina-button size="sm" variant="glass">Ver detalhes</lumina-button>\n'
+            '      </div>'
+        )
+    if tag == 'lumina-stack-card':
+        return (
+            '<div data-card="0" style={{padding:"24px",textAlign:"center"}}>\n'
+            '        <h3>Card 1</h3><p>Arraste para o lado</p>\n'
+            '      </div>\n'
+            '      <div data-card="1" style={{padding:"24px",textAlign:"center"}}>\n'
+            '        <h3>Card 2</h3><p>Segundo card</p>\n'
+            '      </div>\n'
+            '      <div data-card="2" style={{padding:"24px",textAlign:"center"}}>\n'
+            '        <h3>Card 3</h3><p>Terceiro card</p>\n'
+            '      </div>'
+        )
+    if tag == 'lumina-parallax-card':
+        return (
+            '<div slot="back" style={{height:"100%",background:"radial-gradient(circle at 30% 30%,#7c5cff 0%,transparent 60%)"}} />\n'
+            '      <div slot="mid" style={{height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}>\n'
+            '        <div style={{width:80,height:80,borderRadius:"50%",background:"rgba(120,240,255,0.4)"}} />\n'
+            '      </div>\n'
+            '      <div slot="front" style={{padding:20}}>\n'
+            '        <h3 style={{color:"#fff"}}>Parallax 3D</h3>\n'
+            '        <p>3 camadas com velocidades diferentes</p>\n'
+            '      </div>'
+        )
+    return (
+        '<h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>\n'
+        '      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>\n'
+        '        Conteúdo principal do card.\n'
+        '      </p>\n'
+        '      <div style={{display:"flex",gap:8}}>\n'
+        '        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>\n'
+        '        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>\n'
+        '      </div>'
+    )
+
+
 def gen_component_snippet(spec):
     name = spec['name']
     tag = spec['tag']
@@ -178,7 +312,7 @@ def gen_vanilla_snippet(spec):
     elif tag == 'lumina-gesture-button':
         content = 'Toque, segure ou arraste'
     elif cat == 'cards':
-        content = '<h3 slot="title">Título</h3>\n  <p slot="subtitle">subtítulo</p>\n  <p>Conteúdo de exemplo.</p>'
+        content = _card_vanilla_content(tag)
     elif cat == 'inputs':
         # self-closing
         pass
@@ -282,7 +416,7 @@ def gen_react_snippet(spec):
     elif tag == 'lumina-button-group':
         content = '<button data-value="a">A</button><button data-value="b">B</button>'
     elif cat == 'cards':
-        content = '<h3 slot="title">Título</h3><p>Conteúdo.</p>'
+        content = _card_react_content(tag)
     elif cat == 'inputs':
         content = ''
     elif cat == 'feedback':

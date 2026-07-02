@@ -63,63 +63,18 @@ customElements.define(Button.tagName, Button);
 </lumina-button>
 <script type="module">
   const el = document.querySelector('lumina-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
     react: `import 'lumina-ui';
-import { useState } from 'react';
 
 export function ButtonExample() {
-  const [loading, setLoading] = useState(false);
-
   return (
-    <>
-      {/* Basic */}
-      <lumina-button
-        variant="glass"
-        intensity="intense"
-        accent-color="#7c5cff"
-        speed={0.5}
-        theme="dark"
-        onLuminaPress={(e) => console.log('Pressed!', e)}
-        onLuminaHoverStart={() => console.log('Hover started')}
-        onDblClick={() => console.log('Double-clicked!')}
-      >
-        Click me
-      </lumina-button>
-
-      {/* Disabled */}
-      <lumina-button variant="glass" accent-color="#7c5cff" disabled>
-        Disabled
-      </lumina-button>
-
-      {/* Danger */}
-      <lumina-button
-        variant="void"
-        intensity="extreme"
-        accent-color="#ff5577"
-        onLuminaPress={() => {
-          if (confirm('Delete?')) console.log('Deleted!');
-        }}
-      >
-        Delete
-      </lumina-button>
-
-      {/* Loading state */}
-      <lumina-button
-        variant="glass"
-        accent-color="#7c5cff"
-        disabled={loading}
-        onLuminaPress={async () => {
-          setLoading(true);
-          await fetch('/api/save');
-          setLoading(false);
-        }}
-      >
-        {loading ? 'Saving...' : 'Save'}
-      </lumina-button>
-    </>
+    <lumina-button variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
+      onLuminaClick={(e) => console.log(e.detail)}>
+      Conteúdo
+    </lumina-button>
   );
 }`,
   },
@@ -168,7 +123,7 @@ customElements.define(IconButton.tagName, IconButton);
 </lumina-icon-button>
 <script type="module">
   const el = document.querySelector('lumina-icon-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -176,8 +131,7 @@ customElements.define(IconButton.tagName, IconButton);
 
 export function IconButtonExample() {
   return (
-    <lumina-icon-button variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark" size="md" shape="circle"
+    <lumina-icon-button variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} size="md" shape="circle"
       onLuminaClick={(e) => console.log(e.detail)}>
       ⚙
     </lumina-icon-button>
@@ -228,7 +182,7 @@ customElements.define(FloatingActionButton.tagName, FloatingActionButton);
 </lumina-fab>
 <script type="module">
   const el = document.querySelector('lumina-fab');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -236,8 +190,7 @@ customElements.define(FloatingActionButton.tagName, FloatingActionButton);
 
 export function FloatingActionButtonExample() {
   return (
-    <lumina-fab variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" position="bottom-right"
+    <lumina-fab variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} position="bottom-right"
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-fab>
@@ -287,7 +240,7 @@ customElements.define(SplitButton.tagName, SplitButton);
 </lumina-split-button>
 <script type="module">
   const el = document.querySelector('lumina-split-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -296,7 +249,6 @@ customElements.define(SplitButton.tagName, SplitButton);
 export function SplitButtonExample() {
   return (
     <lumina-split-button variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-split-button>
@@ -355,7 +307,6 @@ customElements.define(ToggleButton.tagName, ToggleButton);
 export function ToggleButtonExample() {
   return (
     <lumina-toggle-button variant="glass" intensity="intense" accent-color="#ffd166" speed={0.5}
-        theme="dark"
       onLuminaChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-toggle-button>
@@ -415,7 +366,6 @@ customElements.define(ButtonGroup.tagName, ButtonGroup);
 export function ButtonGroupExample() {
   return (
     <lumina-button-group variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaChange={(e) => console.log(e.detail)}>
       <button data-value="a">A</button><button data-value="b">B</button>
     </lumina-button-group>
@@ -463,7 +413,7 @@ customElements.define(CommandButton.tagName, CommandButton);
 </lumina-command-button>
 <script type="module">
   const el = document.querySelector('lumina-command-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -472,7 +422,6 @@ customElements.define(CommandButton.tagName, CommandButton);
 export function CommandButtonExample() {
   return (
     <lumina-command-button variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark"
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-command-button>
@@ -525,7 +474,7 @@ customElements.define(RippleButton.tagName, RippleButton);
 </lumina-ripple-button>
 <script type="module">
   const el = document.querySelector('lumina-ripple-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -533,8 +482,7 @@ customElements.define(RippleButton.tagName, RippleButton);
 
 export function RippleButtonExample() {
   return (
-    <lumina-ripple-button variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" ripple-color="var(--lumina-accent)" ripple-duration={600} multi
+    <lumina-ripple-button variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} ripple-color="var(--lumina-accent)" ripple-duration={600} multi
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-ripple-button>
@@ -583,7 +531,7 @@ customElements.define(MagneticButton.tagName, MagneticButton);
 </lumina-magnetic-button>
 <script type="module">
   const el = document.querySelector('lumina-magnetic-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -591,8 +539,7 @@ customElements.define(MagneticButton.tagName, MagneticButton);
 
 export function MagneticButtonExample() {
   return (
-    <lumina-magnetic-button variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark" magnetic-strength={0.4}
+    <lumina-magnetic-button variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5} magnetic-strength={0.4}
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-magnetic-button>
@@ -640,7 +587,7 @@ customElements.define(BreathButton.tagName, BreathButton);
 </lumina-breath-button>
 <script type="module">
   const el = document.querySelector('lumina-breath-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -649,7 +596,6 @@ customElements.define(BreathButton.tagName, BreathButton);
 export function BreathButtonExample() {
   return (
     <lumina-breath-button variant="glass" intensity="intense" accent-color="#ffd166" speed={0.5}
-        theme="dark"
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-breath-button>
@@ -698,7 +644,7 @@ customElements.define(NeuralButton.tagName, NeuralButton);
 </lumina-neural-button>
 <script type="module">
   const el = document.querySelector('lumina-neural-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -706,8 +652,7 @@ customElements.define(NeuralButton.tagName, NeuralButton);
 
 export function NeuralButtonExample() {
   return (
-    <lumina-neural-button variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark" particle-count={20}
+    <lumina-neural-button variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} particle-count={20}
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-neural-button>
@@ -755,7 +700,7 @@ customElements.define(PortalButton.tagName, PortalButton);
 </lumina-portal-button>
 <script type="module">
   const el = document.querySelector('lumina-portal-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -764,7 +709,6 @@ customElements.define(PortalButton.tagName, PortalButton);
 export function PortalButtonExample() {
   return (
     <lumina-portal-button variant="void" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark"
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-portal-button>
@@ -813,7 +757,7 @@ customElements.define(EchoButton.tagName, EchoButton);
 </lumina-echo-button>
 <script type="module">
   const el = document.querySelector('lumina-echo-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -821,8 +765,7 @@ customElements.define(EchoButton.tagName, EchoButton);
 
 export function EchoButtonExample() {
   return (
-    <lumina-echo-button variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" echo-count={3}
+    <lumina-echo-button variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} echo-count={3}
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-echo-button>
@@ -871,7 +814,7 @@ customElements.define(MorphButton.tagName, MorphButton);
 </lumina-morph-button>
 <script type="module">
   const el = document.querySelector('lumina-morph-button');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -880,7 +823,6 @@ customElements.define(MorphButton.tagName, MorphButton);
 export function MorphButtonExample() {
   return (
     <lumina-morph-button variant="morph" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-morph-button>
@@ -939,8 +881,7 @@ customElements.define(GestureButton.tagName, GestureButton);
 
 export function GestureButtonExample() {
   return (
-    <lumina-gesture-button variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark" gestures="hold,swipe,double-tap" hold-delay={500}
+    <lumina-gesture-button variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} gestures="hold,swipe,double-tap" hold-delay={500}
       onLuminaGesture={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-gesture-button>
@@ -985,9 +926,16 @@ customElements.define(Card.tagName, Card);
   speed="0.5"
   interactive
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <header slot="header">
+    <h3>Card Title</h3>
+    <span class="badge">NEW</span>
+  </header>
+  <div slot="media" style="height:120px;background:linear-gradient(135deg,#7c5cff,#78f0ff);border-radius:8px;"></div>
+  <p>Conteúdo principal do card. Pode conter texto, imagens, ou qualquer elemento HTML.</p>
+  <footer slot="footer">
+    <lumina-button variant="glass" size="sm">Cancelar</lumina-button>
+    <lumina-button size="sm">Confirmar</lumina-button>
+  </footer>
 </lumina-card>
 <script type="module">
   const el = document.querySelector('lumina-card');
@@ -999,10 +947,18 @@ customElements.define(Card.tagName, Card);
 
 export function CardExample() {
   return (
-    <lumina-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" interactive
+    <lumina-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} interactive
       onLuminaHover={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <header slot="header">
+        <h3>Card Title</h3>
+        <span className="badge">NEW</span>
+      </header>
+      <div slot="media" style={{height:"120px",background:"linear-gradient(135deg,#7c5cff,#78f0ff)",borderRadius:"8px"}} />
+      <p>Conteúdo principal do card.</p>
+      <footer slot="footer">
+        <lumina-button variant="glass" size="sm">Cancelar</lumina-button>
+        <lumina-button size="sm">Confirmar</lumina-button>
+      </footer>
     </lumina-card>
   );
 }`,
@@ -1045,9 +1001,14 @@ customElements.define(GlassCard.tagName, GlassCard);
   speed="0.5"
   blur="18"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-glass-card>
 <script type="module">
   const el = document.querySelector('lumina-glass-card');
@@ -1059,10 +1020,16 @@ customElements.define(GlassCard.tagName, GlassCard);
 
 export function GlassCardExample() {
   return (
-    <lumina-glass-card variant="light" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" blur={18}
+    <lumina-glass-card variant="light" intensity="intense" accent-color="#7c5cff" speed={0.5} blur={18}
       onLuminaHover={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-glass-card>
   );
 }`,
@@ -1104,9 +1071,14 @@ customElements.define(MorphCard.tagName, MorphCard);
   accent-color="#78f0ff"
   speed="0.5"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-morph-card>
 <script type="module">
   const el = document.querySelector('lumina-morph-card');
@@ -1119,9 +1091,15 @@ customElements.define(MorphCard.tagName, MorphCard);
 export function MorphCardExample() {
   return (
     <lumina-morph-card variant="subtle" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark"
       onLuminaMorphStart={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-morph-card>
   );
 }`,
@@ -1164,9 +1142,14 @@ customElements.define(NeuralCard.tagName, NeuralCard);
   speed="0.5"
   particle-count="40"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-neural-card>
 <script type="module">
   const el = document.querySelector('lumina-neural-card');
@@ -1178,10 +1161,16 @@ customElements.define(NeuralCard.tagName, NeuralCard);
 
 export function NeuralCardExample() {
   return (
-    <lumina-neural-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark" particle-count={40}
+    <lumina-neural-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} particle-count={40}
       onLuminaHover={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-neural-card>
   );
 }`,
@@ -1223,9 +1212,14 @@ customElements.define(VoidCard.tagName, VoidCard);
   accent-color="#78f0ff"
   speed="0.5"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-void-card>
 <script type="module">
   const el = document.querySelector('lumina-void-card');
@@ -1238,9 +1232,15 @@ customElements.define(VoidCard.tagName, VoidCard);
 export function VoidCardExample() {
   return (
     <lumina-void-card variant="void" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark"
       onLuminaHover={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-void-card>
   );
 }`,
@@ -1283,9 +1283,14 @@ customElements.define(DimensionalCard.tagName, DimensionalCard);
   speed="0.5"
   interactive
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-dimensional-card>
 <script type="module">
   const el = document.querySelector('lumina-dimensional-card');
@@ -1297,10 +1302,16 @@ customElements.define(DimensionalCard.tagName, DimensionalCard);
 
 export function DimensionalCardExample() {
   return (
-    <lumina-dimensional-card variant="medium" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" interactive
+    <lumina-dimensional-card variant="medium" intensity="intense" accent-color="#7c5cff" speed={0.5} interactive
       onLuminaTiltStart={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-dimensional-card>
   );
 }`,
@@ -1343,9 +1354,14 @@ customElements.define(HoverCard.tagName, HoverCard);
   speed="0.5"
   expand-on-hover
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <div slot="preview" style="padding:8px 0;">
+    <h3 style="margin:0;font-size:18px;color:#fff;">Passe o mouse</h3>
+    <p style="margin:4px 0 0;color:rgba(245,245,255,0.6);font-size:13px;">Hover para revelar mais</p>
+  </div>
+  <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:8px;">
+    <p style="margin:0 0 8px;">Conteúdo revelado ao hover! Use para ações secundárias, detalhes, ou atalhos.</p>
+    <lumina-button size="sm" variant="glass">Ver detalhes</lumina-button>
+  </div>
 </lumina-hover-card>
 <script type="module">
   const el = document.querySelector('lumina-hover-card');
@@ -1357,10 +1373,16 @@ customElements.define(HoverCard.tagName, HoverCard);
 
 export function HoverCardExample() {
   return (
-    <lumina-hover-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" expand-on-hover
+    <lumina-hover-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} expand-on-hover
       onLuminaHover={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <div slot="preview" style={{padding:"8px 0"}}>
+        <h3 style={{margin:0,color:"#fff"}}>Passe o mouse</h3>
+        <p style={{margin:"4px 0 0",color:"rgba(245,245,255,0.6)"}}>Hover para revelar mais</p>
+      </div>
+      <div style={{borderTop:"1px solid rgba(255,255,255,0.1)",paddingTop:"12px"}}>
+        <p>Conteúdo revelado ao hover!</p>
+        <lumina-button size="sm" variant="glass">Ver detalhes</lumina-button>
+      </div>
     </lumina-hover-card>
   );
 }`,
@@ -1403,9 +1425,14 @@ customElements.define(ContextCard.tagName, ContextCard);
   speed="0.5"
   auto-adapt
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-context-card>
 <script type="module">
   const el = document.querySelector('lumina-context-card');
@@ -1417,10 +1444,16 @@ customElements.define(ContextCard.tagName, ContextCard);
 
 export function ContextCardExample() {
   return (
-    <lumina-context-card variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5}
-        theme="dark" auto-adapt
+    <lumina-context-card variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5} auto-adapt
       onLuminaContextChange={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-context-card>
   );
 }`,
@@ -1462,17 +1495,28 @@ customElements.define(BreathCard.tagName, BreathCard);
   accent-color="#ffd166"
   speed="0.5"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-breath-card>`,
     react: `import 'lumina-ui';
 
 export function BreathCardExample() {
   return (
-    <lumina-breath-card variant="subtle" intensity="intense" accent-color="#ffd166" speed={0.5}
-        theme="dark">
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+    <lumina-breath-card variant="subtle" intensity="intense" accent-color="#ffd166" speed={0.5}>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-breath-card>
   );
 }`,
@@ -1517,9 +1561,18 @@ customElements.define(StackCard.tagName, StackCard);
   count="3"
   interactive
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <div data-card="0" style="padding:24px;text-align:center;">
+    <h3 style="margin:0 0 8px;">Card 1</h3>
+    <p style="margin:0;color:rgba(245,245,255,0.6);">Arraste para o lado</p>
+  </div>
+  <div data-card="1" style="padding:24px;text-align:center;">
+    <h3 style="margin:0 0 8px;">Card 2</h3>
+    <p style="margin:0;color:rgba(245,245,255,0.6);">Segundo card</p>
+  </div>
+  <div data-card="2" style="padding:24px;text-align:center;">
+    <h3 style="margin:0 0 8px;">Card 3</h3>
+    <p style="margin:0;color:rgba(245,245,255,0.6);">Terceiro card</p>
+  </div>
 </lumina-stack-card>
 <script type="module">
   const el = document.querySelector('lumina-stack-card');
@@ -1531,10 +1584,17 @@ customElements.define(StackCard.tagName, StackCard);
 
 export function StackCardExample() {
   return (
-    <lumina-stack-card variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark" count={3} interactive
+    <lumina-stack-card variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5} count={3} interactive
       onLuminaCardSelect={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <div data-card="0" style={{padding:"24px",textAlign:"center"}}>
+        <h3>Card 1</h3><p>Arraste para o lado</p>
+      </div>
+      <div data-card="1" style={{padding:"24px",textAlign:"center"}}>
+        <h3>Card 2</h3><p>Segundo card</p>
+      </div>
+      <div data-card="2" style={{padding:"24px",textAlign:"center"}}>
+        <h3>Card 3</h3><p>Terceiro card</p>
+      </div>
     </lumina-stack-card>
   );
 }`,
@@ -1577,9 +1637,14 @@ customElements.define(RevealCard.tagName, RevealCard);
   speed="0.5"
   reveal-on-scroll
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-reveal-card>
 <script type="module">
   const el = document.querySelector('lumina-reveal-card');
@@ -1591,10 +1656,16 @@ customElements.define(RevealCard.tagName, RevealCard);
 
 export function RevealCardExample() {
   return (
-    <lumina-reveal-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" reveal-on-scroll
+    <lumina-reveal-card variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} reveal-on-scroll
       onLuminaRevealStart={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-reveal-card>
   );
 }`,
@@ -1636,9 +1707,14 @@ customElements.define(ParallaxCard.tagName, ParallaxCard);
   accent-color="#78f0ff"
   speed="0.5"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <div slot="back" style="height:100%;background:radial-gradient(circle at 30% 30%,#7c5cff 0%,transparent 60%);"></div>
+  <div slot="mid" style="height:100%;display:flex;align-items:center;justify-content:center;">
+    <div style="width:80px;height:80px;border-radius:50%;background:rgba(120,240,255,0.4);backdrop-filter:blur(8px);"></div>
+  </div>
+  <div slot="front" style="padding:20px;">
+    <h3 style="margin:0;color:#fff;">Parallax 3D</h3>
+    <p style="margin:4px 0 0;color:rgba(245,245,255,0.7);">3 camadas com velocidades diferentes</p>
+  </div>
 </lumina-parallax-card>
 <script type="module">
   const el = document.querySelector('lumina-parallax-card');
@@ -1651,9 +1727,15 @@ customElements.define(ParallaxCard.tagName, ParallaxCard);
 export function ParallaxCardExample() {
   return (
     <lumina-parallax-card variant="medium" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark"
       onLuminaParallax={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <div slot="back" style={{height:"100%",background:"radial-gradient(circle at 30% 30%,#7c5cff 0%,transparent 60%)"}} />
+      <div slot="mid" style={{height:"100%",display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <div style={{width:80,height:80,borderRadius:"50%",background:"rgba(120,240,255,0.4)"}} />
+      </div>
+      <div slot="front" style={{padding:20}}>
+        <h3 style={{color:"#fff"}}>Parallax 3D</h3>
+        <p>3 camadas com velocidades diferentes</p>
+      </div>
     </lumina-parallax-card>
   );
 }`,
@@ -1696,9 +1778,14 @@ customElements.define(GlowCard.tagName, GlowCard);
   speed="0.5"
   glow-intensity="0.6"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-glow-card>
 <script type="module">
   const el = document.querySelector('lumina-glow-card');
@@ -1710,10 +1797,16 @@ customElements.define(GlowCard.tagName, GlowCard);
 
 export function GlowCardExample() {
   return (
-    <lumina-glow-card variant="aura" intensity="intense" accent-color="#ffd166" speed={0.5}
-        theme="dark" glow-intensity={0.6}
+    <lumina-glow-card variant="aura" intensity="intense" accent-color="#ffd166" speed={0.5} glow-intensity={0.6}
       onLuminaHover={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-glow-card>
   );
 }`,
@@ -1756,9 +1849,14 @@ customElements.define(ParticleCard.tagName, ParticleCard);
   speed="0.5"
   particle-count="50"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-particle-card>
 <script type="module">
   const el = document.querySelector('lumina-particle-card');
@@ -1770,10 +1868,16 @@ customElements.define(ParticleCard.tagName, ParticleCard);
 
 export function ParticleCardExample() {
   return (
-    <lumina-particle-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark" particle-count={50}
+    <lumina-particle-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} particle-count={50}
       onLuminaParticleInteract={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-particle-card>
   );
 }`,
@@ -1815,9 +1919,14 @@ customElements.define(LiquidCard.tagName, LiquidCard);
   accent-color="#78f0ff"
   speed="0.5"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-liquid-card>
 <script type="module">
   const el = document.querySelector('lumina-liquid-card');
@@ -1830,9 +1939,15 @@ customElements.define(LiquidCard.tagName, LiquidCard);
 export function LiquidCardExample() {
   return (
     <lumina-liquid-card variant="morph" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark"
       onLuminaInteract={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-liquid-card>
   );
 }`,
@@ -1874,9 +1989,14 @@ customElements.define(HoloCard.tagName, HoloCard);
   accent-color="#ff6ec7"
   speed="0.5"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-holo-card>
 <script type="module">
   const el = document.querySelector('lumina-holo-card');
@@ -1889,9 +2009,15 @@ customElements.define(HoloCard.tagName, HoloCard);
 export function HoloCardExample() {
   return (
     <lumina-holo-card variant="holo" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark"
       onLuminaHover={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-holo-card>
   );
 }`,
@@ -1934,9 +2060,14 @@ customElements.define(MemoryCard.tagName, MemoryCard);
   speed="0.5"
   memory-enabled
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-memory-card>
 <script type="module">
   const el = document.querySelector('lumina-memory-card');
@@ -1948,10 +2079,16 @@ customElements.define(MemoryCard.tagName, MemoryCard);
 
 export function MemoryCardExample() {
   return (
-    <lumina-memory-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark" memory-enabled
+    <lumina-memory-card variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} memory-enabled
       onLuminaMemoryUpdate={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-memory-card>
   );
 }`,
@@ -1994,9 +2131,14 @@ customElements.define(EchoCard.tagName, EchoCard);
   speed="0.5"
   echo-intensity="0.7"
 >
-  <h3 slot="title">Título</h3>
-  <p slot="subtitle">subtítulo</p>
-  <p>Conteúdo de exemplo.</p>
+  <h3 style="margin:0 0 8px;color:#fff;">Título do Card</h3>
+  <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);line-height:1.5;">
+    Conteúdo principal. Use este card para destacar informações, imagens ou ações.
+  </p>
+  <div style="display:flex;gap:8px;">
+    <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+    <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+  </div>
 </lumina-echo-card>
 <script type="module">
   const el = document.querySelector('lumina-echo-card');
@@ -2008,10 +2150,16 @@ customElements.define(EchoCard.tagName, EchoCard);
 
 export function EchoCardExample() {
   return (
-    <lumina-echo-card variant="aura" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" echo-intensity={0.7}
+    <lumina-echo-card variant="aura" intensity="intense" accent-color="#7c5cff" speed={0.5} echo-intensity={0.7}
       onLuminaEcho={(e) => console.log(e.detail)}>
-      <h3 slot="title">Título</h3><p>Conteúdo.</p>
+      <h3 style={{margin:"0 0 8px",color:"#fff"}}>Título do Card</h3>
+      <p style={{margin:"0 0 12px",color:"rgba(245,245,255,0.7)"}}>
+        Conteúdo principal do card.
+      </p>
+      <div style={{display:"flex",gap:8}}>
+        <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+        <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+      </div>
     </lumina-echo-card>
   );
 }`,
@@ -2067,7 +2215,6 @@ customElements.define(Input.tagName, Input);
 export function InputExample() {
   return (
     <lumina-input variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark"
       onLuminaInput={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2125,8 +2272,7 @@ customElements.define(Textarea.tagName, Textarea);
 
 export function TextareaExample() {
   return (
-    <lumina-textarea variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" rows={4} max-length={0} auto-grow
+    <lumina-textarea variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} rows={4} max-length={0} auto-grow
       onLuminaInput={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2181,7 +2327,6 @@ customElements.define(SearchInput.tagName, SearchInput);
 export function SearchInputExample() {
   return (
     <lumina-search-input variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaSearch={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2234,7 +2379,6 @@ customElements.define(PasswordInput.tagName, PasswordInput);
 export function PasswordInputExample() {
   return (
     <lumina-password-input variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark"
       onLuminaVisibilityToggle={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2290,7 +2434,6 @@ customElements.define(Select.tagName, Select);
 export function SelectExample() {
   return (
     <lumina-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2345,8 +2488,7 @@ customElements.define(MultiSelect.tagName, MultiSelect);
 
 export function MultiSelectExample() {
   return (
-    <lumina-multi-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" max={0}
+    <lumina-multi-select variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max={0}
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2400,7 +2542,6 @@ customElements.define(Autocomplete.tagName, Autocomplete);
 export function AutocompleteExample() {
   return (
     <lumina-autocomplete variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark"
       onLuminaSelect={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2460,8 +2601,7 @@ customElements.define(Slider.tagName, Slider);
 
 export function SliderExample() {
   return (
-    <lumina-slider variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" value={50} min={0} max={100} step={1}
+    <lumina-slider variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} value={50} min={0} max={100} step={1}
       onLuminaInput={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2520,8 +2660,7 @@ customElements.define(RangeSlider.tagName, RangeSlider);
 
 export function RangeSliderExample() {
   return (
-    <lumina-range-slider variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark" min-value={0} max-value={0} min={0} max={100}
+    <lumina-range-slider variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} min-value={0} max-value={0} min={0} max={100}
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2574,7 +2713,6 @@ customElements.define(Switch.tagName, Switch);
 export function SwitchExample() {
   return (
     <lumina-switch variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2628,7 +2766,6 @@ customElements.define(Checkbox.tagName, Checkbox);
 export function CheckboxExample() {
   return (
     <lumina-checkbox variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2681,7 +2818,6 @@ customElements.define(RadioGroup.tagName, RadioGroup);
 export function RadioGroupExample() {
   return (
     <lumina-radio-group variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2736,8 +2872,7 @@ customElements.define(FileUpload.tagName, FileUpload);
 
 export function FileUploadExample() {
   return (
-    <lumina-file-upload variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" max-size={0}
+    <lumina-file-upload variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max-size={0}
       onLuminaFileAdd={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2790,8 +2925,7 @@ customElements.define(ColorPicker.tagName, ColorPicker);
 
 export function ColorPickerExample() {
   return (
-    <lumina-color-picker variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark" value="#7c5cff"
+    <lumina-color-picker variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5} value="#7c5cff"
       onLuminaColorChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2844,7 +2978,6 @@ customElements.define(DatePicker.tagName, DatePicker);
 export function DatePickerExample() {
   return (
     <lumina-date-picker variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaDateChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2898,8 +3031,7 @@ customElements.define(TimePicker.tagName, TimePicker);
 
 export function TimePickerExample() {
   return (
-    <lumina-time-picker variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark" format="24h"
+    <lumina-time-picker variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} format="24h"
       onLuminaTimeChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -2952,7 +3084,6 @@ customElements.define(SignaturePad.tagName, SignaturePad);
 export function SignaturePadExample() {
   return (
     <lumina-signature-pad variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaSignatureStart={(e) => console.log(e.detail)} />
   );
 }`,
@@ -3005,7 +3136,6 @@ customElements.define(VoiceInput.tagName, VoiceInput);
 export function VoiceInputExample() {
   return (
     <lumina-voice-input variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark"
       onLuminaVoiceStart={(e) => console.log(e.detail)} />
   );
 }`,
@@ -3058,7 +3188,6 @@ customElements.define(NeuralInput.tagName, NeuralInput);
 export function NeuralInputExample() {
   return (
     <lumina-neural-input variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark"
       onLuminaInput={(e) => console.log(e.detail)} />
   );
 }`,
@@ -3111,7 +3240,6 @@ customElements.define(ContextInput.tagName, ContextInput);
 export function ContextInputExample() {
   return (
     <lumina-context-input variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5}
-        theme="dark"
       onLuminaContextChange={(e) => console.log(e.detail)} />
   );
 }`,
@@ -3166,7 +3294,6 @@ customElements.define(Navigation.tagName, Navigation);
 export function NavigationExample() {
   return (
     <lumina-navigation variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaNavChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-navigation>
@@ -3225,8 +3352,7 @@ customElements.define(Tabs.tagName, Tabs);
 
 export function TabsExample() {
   return (
-    <lumina-tabs variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" orientation="horizontal"
+    <lumina-tabs variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} orientation="horizontal"
       onLuminaTabChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-tabs>
@@ -3283,7 +3409,6 @@ customElements.define(Breadcrumbs.tagName, Breadcrumbs);
 export function BreadcrumbsExample() {
   return (
     <lumina-breadcrumbs variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaNavigate={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-breadcrumbs>
@@ -3342,8 +3467,7 @@ customElements.define(Pagination.tagName, Pagination);
 
 export function PaginationExample() {
   return (
-    <lumina-pagination variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" page={0} total={0}
+    <lumina-pagination variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} page={0} total={0}
       onLuminaPageChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-pagination>
@@ -3400,7 +3524,6 @@ customElements.define(Sidebar.tagName, Sidebar);
 export function SidebarExample() {
   return (
     <lumina-sidebar variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaToggle={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-sidebar>
@@ -3460,8 +3583,7 @@ customElements.define(Drawer.tagName, Drawer);
 
 export function DrawerExample() {
   return (
-    <lumina-drawer variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark" placement="left" size="md"
+    <lumina-drawer variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} placement="left" size="md"
       onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-drawer>
@@ -3518,7 +3640,6 @@ customElements.define(MegaMenu.tagName, MegaMenu);
 export function MegaMenuExample() {
   return (
     <lumina-mega-menu variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaNavigate={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-mega-menu>
@@ -3575,7 +3696,6 @@ customElements.define(CommandPalette.tagName, CommandPalette);
 export function CommandPaletteExample() {
   return (
     <lumina-command-palette variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaExecute={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-command-palette>
@@ -3632,7 +3752,6 @@ customElements.define(FloatingNav.tagName, FloatingNav);
 export function FloatingNavExample() {
   return (
     <lumina-floating-nav variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaShow={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-floating-nav>
@@ -3691,8 +3810,7 @@ customElements.define(StepIndicator.tagName, StepIndicator);
 
 export function StepIndicatorExample() {
   return (
-    <lumina-step-indicator variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" current={0} total={0}
+    <lumina-step-indicator variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} current={0} total={0}
       onLuminaStepChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-step-indicator>
@@ -3749,7 +3867,6 @@ customElements.define(ProgressNav.tagName, ProgressNav);
 export function ProgressNavExample() {
   return (
     <lumina-progress-nav variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaNavigate={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-progress-nav>
@@ -3806,7 +3923,6 @@ customElements.define(OrbitalNav.tagName, OrbitalNav);
 export function OrbitalNavExample() {
   return (
     <lumina-orbital-nav variant="dimensional" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark"
       onLuminaNavigate={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-orbital-nav>
@@ -3866,8 +3982,7 @@ customElements.define(Alert.tagName, Alert);
 
 export function AlertExample() {
   return (
-    <lumina-alert variant="glass" intensity="intense" accent-color="#22c55e" speed={0.5}
-        theme="dark" dismissible auto-dismiss={0}
+    <lumina-alert variant="glass" intensity="intense" accent-color="#22c55e" speed={0.5} dismissible auto-dismiss={0}
       onLuminaClose={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-alert>
@@ -3927,8 +4042,7 @@ customElements.define(Toast.tagName, Toast);
 
 export function ToastExample() {
   return (
-    <lumina-toast variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" duration={4000} position="top-right"
+    <lumina-toast variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} duration={4000} position="top-right"
       onLuminaDismiss={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-toast>
@@ -3986,8 +4100,7 @@ customElements.define(Progress.tagName, Progress);
 
 export function ProgressExample() {
   return (
-    <lumina-progress variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark" value={0} max={100}
+    <lumina-progress variant="glass" intensity="intense" accent-color="#78f0ff" speed={0.5} value={0} max={100}
       onLuminaProgressComplete={(e) => console.log(e.detail)} />
   );
 }`,
@@ -4038,8 +4151,7 @@ customElements.define(Skeleton.tagName, Skeleton);
 
 export function SkeletonExample() {
   return (
-    <lumina-skeleton variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" shape="text" count={1} />
+    <lumina-skeleton variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} shape="text" count={1} />
   );
 }`,
   },
@@ -4095,7 +4207,6 @@ customElements.define(Badge.tagName, Badge);
 export function BadgeExample() {
   return (
     <lumina-badge variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark"
       onLuminaRemove={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-badge>
@@ -4155,8 +4266,7 @@ customElements.define(Chip.tagName, Chip);
 
 export function ChipExample() {
   return (
-    <lumina-chip variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" removable
+    <lumina-chip variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} removable
       onLuminaRemove={(e) => console.log(e.detail)}>
       TypeScript
     </lumina-chip>
@@ -4207,8 +4317,7 @@ customElements.define(Loading.tagName, Loading);
 
 export function LoadingExample() {
   return (
-    <lumina-loading variant="neural" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" size={64} />
+    <lumina-loading variant="neural" intensity="intense" accent-color="#7c5cff" speed={0.5} size={64} />
   );
 }`,
   },
@@ -4255,8 +4364,7 @@ customElements.define(Spinner.tagName, Spinner);
 
 export function SpinnerExample() {
   return (
-    <lumina-spinner variant="neural" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" size={40} />
+    <lumina-spinner variant="neural" intensity="intense" accent-color="#7c5cff" speed={0.5} size={40} />
   );
 }`,
   },
@@ -4309,8 +4417,7 @@ customElements.define(StatusIndicator.tagName, StatusIndicator);
 
 export function StatusIndicatorExample() {
   return (
-    <lumina-status-indicator variant="online" intensity="intense" accent-color="#22c55e" speed={0.5}
-        theme="dark" status="online"
+    <lumina-status-indicator variant="online" intensity="intense" accent-color="#22c55e" speed={0.5} status="online"
       onLuminaStatusChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-status-indicator>
@@ -4359,7 +4466,7 @@ customElements.define(NotificationBadge.tagName, NotificationBadge);
 </lumina-notification-badge>
 <script type="module">
   const el = document.querySelector('lumina-notification-badge');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -4367,8 +4474,7 @@ customElements.define(NotificationBadge.tagName, NotificationBadge);
 
 export function NotificationBadgeExample() {
   return (
-    <lumina-notification-badge variant="glass" intensity="intense" accent-color="#ff5577" speed={0.5}
-        theme="dark" count={0}
+    <lumina-notification-badge variant="glass" intensity="intense" accent-color="#ff5577" speed={0.5} count={0}
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-notification-badge>
@@ -4416,8 +4522,7 @@ customElements.define(PulseIndicator.tagName, PulseIndicator);
 
 export function PulseIndicatorExample() {
   return (
-    <lumina-pulse-indicator variant="aura" intensity="intense" accent-color="#ffd166" speed={0.5}
-        theme="dark">
+    <lumina-pulse-indicator variant="aura" intensity="intense" accent-color="#ffd166" speed={0.5}>
       Conteúdo
     </lumina-pulse-indicator>
   );
@@ -4471,8 +4576,7 @@ customElements.define(NeuralLoader.tagName, NeuralLoader);
 
 export function NeuralLoaderExample() {
   return (
-    <lumina-neural-loader variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark" progress={0}
+    <lumina-neural-loader variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} progress={0}
       onLuminaProgress={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-neural-loader>
@@ -4532,8 +4636,7 @@ customElements.define(Modal.tagName, Modal);
 
 export function ModalExample() {
   return (
-    <lumina-modal variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" close-on-backdrop
+    <lumina-modal variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} close-on-backdrop
       onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-modal>
@@ -4595,8 +4698,7 @@ customElements.define(DrawerModal.tagName, DrawerModal);
 
 export function DrawerModalExample() {
   return (
-    <lumina-drawer-modal variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" side="right" size="md"
+    <lumina-drawer-modal variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} side="right" size="md"
       onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-drawer-modal>
@@ -4659,8 +4761,7 @@ customElements.define(Dialog.tagName, Dialog);
 
 export function DialogExample() {
   return (
-    <lumina-dialog variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" confirm-label="Confirmar" cancel-label="Cancelar"
+    <lumina-dialog variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} confirm-label="Confirmar" cancel-label="Cancelar"
       onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-dialog>
@@ -4718,8 +4819,7 @@ customElements.define(Popover.tagName, Popover);
 
 export function PopoverExample() {
   return (
-    <lumina-popover variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" placement="top"
+    <lumina-popover variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} placement="top"
       onLuminaShow={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-popover>
@@ -4779,8 +4879,7 @@ customElements.define(Tooltip.tagName, Tooltip);
 
 export function TooltipExample() {
   return (
-    <lumina-tooltip variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" side="top" delay={200}
+    <lumina-tooltip variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} side="top" delay={200}
       onLuminaShow={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-tooltip>
@@ -4837,7 +4936,6 @@ customElements.define(ContextMenu.tagName, ContextMenu);
 export function ContextMenuExample() {
   return (
     <lumina-context-menu variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaShow={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-context-menu>
@@ -4895,7 +4993,6 @@ customElements.define(Lightbox.tagName, Lightbox);
 export function LightboxExample() {
   return (
     <lumina-lightbox variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-lightbox>
@@ -4955,8 +5052,7 @@ customElements.define(ImageZoom.tagName, ImageZoom);
 
 export function ImageZoomExample() {
   return (
-    <lumina-image-zoom variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" zoom={1} max-zoom={5}
+    <lumina-image-zoom variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} zoom={1} max-zoom={5}
       onLuminaZoomChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-image-zoom>
@@ -5013,7 +5109,6 @@ customElements.define(FullscreenOverlay.tagName, FullscreenOverlay);
 export function FullscreenOverlayExample() {
   return (
     <lumina-fullscreen-overlay variant="void" intensity="intense" accent-color="#78f0ff" speed={0.5}
-        theme="dark"
       onLuminaOpen={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-fullscreen-overlay>
@@ -5078,8 +5173,7 @@ customElements.define(ConfirmationDialog.tagName, ConfirmationDialog);
 
 export function ConfirmationDialogExample() {
   return (
-    <lumina-confirmation-dialog variant="glass" intensity="intense" accent-color="#ff5577" speed={0.5}
-        theme="dark" confirm-label="Confirmar" cancel-label="Cancelar"
+    <lumina-confirmation-dialog variant="glass" intensity="intense" accent-color="#ff5577" speed={0.5} confirm-label="Confirmar" cancel-label="Cancelar"
       onLuminaConfirm={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-confirmation-dialog>
@@ -5136,7 +5230,6 @@ customElements.define(Table.tagName, Table);
 export function TableExample() {
   return (
     <lumina-table variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaSort={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-table>
@@ -5193,7 +5286,6 @@ customElements.define(DataGrid.tagName, DataGrid);
 export function DataGridExample() {
   return (
     <lumina-data-grid variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaSelect={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-data-grid>
@@ -5250,7 +5342,6 @@ customElements.define(List.tagName, List);
 export function ListExample() {
   return (
     <lumina-list variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaSelect={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-list>
@@ -5300,8 +5391,7 @@ customElements.define(Grid.tagName, Grid);
 
 export function GridExample() {
   return (
-    <lumina-grid variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark">
+    <lumina-grid variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}>
       Conteúdo
     </lumina-grid>
   );
@@ -5353,7 +5443,7 @@ customElements.define(Avatar.tagName, Avatar);
 </lumina-avatar>
 <script type="module">
   const el = document.querySelector('lumina-avatar');
-  el.addEventListener('lumina-press', (e) => {
+  el.addEventListener('lumina-click', (e) => {
     console.log('lumina-click', e.detail);
   });
 </script>`,
@@ -5361,8 +5451,7 @@ customElements.define(Avatar.tagName, Avatar);
 
 export function AvatarExample() {
   return (
-    <lumina-avatar variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" size="md"
+    <lumina-avatar variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} size="md"
       onLuminaClick={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-avatar>
@@ -5413,8 +5502,7 @@ customElements.define(AvatarGroup.tagName, AvatarGroup);
 
 export function AvatarGroupExample() {
   return (
-    <lumina-avatar-group variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark" max={5}>
+    <lumina-avatar-group variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5} max={5}>
       Conteúdo
     </lumina-avatar-group>
   );
@@ -5470,7 +5558,6 @@ customElements.define(Timeline.tagName, Timeline);
 export function TimelineExample() {
   return (
     <lumina-timeline variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaSelect={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-timeline>
@@ -5527,7 +5614,6 @@ customElements.define(TreeView.tagName, TreeView);
 export function TreeViewExample() {
   return (
     <lumina-tree-view variant="glass" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaExpand={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-tree-view>
@@ -5584,7 +5670,6 @@ customElements.define(MorphLab.tagName, MorphLab);
 export function MorphLabExample() {
   return (
     <lumina-morph-lab variant="glass" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark"
       onLuminaMorph={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-morph-lab>
@@ -5643,8 +5728,7 @@ customElements.define(ParticleSystem.tagName, ParticleSystem);
 
 export function ParticleSystemExample() {
   return (
-    <lumina-particle-system variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5}
-        theme="dark" count={60} mode="plain"
+    <lumina-particle-system variant="neural" intensity="intense" accent-color="#ff6ec7" speed={0.5} count={60} mode="plain"
       onLuminaParticleBurst={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-particle-system>
@@ -5701,7 +5785,6 @@ customElements.define(DepthController.tagName, DepthController);
 export function DepthControllerExample() {
   return (
     <lumina-depth-controller variant="flat" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaDepthChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-depth-controller>
@@ -5758,7 +5841,6 @@ customElements.define(ContextAware.tagName, ContextAware);
 export function ContextAwareExample() {
   return (
     <lumina-context-aware variant="adaptive" intensity="intense" accent-color="#ffd166" speed={0.5}
-        theme="dark"
       onLuminaContextChange={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-context-aware>
@@ -5815,7 +5897,6 @@ customElements.define(EchoSystem.tagName, EchoSystem);
 export function EchoSystemExample() {
   return (
     <lumina-echo-system variant="aura" intensity="intense" accent-color="#7c5cff" speed={0.5}
-        theme="dark"
       onLuminaEcho={(e) => console.log(e.detail)}>
       Conteúdo
     </lumina-echo-system>

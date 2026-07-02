@@ -257,6 +257,11 @@ function buildGalleryHTML(meta: ComponentMeta, state: { variant: string; intensi
     return buildButtonGallery(tag, state, a);
   }
 
+  // ===== CARDS: rich gallery with variants + slots + props =====
+  if (cat === 'cards') {
+    return buildCardGallery(tag, meta, state, a);
+  }
+
   // ===== Default: single preview =====
   return `<div class="playground__gallery-row">
     <div class="playground__gallery-label">Preview</div>
@@ -497,6 +502,333 @@ function buildLuminaButtonGallery(state: { variant: string; intensity: string; a
         <lumina-button id="demo-c2" variant="dimensional" intensity="extreme" accent-color="#22c55e" depth="extrude" theme="dark">Green 3D</lumina-button>
         <lumina-button id="demo-c3" variant="neural" intensity="extreme" accent-color="#f59e0b" theme="dark">Amber</lumina-button>
         <lumina-button id="demo-c4" variant="void" intensity="extreme" accent-color="#ef4444" theme="dark">Red Void</lumina-button>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * Build the card gallery — shows all variants, slot usage, and prop examples.
+ * Each card type gets a tailored gallery that demonstrates its real capabilities.
+ */
+function buildCardGallery(tag: string, meta: ComponentMeta, state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = meta.variants;
+  const accent = state.accent;
+  const intensity = state.intensity;
+
+  // === Special galleries for cards with non-default slots ===
+  if (tag === 'lumina-card') return buildLuminaCardGallery(state, attrs);
+  if (tag === 'lumina-hover-card') return buildHoverCardGallery(state, attrs);
+  if (tag === 'lumina-stack-card') return buildStackCardGallery(state, attrs);
+  if (tag === 'lumina-parallax-card') return buildParallaxCardGallery(state, attrs);
+
+  // === Generic card gallery (for cards with just a default slot) ===
+  // Build variant showcase row
+  const variantRow = variants.length > 1 ? `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes (${variants.length})</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <${tag} id="demo-v${i}" variant="${v}" intensity="${intensity}" accent-color="${accent}" theme="dark" style="width:200px;min-height:160px;">
+            <h3 style="margin:0 0 6px;font-size:14px;color:#fff;capitalize;">${v}</h3>
+            <p style="margin:0;font-size:11px;color:rgba(245,245,255,0.6);">Conteúdo de exemplo para esta variante.</p>
+          </${tag}>
+        `).join('')}
+      </div>
+    </div>
+  ` : '';
+
+  // Intensity showcase row
+  const intensityRow = `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Intensidades (subtle / medium / intense / extreme)</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <${tag} id="demo-i1" variant="${variants[0]}" intensity="subtle" accent-color="${accent}" theme="dark" style="width:160px;min-height:140px;">
+          <h4 style="margin:0 0 4px;font-size:13px;color:#fff;">Subtle</h4>
+          <p style="margin:0;font-size:11px;color:rgba(245,245,255,0.5);">0.4x</p>
+        </${tag}>
+        <${tag} id="demo-i2" variant="${variants[0]}" intensity="medium" accent-color="${accent}" theme="dark" style="width:160px;min-height:140px;">
+          <h4 style="margin:0 0 4px;font-size:13px;color:#fff;">Medium</h4>
+          <p style="margin:0;font-size:11px;color:rgba(245,245,255,0.5);">0.7x</p>
+        </${tag}>
+        <${tag} id="demo-i3" variant="${variants[0]}" intensity="intense" accent-color="${accent}" theme="dark" style="width:160px;min-height:140px;">
+          <h4 style="margin:0 0 4px;font-size:13px;color:#fff;">Intense</h4>
+          <p style="margin:0;font-size:11px;color:rgba(245,245,255,0.5);">1.0x</p>
+        </${tag}>
+        <${tag} id="demo-i4" variant="${variants[0]}" intensity="extreme" accent-color="${accent}" theme="dark" style="width:160px;min-height:140px;">
+          <h4 style="margin:0 0 4px;font-size:13px;color:#fff;">Extreme</h4>
+          <p style="margin:0;font-size:11px;color:rgba(245,245,255,0.5);">1.6x</p>
+        </${tag}>
+      </div>
+    </div>
+  `;
+
+  // Real-world usage example
+  const usageRow = `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Exemplo real de uso</div>
+      <div class="playground__gallery-items">
+        <${tag} id="demo-usage" ${attrs} style="width:340px;">
+          <h3 style="margin:0 0 8px;color:#fff;font-size:16px;">${meta.name.replace('Lumina', '')}</h3>
+          <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);font-size:13px;line-height:1.5;">
+            ${meta.tagline}
+          </p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <lumina-button size="sm" variant="glass">Saiba mais</lumina-button>
+            <lumina-button size="sm" accent-color="#22c55e">Confirmar</lumina-button>
+          </div>
+        </${tag}>
+      </div>
+    </div>
+  `;
+
+  // Custom accent colors
+  const colorsRow = `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Cores customizadas</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <${tag} id="demo-c1" variant="${variants[0]}" intensity="extreme" accent-color="#ff6ec7" theme="dark" style="width:160px;min-height:130px;">
+          <h4 style="margin:0;color:#fff;font-size:13px;">Pink</h4>
+        </${tag}>
+        <${tag} id="demo-c2" variant="${variants[0]}" intensity="extreme" accent-color="#22c55e" theme="dark" style="width:160px;min-height:130px;">
+          <h4 style="margin:0;color:#fff;font-size:13px;">Green</h4>
+        </${tag}>
+        <${tag} id="demo-c3" variant="${variants[0]}" intensity="extreme" accent-color="#f59e0b" theme="dark" style="width:160px;min-height:130px;">
+          <h4 style="margin:0;color:#fff;font-size:13px;">Amber</h4>
+        </${tag}>
+        <${tag} id="demo-c4" variant="${variants[0]}" intensity="extreme" accent-color="#78f0ff" theme="dark" style="width:160px;min-height:130px;">
+          <h4 style="margin:0;color:#fff;font-size:13px;">Cyan</h4>
+        </${tag}>
+      </div>
+    </div>
+  `;
+
+  // Hint row pointing to event console
+  const hintRow = (meta.events && meta.events.length > 0) ? `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Interatividade — hover, clique, ou arraste sobre os cards acima. Eventos aparecem no console.</div>
+      <div class="playground__gallery-items">
+        <code style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#78f0ff;background:rgba(120,240,255,0.08);padding:4px 8px;border-radius:4px;">
+          ${meta.events.join(' · ')}
+        </code>
+      </div>
+    </div>
+  ` : '';
+
+  return variantRow + intensityRow + usageRow + colorsRow + hintRow;
+}
+
+/**
+ * lumina-card — full showcase with all 4 slots (header, media, default, footer).
+ */
+function buildLuminaCardGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  const variants = ['glass', 'morph', 'neural', 'void', 'dimensional', 'holo'];
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Card completo — slots header / media / default / footer</div>
+      <div class="playground__gallery-items">
+        <lumina-card id="demo-full" ${attrs} style="width:340px;">
+          <header slot="header" style="display:flex;justify-content:space-between;align-items:center;">
+            <h3 style="margin:0;font-size:16px;color:#fff;">Card Title</h3>
+            <span style="font-size:10px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:999px;background:rgba(124,92,255,0.2);color:#b4a5ff;">NEW</span>
+          </header>
+          <div slot="media" style="height:100px;background:linear-gradient(135deg,#7c5cff,#78f0ff);border-radius:8px;margin-bottom:12px;"></div>
+          <p style="margin:0 0 12px;color:rgba(245,245,255,0.7);font-size:13px;line-height:1.5;">
+            Conteúdo principal do card. Suporta qualquer HTML: texto, imagens, listas, etc.
+          </p>
+          <footer slot="footer" style="display:flex;gap:8px;justify-content:flex-end;">
+            <lumina-button size="sm" variant="glass">Cancelar</lumina-button>
+            <lumina-button size="sm">Confirmar</lumina-button>
+          </footer>
+        </lumina-card>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Todas as variantes (6)</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${variants.map((v: string, i: number) => `
+          <lumina-card id="demo-v${i}" variant="${v}" intensity="${state.intensity}" accent-color="${state.accent}" theme="dark" style="width:170px;min-height:140px;">
+            <h4 style="margin:0 0 4px;color:#fff;font-size:13px;text-transform:capitalize;">${v}</h4>
+            <p style="margin:0;color:rgba(245,245,255,0.5);font-size:11px;">Variante ${v}</p>
+          </lumina-card>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Card simples (só default slot)</div>
+      <div class="playground__gallery-items">
+        <lumina-card id="demo-simple" ${attrs} style="width:260px;">
+          <h3 style="margin:0 0 6px;color:#fff;font-size:15px;">Card Simples</h3>
+          <p style="margin:0;color:rgba(245,245,255,0.6);font-size:13px;">Sem header, media ou footer — apenas conteúdo.</p>
+        </lumina-card>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Intensidades (subtle → extreme)</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        ${['subtle','medium','intense','extreme'].map((lvl: string, i: number) => `
+          <lumina-card id="demo-i${i}" variant="glass" intensity="${lvl}" accent-color="${state.accent}" theme="dark" style="width:140px;min-height:120px;">
+            <h4 style="margin:0;color:#fff;font-size:12px;text-transform:capitalize;">${lvl}</h4>
+          </lumina-card>
+        `).join('')}
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Cores customizadas</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-card id="demo-c1" variant="neural" intensity="extreme" accent-color="#ff6ec7" theme="dark" style="width:140px;min-height:120px;">
+          <h4 style="margin:0;color:#fff;font-size:12px;">Pink</h4>
+        </lumina-card>
+        <lumina-card id="demo-c2" variant="void" intensity="extreme" accent-color="#22c55e" theme="dark" style="width:140px;min-height:120px;">
+          <h4 style="margin:0;color:#fff;font-size:12px;">Green Void</h4>
+        </lumina-card>
+        <lumina-card id="demo-c3" variant="dimensional" intensity="extreme" accent-color="#f59e0b" theme="dark" style="width:140px;min-height:120px;">
+          <h4 style="margin:0;color:#fff;font-size:12px;">Amber 3D</h4>
+        </lumina-card>
+        <lumina-card id="demo-c4" variant="holo" intensity="extreme" accent-color="#78f0ff" theme="dark" style="width:140px;min-height:120px;">
+          <h4 style="margin:0;color:#fff;font-size:12px;">Cyan Holo</h4>
+        </lumina-card>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Interatividade — hover, clique, ou segure sobre os cards. Eventos: lumina-hover · lumina-tilt-start · lumina-morph</div>
+      <div class="playground__gallery-items"></div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-hover-card — shows the preview slot (always visible) and default slot (revealed on hover).
+ */
+function buildHoverCardGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Hover Card — passe o mouse para revelar conteúdo</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-hover-card id="demo-h1" ${attrs} style="width:260px;min-height:160px;">
+          <div slot="preview" style="padding:8px 0;">
+            <h3 style="margin:0;font-size:16px;color:#fff;">Passe o mouse</h3>
+            <p style="margin:4px 0 0;color:rgba(245,245,255,0.6);font-size:13px;">Hover para revelar mais conteúdo</p>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:8px;">
+            <p style="margin:0 0 8px;color:rgba(245,245,255,0.7);font-size:13px;">Conteúdo revelado ao hover!</p>
+            <lumina-button size="sm" variant="glass">Ver detalhes</lumina-button>
+          </div>
+        </lumina-hover-card>
+
+        <lumina-hover-card id="demo-h2" variant="morph" intensity="${state.intensity}" accent-color="#ff6ec7" theme="dark" style="width:260px;min-height:160px;">
+          <div slot="preview" style="padding:8px 0;">
+            <h3 style="margin:0;font-size:16px;color:#fff;">Morph variant</h3>
+            <p style="margin:4px 0 0;color:rgba(245,245,255,0.6);font-size:13px;">Bordas morfadas</p>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:8px;">
+            <p style="margin:0 0 8px;color:rgba(245,245,255,0.7);font-size:13px;">Conteúdo extra revelado.</p>
+          </div>
+        </lumina-hover-card>
+
+        <lumina-hover-card id="demo-h3" variant="neural" intensity="${state.intensity}" accent-color="#78f0ff" theme="dark" style="width:260px;min-height:160px;">
+          <div slot="preview" style="padding:8px 0;">
+            <h3 style="margin:0;font-size:16px;color:#fff;">Neural variant</h3>
+            <p style="margin:4px 0 0;color:rgba(245,245,255,0.6);font-size:13px;">Borda neural</p>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:8px;">
+            <p style="margin:0 0 8px;color:rgba(245,245,255,0.7);font-size:13px;">Conteúdo extra revelado.</p>
+          </div>
+        </lumina-hover-card>
+      </div>
+    </div>
+
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Sempre expandido (expand-on-hover="false")</div>
+      <div class="playground__gallery-items">
+        <lumina-hover-card id="demo-h4" ${attrs} expand-on-hover="false" style="width:280px;">
+          <div slot="preview" style="padding:8px 0;">
+            <h3 style="margin:0;font-size:15px;color:#fff;">Sempre visível</h3>
+          </div>
+          <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:12px;margin-top:8px;">
+            <p style="margin:0;color:rgba(245,245,255,0.7);font-size:13px;">Este conteúdo fica sempre expandido. Útil quando você quer mostrar tudo sem depender de hover (ex: mobile).</p>
+          </div>
+        </lumina-hover-card>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-stack-card — multiple cards stacked, draggable (Tinder-style).
+ */
+function buildStackCardGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Stack — arraste para o lado (Tinder-style)</div>
+      <div class="playground__gallery-items">
+        <lumina-stack-card id="demo-s1" ${attrs} count="3" style="width:280px;height:340px;">
+          <div data-card="0" style="padding:24px;text-align:center;">
+            <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#7c5cff,#ff6ec7);margin:0 auto 12px;"></div>
+            <h3 style="margin:0 0 6px;color:#fff;">Card 1</h3>
+            <p style="margin:0;color:rgba(245,245,255,0.6);font-size:13px;">Arraste para a direita para aceitar</p>
+          </div>
+          <div data-card="1" style="padding:24px;text-align:center;">
+            <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#78f0ff,#22c55e);margin:0 auto 12px;"></div>
+            <h3 style="margin:0 0 6px;color:#fff;">Card 2</h3>
+            <p style="margin:0;color:rgba(245,245,255,0.6);font-size:13px;">Segundo card</p>
+          </div>
+          <div data-card="2" style="padding:24px;text-align:center;">
+            <div style="width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#ff5577);margin:0 auto 12px;"></div>
+            <h3 style="margin:0 0 6px;color:#fff;">Card 3</h3>
+            <p style="margin:0;color:rgba(245,245,255,0.6);font-size:13px;">Último card</p>
+          </div>
+        </lumina-stack-card>
+      </div>
+    </div>
+  `;
+}
+
+/**
+ * lumina-parallax-card — 3 layers (back, mid, front) with different parallax speeds.
+ */
+function buildParallaxCardGallery(state: { variant: string; intensity: string; accent: string }, attrs: string): string {
+  return `
+    <div class="playground__gallery-row">
+      <div class="playground__gallery-label">Parallax 3 camadas — mova o mouse sobre o card</div>
+      <div class="playground__gallery-items" style="align-items:stretch;">
+        <lumina-parallax-card id="demo-p1" ${attrs} style="width:240px;height:280px;">
+          <div slot="back" style="height:100%;background:radial-gradient(circle at 30% 30%,#7c5cff 0%,transparent 60%);"></div>
+          <div slot="mid" style="height:100%;display:flex;align-items:center;justify-content:center;">
+            <div style="width:80px;height:80px;border-radius:50%;background:rgba(120,240,255,0.4);backdrop-filter:blur(8px);"></div>
+          </div>
+          <div slot="front" style="padding:20px;">
+            <h3 style="margin:0;color:#fff;font-size:18px;">Parallax 3D</h3>
+            <p style="margin:4px 0 0;color:rgba(245,245,255,0.7);font-size:13px;">3 camadas com velocidades diferentes</p>
+          </div>
+        </lumina-parallax-card>
+
+        <lumina-parallax-card id="demo-p2" variant="deep" intensity="${state.intensity}" accent-color="#ff6ec7" theme="dark" style="width:240px;height:280px;">
+          <div slot="back" style="height:100%;background:radial-gradient(circle at 70% 70%,#ff6ec7 0%,transparent 60%);"></div>
+          <div slot="mid" style="height:100%;display:flex;align-items:center;justify-content:center;">
+            <div style="width:100px;height:60px;border-radius:12px;background:rgba(255,110,199,0.3);backdrop-filter:blur(8px);"></div>
+          </div>
+          <div slot="front" style="padding:20px;">
+            <h3 style="margin:0;color:#fff;font-size:18px;">Deep Pink</h3>
+            <p style="margin:4px 0 0;color:rgba(245,245,255,0.7);font-size:13px;">Profundidade extrema</p>
+          </div>
+        </lumina-parallax-card>
+
+        <lumina-parallax-card id="demo-p3" variant="extrude" intensity="${state.intensity}" accent-color="#22c55e" theme="dark" style="width:240px;height:280px;">
+          <div slot="back" style="height:100%;background:radial-gradient(circle at 50% 50%,#22c55e 0%,transparent 60%);"></div>
+          <div slot="mid" style="height:100%;display:flex;align-items:center;justify-content:center;">
+            <div style="width:60px;height:60px;background:rgba(34,197,94,0.4);backdrop-filter:blur(8px);transform:rotate(45deg);"></div>
+          </div>
+          <div slot="front" style="padding:20px;">
+            <h3 style="margin:0;color:#fff;font-size:18px;">Extrude</h3>
+            <p style="margin:4px 0 0;color:rgba(245,245,255,0.7);font-size:13px;">Camada extrudada para fora</p>
+          </div>
+        </lumina-parallax-card>
       </div>
     </div>
   `;
